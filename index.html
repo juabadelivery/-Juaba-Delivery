@@ -288,7 +288,14 @@
 <div class="toast" id="toast">Mensagem</div>
 
 <div id="tab-home" class="app-view active">
-    <header><div class="header-top" style="justify-content: center;"><div class="brand-logo">Juaba Delivery</div></div></header>
+    <header>
+        <div class="header-top" style="justify-content: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 32px; height: 32px; background: var(--primary); color: var(--white); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(234, 29, 44, 0.3);">JD</div>
+                <span style="font-weight: 900; font-size: 1.4rem; color: #111; letter-spacing: -0.5px;">Juaba<span style="color: var(--primary);">Delivery</span></span>
+            </div>
+        </div>
+    </header>
     <div class="banner-scroll">
         <div class="banner-card"><img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80" alt="Pizza"><div class="banner-text-overlay">Festival de Pizzas</div></div>
         <div class="banner-card"><img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80" alt="Burger"><div class="banner-text-overlay">Artesanais Suculentos</div></div>
@@ -946,26 +953,46 @@
     window.executeSearch = function(val) {
         const term = val.toLowerCase().trim();
         const container = document.getElementById('search-results');
-        if(!term) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800;">Pesquise por delícias...</p>'; return; }
-        const results = window.allProducts.filter(p => p.nome.toLowerCase().includes(term) || (p.categoria && p.categoria.toLowerCase().includes(term)));
-        if(results.length === 0) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800;">Nenhum item encontrado.</p>'; return; }
-        container.innerHTML = results.map(p => {
-            const loja = window.allStores.find(l => l.id === p.lojaId);
-            const nomeLoja = loja ? (loja.nome_loja || 'Loja') : 'Loja';
-            const logoLoja = loja && loja.logo_loja ? loja.logo_loja : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
-            const preco = parseFloat(p.preco||0).toFixed(2).replace('.',',');
-            return `<div class="product-card" onclick="openProductDetail('${p.id}')">
-                        <div class="product-info">
-                            <div style="font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
-                                <img src="${logoLoja}" style="width:16px; height:16px; border-radius:50%; object-fit:cover; border:1px solid #eee;"> ${nomeLoja}
+        if(!term) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800; grid-column: 1 / -1;">Pesquise por lojas ou delícias...</p>'; return; }
+        
+        // Pesquisa Lojas e Produtos simultaneamente
+        const storeResults = window.allStores.filter(l => l.nome_loja && l.nome_loja.toLowerCase().includes(term));
+        const productResults = window.allProducts.filter(p => p.nome.toLowerCase().includes(term) || (p.categoria && p.categoria.toLowerCase().includes(term)));
+        
+        if(storeResults.length === 0 && productResults.length === 0) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800; grid-column: 1 / -1;">Nenhum item ou loja encontrado.</p>'; return; }
+        
+        let html = '';
+        
+        // 1. Desenha as Lojas encontradas
+        if (storeResults.length > 0) {
+            html += storeResults.map(loja => {
+                const isFechada = (String(loja.aberto).toLowerCase() === 'false' || loja.aberto === false);
+                return `<div class="store-card" onclick="openStore('${loja.id}')" style="${isFechada ? 'opacity: 0.6;' : ''}"><img src="${loja.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" class="store-logo" alt="Logo"><div class="store-info"><div class="store-name">${loja.nome_loja || 'Loja'}</div><div class="store-meta"><span class="star">★</span> ${loja.nota || '5.0'} • Entrega ${isFechada ? ' • <span style="color:#ea1d2c; font-weight:900;">Fechado</span>' : ''}</div></div></div>`;
+            }).join('');
+        }
+
+        // 2. Desenha os Produtos encontrados logo a seguir
+        if (productResults.length > 0) {
+            html += productResults.map(p => {
+                const loja = window.allStores.find(l => l.id === p.lojaId);
+                const nomeLoja = loja ? (loja.nome_loja || 'Loja') : 'Loja';
+                const logoLoja = loja && loja.logo_loja ? loja.logo_loja : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
+                const preco = parseFloat(p.preco||0).toFixed(2).replace('.',',');
+                return `<div class="product-card" onclick="openProductDetail('${p.id}')">
+                            <div class="product-info">
+                                <div style="font-size:0.75rem; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                                    <img src="${logoLoja}" style="width:16px; height:16px; border-radius:50%; object-fit:cover; border:1px solid #eee;"> ${nomeLoja}
+                                </div>
+                                <div class="product-name">${p.nome}</div>
+                                <div class="product-desc">${p.descricao || ''}</div>
+                                <div class="product-price">R$ ${preco}</div>
                             </div>
-                            <div class="product-name">${p.nome}</div>
-                            <div class="product-desc">${p.descricao || ''}</div>
-                            <div class="product-price">R$ ${preco}</div>
-                        </div>
-                        <img src="${p.imagem}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
-                    </div>`;
-        }).join('');
+                            <img src="${p.imagem}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
+                        </div>`;
+            }).join('');
+        }
+        
+        container.innerHTML = html;
     }
 
     window.openProductDetail = function(id) {
