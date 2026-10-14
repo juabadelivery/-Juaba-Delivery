@@ -17,7 +17,7 @@
 {
 "src": "videologo.mp4",
 "sizes": "512x512",
-"type": "image/png",
+"type": "image/mp4",
 "purpose": "any maskable"
 }
 ]
