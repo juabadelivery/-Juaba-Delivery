@@ -1,18 +1,35 @@
 <!DOCTYPE html>
+<!-- lang="pt-BR" avisa aos navegadores que o idioma do app é o português do Brasil -->
 <html lang="pt-BR">
 <head>
+    <!-- Configurações de caracteres (para aceitar acentos como á, ç, ã) -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#ffffff">
-    <title>Marketplace Oficial</title>
     
+    <!-- Configuração OBRIGATÓRIA para aplicativos de telemóvel. Faz com que o site se adapte ao ecrã e impede o usuário de dar zoom acidentalmente -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Cor da barra superior do navegador (no Android) -->
+    <meta name="theme-color" content="#ffffff">
+    
+    <!-- O nome que aparece na aba do navegador -->
+    <title>JuabaDelivery</title>
+    
+    <!-- Ícone (favicon) que aparece na aba do navegador -->
     <link rel="icon" type="image/png" href="https://github.com/juabadelivery/Bd_imagens/blob/main/redondo%20.jpg?raw=true">
+    
+    <!-- Link para o Manifesto PWA (que permite instalar o app no telemóvel) -->
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Ícone que aparece no ecrã principal do iPhone (Apple) quando o app é instalado -->
     <link rel="apple-touch-icon" href="https://github.com/juabadelivery/Bd_imagens/blob/main/redondo%20.jpg?raw=true">
+    
+    <!-- Importação da fonte de texto 'Inter' do Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Importação do OneSignal (Sistema de Notificações Push) -->
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
+      // Inicializando o OneSignal com o seu ID
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({ appId: "b85bcf3b-df80-476a-bacf-741995153efd", notifyButton: { enable: true } });
@@ -20,14 +37,55 @@
     </script>
 
     <style>
-        :root { --primary: #ea1d2c; --primary-dark: #cc1523; --white: #ffffff; --bg-color: #f7f7f8; --text-main: #3e3e3e; --text-light: #717171; --border: #f0f0f0; --success: #118c4f; --shadow: 0 2px 8px rgba(0,0,0,0.05); --safe-bottom: env(safe-area-inset-bottom, 20px); }
+        /* =========================================================
+           🎨 PALETA DE CORES PRINCIPAL
+           ========================================================= */
+        :root { 
+            --primary: #ea1d2c; /* Cor principal (Vermelho iFood) */
+            --primary-dark: #cc1523; /* Vermelho escuro para botões quando clicados */
+            --white: #ffffff; /* Branco puro */
+            --bg-color: #f7f7f8; /* Cor de fundo cinza bem clarinho do app */
+            --text-main: #3e3e3e; /* Cor do texto principal (quase preto) */
+            --text-light: #717171; /* Cor do texto secundário (cinza) */
+            --border: #f0f0f0; /* Cor da linha que divide os itens */
+            --success: #118c4f; /* Verde para preços e coisas de sucesso */
+            --shadow: 0 2px 8px rgba(0,0,0,0.05); /* Sombra suave padrão */
+            --safe-bottom: env(safe-area-inset-bottom, 20px); /* Evita que os botões fiquem escondidos na barra de baixo do iPhone */
+        }
+
+        /* Configuração de base para todos os elementos */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        
+        /* Cor de fundo do corpo da página e fonte principal */
         body { background-color: var(--white); color: var(--text-main); font-size: 14px; overflow-x: hidden; }
 
+        /* */
+        /* =========================================================
+           🎬 TELA DE ABERTURA ANIMADA (SPLASH SCREEN)
+           ========================================================= */
+        #splash-screen { 
+            position: fixed; inset: 0; 
+            background: var(--white); /* Fundo branco igual à imagem da logo */
+            z-index: 99999; display: flex; align-items: center; justify-content: center; 
+            transition: opacity 0.4s ease, visibility 0.4s ease; /* Animação para sumir suavemente */
+        }
+        /* Classe que apaga a tela de abertura quando o tempo acaba */
+        #splash-screen.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .splash-logo-container { display: flex; flex-direction: row; align-items: center; gap: 10px; animation: pulseSplash 1.5s infinite ease-in-out; }
+        .splash-box { width: 48px; height: 48px; background: var(--primary); color: var(--white); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; box-shadow: 0 8px 20px rgba(234, 29, 44, 0.35); }
+        .splash-text { color: #111111; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; }
+        
+        @keyframes pulseSplash { 
+            0%, 100% { transform: scale(1); } 
+            50% { transform: scale(1.08); } 
+        }
+        
+        /* Esta parte do código só é ativada se a tela for maior que 768px (Computadores e Tablets) */
         @media (min-width: 768px) {
             body { background-color: #f4f5f7; display: block; }
             .app-view { width: 100%; max-width: 1200px; margin: 0 auto; background: var(--white); box-shadow: 0 0 30px rgba(0,0,0,0.05); position: relative; min-height: 100vh; border-radius: 0 0 24px 24px; overflow-x: hidden; }
-            header, .bottom-nav, .action-sheet, .choice-sheet, #tracking-overlay, #cart-drawer, .address-view-page, .action-sheet-overlay, .choice-sheet-overlay, #address-modal { width: 100% !important; max-width: 1200px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; }
+            header, .bottom-nav, .action-sheet, .choice-sheet, #tracking-overlay, #cart-drawer, .address-view-page, .action-sheet-overlay, .choice-sheet-overlay, #address-modal, #custom-confirm-modal { width: 100% !important; max-width: 1200px !important; left: 0 !important; right: 0 !important; margin: 0 auto !important; }
             .bottom-nav { border-radius: 24px 24px 0 0; }
             .stores-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .banner-card { flex: 0 0 48%; height: 240px; }
@@ -49,14 +107,18 @@
             .banner-scroll::-webkit-scrollbar, .cat-scroll::-webkit-scrollbar, .store-nav-sticky::-webkit-scrollbar { display: block; height: 8px; }
         }
 
+        /* Controla a exibição das diferentes telas (Início, Busca, Perfil) */
         .app-view { display: none; padding-bottom: calc(145px + var(--safe-bottom)); animation: fadeIn 0.2s; min-height: 100vh; }
-        .app-view.active { display: block; }
+        .app-view.active { display: block; } 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* O topo do app (Com a nova logomarca moderna "JD JuabaDelivery") */
         header { background: var(--white); padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-top { display: flex; align-items: center; justify-content: center; }
-        .brand-logo { font-size: 1.4rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
+        .header-top { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .jd-logo-box { width: 34px; height: 34px; background: var(--primary); color: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(234, 29, 44, 0.3); }
+        .jd-brand-text { font-weight: 900; font-size: 1.5rem; color: #111; letter-spacing: -0.5px; }
         
+        /* A barra de botões que fica no fundo do celular */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: calc(65px + var(--safe-bottom)); background: var(--white); box-shadow: 0 -2px 15px rgba(0,0,0,0.06); display: flex; justify-content: space-around; align-items: flex-start; padding-top: 12px; z-index: 190; border-top: 1px solid var(--border); }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a6a6a6; background: none; border: none; cursor: pointer; position: relative; }
         .nav-item svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 2.2; transition: 0.2s; fill: none; }
@@ -64,12 +126,14 @@
         .nav-item.active { color: var(--primary); }
         .nav-item.active svg { stroke: var(--primary); }
 
+        /* Rolagem lateral dos banners promocionais */
         .banner-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 15px 20px; scrollbar-width: none; scroll-snap-type: x mandatory; }
         .banner-scroll::-webkit-scrollbar { display: none; }
         .banner-card { flex: 0 0 92%; height: 160px; border-radius: 16px; overflow: hidden; scroll-snap-align: center; position: relative; box-shadow: var(--shadow); }
         .banner-card img { width: 100%; height: 100%; object-fit: cover; }
         .banner-text-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 15px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); color: #fff; font-weight: 900; font-size: 1.2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
+        /* Ícones de Categorias */
         .cat-scroll { display: flex; justify-content: space-between; padding: 10px 20px 25px; overflow-x: auto; scrollbar-width: none; }
         .cat-scroll::-webkit-scrollbar { display: none; }
         .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; min-width: 75px; }
@@ -78,13 +142,14 @@
         .cat-item:active .cat-icon-bg { transform: scale(0.95); }
         .cat-item span { font-size: 0.85rem; font-weight: 800; color: #555; }
 
+        /* Título das Lojas e botão de trocar a visualização */
         .section-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .section-header h2 { font-size: 1.2rem; font-weight: 900; color: #111; }
-        
         .view-toggle { display: flex; background: #f0f0f0; border-radius: 8px; padding: 3px; }
         .view-toggle button { background: none; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 1rem; color: #888; transition: 0.2s; }
         .view-toggle button.active { background: var(--white); color: var(--primary); box-shadow: var(--shadow); }
 
+        /* Estilos da lista de lojas */
         .stores-list { padding: 0 20px; display: flex; flex-direction: column; gap: 15px; }
         .stores-grid { padding: 0 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; } 
         
@@ -100,6 +165,7 @@
         .stores-grid .store-info { display: flex; flex-direction: column; align-items: center; }
         .stores-grid .store-meta { justify-content: center; }
 
+        /* Cabeçalho da loja */
         .store-banner { height: 180px; background: #333; position: relative; }
         .store-banner img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
         .btn-back-store { position: absolute; top: 15px; left: 15px; width: 40px; height: 40px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; font-size: 1.2rem; cursor: pointer; z-index: 10; box-shadow: var(--shadow); }
@@ -109,11 +175,13 @@
         .st-title { font-weight: 900; font-size: 1.4rem; color: #111; margin-bottom: 4px; }
         .st-meta { font-size: 0.85rem; color: #666; font-weight: 700; display: flex; justify-content: center; align-items: center; gap: 5px; }
         
+        /* Menu que prende no topo ao rolar a página da loja */
         .store-nav-sticky { position: sticky; top: 0; background: var(--white); z-index: 90; display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; border-bottom: 1px solid var(--border); scrollbar-width: none; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .store-nav-sticky::-webkit-scrollbar { display: none; }
         .store-nav-btn { background: #f0f0f0; border: none; font-weight: 800; font-size: 0.85rem; color: #444; white-space: nowrap; cursor: pointer; padding: 8px 16px; border-radius: 20px; transition: 0.2s; }
         .store-nav-btn.active { background: #333; color: #fff; }
         
+        /* Listagem dos Produtos no cardápio */
         .menu-category-section { padding-top: 20px; scroll-margin-top: 70px; }
         .menu-category-title { font-weight: 900; font-size: 1.25rem; margin: 0 20px 15px; color: #111; }
         
@@ -125,10 +193,12 @@
         .product-price { font-weight: 900; font-size: 1rem; color: var(--success); }
         .product-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; background: #eee; }
 
+        /* Barra de pesquisa */
         .search-page-header { padding: 20px; position: sticky; top: 0; background: var(--white); z-index: 10; border-bottom: 1px solid var(--border); }
         .search-input-box { background: #f5f5f5; border-radius: 12px; padding: 14px 15px; display: flex; align-items: center; gap: 12px; }
         .search-input-box input { border: none; background: none; outline: none; width: 100%; font-size: 1.05rem; font-family: inherit; font-weight: 600; color:#333; }
         
+        /* Modal do produto */
         #product-modal { position: fixed; inset: 0; background: var(--bg-color); z-index: 250; display: none; flex-direction: column; overflow-y: auto; padding-bottom: 100px; }
         .pm-img { width: 100%; height: 260px; object-fit: cover; background: #eee; }
         .pm-content { padding: 20px; background: var(--white); border-radius: 24px 24px 0 0; margin-top: -24px; position: relative; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); }
@@ -156,6 +226,7 @@
         .pm-add-btn { flex: 1; background: var(--primary); color: var(--white); border: none; border-radius: 12px; font-weight: 900; font-size: 1.05rem; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; cursor: pointer; transition: 0.2s; }
         .pm-add-btn:disabled { background: #ccc; cursor: not-allowed; }
 
+        /* Carrinho flutuante */
         .floating-cart { position: fixed; bottom: calc(75px + var(--safe-bottom)); left: 15px; right: 15px; background: var(--primary); color: var(--white); border-radius: 12px; padding: 14px 20px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(234,29,44,0.3); transform: translateY(150%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; z-index: 180; cursor: pointer; opacity: 0; }
         .floating-cart.visible { transform: translateY(0); opacity: 1; display: flex; }
         .fc-info { display: flex; flex-direction: column; }
@@ -163,10 +234,12 @@
         .fc-items { font-size: 0.8rem; font-weight: 700; opacity: 0.9; }
         .fc-btn { background: none; color: var(--white); border: none; font-weight: 900; font-size: 1rem; pointer-events: none; }
 
+        /* Gaveta da Sacola */
         #cart-drawer { position: fixed; inset: 0; background: var(--bg-color); z-index: 300; display: none; flex-direction: column; padding-bottom: var(--safe-bottom); padding-top: env(safe-area-inset-top, 0px); }
         #cart-drawer::before { content: ''; position: absolute; top: -100vh; left: 0; right: 0; height: 100vh; background: var(--white); z-index: -1; }
         .cart-header { background: var(--white); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 1.2rem; border-bottom: 1px solid var(--border); }
         .cart-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        
         .cart-item { background: var(--white); border-radius: 12px; padding: 15px; display: flex; gap: 15px; border: 1px solid var(--border); position: relative; }
         .cart-item-img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; }
         .cart-item-info { flex: 1; }
@@ -191,6 +264,7 @@
         .summary-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: 900; font-size: 1.25rem; color: #111; border-top: 1px dashed #ddd; padding-top: 10px; }
         .btn-checkout { width: 100%; background: var(--success); color: var(--white); padding: 16px; border-radius: 12px; border: none; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
 
+        /* Autenticação */
         .auth-wrapper { padding: 20px; }
         .auth-card { background: var(--white); padding: 30px 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); animation: fadeIn 0.3s; }
         .auth-card h2 { font-weight: 900; font-size: 1.5rem; margin-bottom: 10px; color: #111;}
@@ -203,6 +277,7 @@
         .input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #666; margin-bottom: 6px; }
         .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95rem; outline: none; background: #fafafa; }
 
+        /* Perfil */
         .profile-header-ifood { display: flex; align-items: center; gap: 15px; padding: 25px 20px; background: var(--white); border-bottom: 10px solid var(--bg-color); }
         .profile-header-ifood .avatar { width: 65px; height: 65px; background: #ffebee; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; flex-shrink: 0; }
         .profile-header-ifood .info { flex: 1; overflow: hidden;}
@@ -219,6 +294,7 @@
         .profile-menu-item .desc { font-size: 0.8rem; color: #888; font-weight: 500; margin-top: 2px; }
         .profile-menu-item .chevron { color: #ccc; font-size: 1.5rem; font-weight: 300; }
 
+        /* Endereços */
         .address-view-page { position: fixed; inset: 0; background: var(--bg-color); z-index: 250; display: none; flex-direction: column; animation: slideInRight 0.3s forwards; overflow-x: hidden; padding-top: env(safe-area-inset-top, 0px); }
         .address-view-page::before { content: ''; position: absolute; top: -100vh; left: 0; right: 0; height: 100vh; background: var(--white); z-index: -1; }
         .address-view-page.active { display: flex; }
@@ -228,12 +304,6 @@
         .btn-back-addr { background: none; border: none; font-size: 1.2rem; color: var(--primary); font-weight: 900; cursor: pointer; padding: 5px; }
         .address-view-title { font-weight: 800; font-size: 1rem; flex: 1; color: #333; letter-spacing: 0.5px; }
         
-        .address-search-bar { background: var(--white); padding: 15px 20px; border-bottom: 1px solid var(--border); }
-        .address-search-box { background: #f5f5f5; border-radius: 8px; padding: 12px 15px; display: flex; align-items: center; gap: 10px; color: #777; }
-        
-        .btn-location { background: var(--white); padding: 15px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); cursor: pointer; margin-bottom: 10px;}
-        .btn-location .icon { color: var(--primary); font-size: 1.2rem; }
-        
         .ifood-address-card { background: var(--white); display: flex; align-items: center; padding: 20px; border: 1px solid #eaeaea; margin: 0 15px 10px; border-radius: 12px; position: relative; }
         .ifood-address-card.selected { border-color: #f7a8a8; background: #fffcfc; }
         .addr-icon { font-size: 1.2rem; color: #999; margin-right: 15px; flex-shrink: 0; }
@@ -242,6 +312,7 @@
         .addr-sub { font-size: 0.8rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-3dots { background: none; border: none; padding: 10px; color: var(--primary); font-weight: 900; font-size: 1.2rem; cursor: pointer; margin-left: 10px; }
 
+        /* Action Sheets */
         .action-sheet-overlay, .choice-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; display: none; opacity: 0; transition: opacity 0.3s; }
         .action-sheet-overlay.active, .choice-sheet-overlay.active { display: block; opacity: 1; }
         
@@ -252,23 +323,26 @@
         
         .action-sheet-buttons { display: flex; gap: 15px; margin-bottom: 25px; }
         .action-btn-item { flex: 1; border: 1px solid #ddd; background: #fff; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 0.95rem; color: #333; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
-        .action-btn-item:active { background: #f9f9f9; transform: scale(0.98); }
         .btn-cancel-sheet { background: none; border: none; color: var(--primary); font-weight: 800; font-size: 1rem; width: 100%; padding: 10px; cursor: pointer; text-align: center;}
 
         .choice-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 50vh; overflow-y: auto;}
         .choice-item { padding: 18px; border: 1px solid #eee; border-radius: 12px; background: #fff; font-weight: 700; font-size: 0.95rem; color: #333; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s;}
-        .choice-item.selected { border-color: var(--primary); background: #fff5f5; color: var(--primary); }
         .choice-item .icon { font-size: 1.3rem; }
 
+        /* Pedidos */
         .order-history-card { background: var(--white); border-radius: 12px; padding: 18px; margin: 15px 20px; border: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .oh-status { display: inline-block; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 900; }
-        .oh-status.novo { background: #fff3cd; color: #856404; } .oh-status.prep { background: #e8f5e9; color: var(--success); } .oh-status.saiu { background: #e3f2fd; color: #0d47a1; } .oh-status.ok { background: #f0f0f0; color: #555; }
+        .oh-status.novo { background: #fff3cd; color: #856404; } .oh-status.prep { background: #e8f5e9; color: var(--success); } .oh-status.saiu { background: #e3f2fd; color: #0d47a1; } .oh-status.ok { background: #f0f0f0; color: #555; } .oh-status.canc { background: #fee2e2; color: #b91c1c; }
         
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100%); background: #333; color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: 0.3s; pointer-events: none; }
+        /* Toast */
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100%); background: #333; color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 99999; opacity: 0; transition: 0.3s; pointer-events: none; }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        /* Loader */
         .loader-spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 40px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* Rastreamento */
         #tracking-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9990; display: none; flex-direction: column; }
         .tracking-box { background: var(--white); padding: 25px 20px; border-radius: 24px 24px 0 0; margin-top: auto; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); animation: slideUp 0.3s forwards; max-width: 600px; width: 100%; margin-left: auto; margin-right: auto;}
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -281,31 +355,66 @@
         .step-item.done .step-icon { background: var(--success); color: #fff; }
         .step-icon { width: 30px; height: 30px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 900; z-index: 2; }
         @keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(17,140,79,0.4); } 70% { box-shadow: 0 0 0 10px rgba(17,140,79,0); } 100% { box-shadow: 0 0 0 0 rgba(17,140,79,0); } }
+
+        /* Modal customizado */
+        .custom-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100000; display: none; align-items: center; justify-content: center; }
+        .custom-modal-box { background: #fff; padding: 25px; border-radius: 16px; max-width: 320px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeIn 0.2s; }
+        .custom-modal-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
     </style>
 </head>
 <body>
 
+<!-- -->
+<!-- 🎬 TELA DE ABERTURA ANIMADA (SPLASH SCREEN) -->
+<div id="splash-screen">
+    <div class="splash-logo-container">
+        <div class="splash-box">JD</div>
+        <div class="splash-text">Juaba<span style="color: var(--primary);">Delivery</span></div>
+    </div>
+</div>
+
+<!-- Modal de confirmação personalizado -->
+<div class="custom-modal-overlay" id="custom-confirm-modal">
+    <div class="custom-modal-box">
+        <h3 style="font-weight:900; margin-bottom:15px; font-size:1.2rem; color:#111;">Atenção</h3>
+        <p id="custom-confirm-msg" style="margin-bottom:20px; font-size:0.95rem; color:#555;"></p>
+        <div style="display:flex; gap:10px;">
+            <button class="custom-modal-btn" id="custom-confirm-no" style="background:#eee; color:#333;" onclick="closeConfirmModal()">Cancelar</button>
+            <button class="custom-modal-btn" id="custom-confirm-yes" style="background:var(--primary); color:#fff;">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notificação Flutuante no Topo -->
 <div class="toast" id="toast">Mensagem</div>
 
+<!-- 🏠 ABA INÍCIO -->
 <div id="tab-home" class="app-view active">
+    <!-- Cabeçalho com a Logomarca Modificada ("JD JuabaDelivery") -->
     <header>
         <div class="header-top" style="justify-content: center;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 32px; height: 32px; background: var(--primary); color: var(--white); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(234, 29, 44, 0.3);">JD</div>
-                <span style="font-weight: 900; font-size: 1.4rem; color: #111; letter-spacing: -0.5px;">Juaba<span style="color: var(--primary);">Delivery</span></span>
+                <div class="jd-logo-box">JD</div>
+                <span class="jd-brand-text">Juaba<span style="color: var(--primary);">Delivery</span></span>
             </div>
         </div>
     </header>
+    
+    <!-- Banners Promocionais -->
     <div class="banner-scroll">
         <div class="banner-card"><img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80" alt="Pizza"><div class="banner-text-overlay">Festival de Pizzas</div></div>
         <div class="banner-card"><img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80" alt="Burger"><div class="banner-text-overlay">Artesanais Suculentos</div></div>
     </div>
+    
+    <!-- Ícones de Categorias -->
     <div class="cat-scroll">
         <div class="cat-item" onclick="searchByCategory('Lanches')"><div class="cat-icon-bg"><img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Lanches"></div><span>Lanches</span></div>
         <div class="cat-item" onclick="searchByCategory('Pizzas')"><div class="cat-icon-bg"><img src="https://cdn-icons-png.flaticon.com/512/3595/3595458.png" alt="Pizza"></div><span>Pizza</span></div>
         <div class="cat-item" onclick="searchByCategory('Bebidas')"><div class="cat-icon-bg"><img src="https://cdn-icons-png.flaticon.com/512/3050/3050115.png" alt="Bebidas"></div><span>Bebidas</span></div>
         <div class="cat-item" onclick="searchByCategory('Petisco')"><div class="cat-icon-bg"><img src="https://cdn-icons-png.flaticon.com/128/2674/2674074.png" alt="Promo"></div><span>Petisco</span></div>
     </div>
+    
+    <!-- Título da seção de Lojas -->
     <div class="section-header">
         <h2>Lojas Disponíveis</h2>
         <div class="view-toggle">
@@ -313,27 +422,32 @@
             <button id="btn-view-grid" class="active" onclick="setStoreView('grid')">☷</button>
         </div>
     </div>
+    
+    <!-- Contentor das Lojas -->
     <div id="stores-container" class="stores-grid"><div class="loader-spinner"></div></div>
 </div>
 
+<!-- 🔍 ABA DE PESQUISA (Atualizada para procurar por Lojas e Produtos) -->
 <div id="tab-search" class="app-view">
     <div class="search-page-header">
         <h2 style="font-weight:900; margin-bottom:15px; font-size:1.4rem;">Busca</h2>
         <div class="search-input-box">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="input-search" placeholder="Item ou categoria" oninput="executeSearch(this.value)">
+            <input type="text" id="input-search" placeholder="Pesquise por lojas ou delícias..." oninput="executeSearch(this.value)">
         </div>
     </div>
-    <div class="menu-list" id="search-results"><p style="text-align:center; padding: 40px; color:#999; font-weight:800;">Pesquise por delícias...</p></div>
+    <div class="menu-list" id="search-results"><p style="text-align:center; padding: 40px; color:#999; font-weight:800;">Pesquise por lojas ou pratos...</p></div>
 </div>
 
+<!-- 📦 ABA MEUS PEDIDOS -->
 <div id="tab-orders" class="app-view">
     <header><h2 style="font-weight:900; font-size:1.4rem;">Meus Pedidos</h2></header>
     <div id="orders-container"><div class="loader-spinner"></div></div>
 </div>
 
+<!-- 👤 ABA MEU PERFIL -->
 <div id="tab-profile" class="app-view">
-    <header id="profile-header-title"><h2 style="font-weight:900; font-size:1.4rem;">Area de Login</h2></header>
+    <header id="profile-header-title"><h2 style="font-weight:900; font-size:1.4rem;">Meu Perfil</h2></header>
     
     <div id="profile-unauth" class="auth-wrapper">
         <div id="view-login" class="auth-card">
@@ -395,8 +509,6 @@
         </div>
         
         <div class="profile-menu-list">
-       
-            
             <div style="padding: 25px 20px 10px; font-weight:800; font-size:1.1rem; color:#111; display:flex; align-items:center; gap:10px;"><span style="font-size:1.2rem;">👤</span> Conta</div>
             
             <div class="profile-menu-item" onclick="openEnderecos()">
@@ -404,7 +516,6 @@
                 <span class="chevron">›</span>
             </div>
           
-            
             <div class="profile-menu-item" onclick="logout()" style="margin-top:20px; border-top:1px solid #eee;">
                 <div class="left"><span class="icon" style="color:var(--primary);">🚪</span><div class="text-group"><span class="title" style="color:var(--primary); font-weight:700;">Sair da conta</span></div></div>
             </div>
@@ -412,19 +523,19 @@
     </div>
 </div>
 
+<!-- 📍 TELA DE GERIR ENDEREÇOS -->
 <div id="view-enderecos" class="address-view-page">
     <div class="address-view-header">
         <button class="btn-back-addr" onclick="closeEnderecos()">❮</button>
         <div class="address-view-title">ENDEREÇO DE ENTREGA</div>
     </div>
-    
     <div style="padding: 15px;">
         <button onclick="openAddressModal()" style="width:100%; background:#f0f0f0; color:#333; border:none; padding:15px; border-radius:12px; font-weight:800; font-size:0.95rem; cursor:pointer; margin-bottom:15px;">+ Adicionar novo endereço</button>
     </div>
-
     <div id="profile-address-list"></div>
 </div>
 
+<!-- Action sheet para endereços -->
 <div class="action-sheet-overlay" id="action-sheet-overlay" onclick="closeActionSheet()"></div>
 <div class="action-sheet" id="action-sheet">
     <div class="drag-bar"></div>
@@ -436,6 +547,7 @@
     <button class="btn-cancel-sheet" onclick="closeActionSheet()">Cancelar</button>
 </div>
 
+<!-- Modal para Adicionar/Editar Endereço -->
 <div id="address-modal" class="overlay" style="align-items:flex-end; justify-content:center; display:none; opacity:1; pointer-events:auto; z-index:9999; position:fixed; inset:0; background:rgba(0,0,0,0.6);">
     <div style="background:var(--white); width:100%; max-width:600px; padding:25px 20px 40px; border-radius:24px 24px 0 0;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -452,6 +564,7 @@
     </div>
 </div>
 
+<!-- 🍔 ABA DA LOJA -->
 <div id="tab-store" class="app-view">
     <div class="store-banner">
         <button class="btn-back-store" onclick="switchTab('home')">←</button>
@@ -466,6 +579,7 @@
     <div id="st-menu-container"></div>
 </div>
 
+<!-- BARRA DE NAVEGAÇÃO INFERIOR -->
 <nav class="bottom-nav">
     <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>Início</span></button>
     <button class="nav-item" id="nav-search" onclick="switchTab('search')"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><span>Busca</span></button>
@@ -473,11 +587,13 @@
     <button class="nav-item" id="nav-profile" onclick="switchTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><span>Perfil</span></button>
 </nav>
 
+<!-- CARRINHO FLUTUANTE -->
 <div id="floating-cart" class="floating-cart" onclick="openCartDrawer()">
     <div class="fc-info"><span class="fc-total" id="fc-total">R$ 0,00</span><span class="fc-items" id="fc-items">0 itens</span></div>
     <button class="fc-btn">Ver sacola <span style="font-size:0.8rem; margin-left:5px;">&gt;</span></button>
 </div>
 
+<!-- MODAL DE DETALHES DO PRODUTO -->
 <div id="product-modal">
     <button class="btn-back-store" style="position:absolute; top:20px; left:20px; z-index:260;" onclick="document.getElementById('product-modal').style.display='none'">✕</button>
     <img id="pm-img" class="pm-img" alt="Produto">
@@ -505,6 +621,7 @@
     </div>
 </div>
 
+<!-- GAVETA DA SACOLA E CHECKOUT -->
 <div id="cart-drawer">
     <div class="cart-header">
         <span>Sua Sacola</span>
@@ -537,6 +654,7 @@
     </div>
 </div>
 
+<!-- Modais de escolha -->
 <div class="choice-sheet-overlay" id="address-choice-overlay" onclick="closeAddressSheet()"></div>
 <div class="choice-sheet" id="address-choice-sheet">
     <div class="drag-bar"></div>
@@ -557,6 +675,7 @@
     <button class="btn-cancel-sheet" onclick="closePaymentSheet()">Cancelar</button>
 </div>
 
+<!-- Rastreamento de pedidos -->
 <div id="tracking-overlay" onclick="if(event.target===this) closeTracking()">
     <div class="tracking-box">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
@@ -567,27 +686,55 @@
     </div>
 </div>
 
+<!-- =========================================================
+     ⚙️ LÓGICA DO JAVASCRIPT E BANCO DE DADOS (FIREBASE)
+     ========================================================= -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, getDoc, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyBYRRtW1_lmoEMd89f7kQ-L6IzkhTkofR4", authDomain: "juaba-delivery.firebaseapp.com", projectId: "juaba-delivery", storageBucket: "juaba-delivery.firebasestorage.app", messagingSenderId: "1048831257004", appId: "1:1048831257004:web:8db55b5383206296ad3209" };
-    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBYRRtW1_lmoEMd89f7kQ-L6IzkhTkofR4", 
+        authDomain: "juaba-delivery.firebaseapp.com", 
+        projectId: "juaba-delivery", 
+        storageBucket: "juaba-delivery.firebasestorage.app", 
+        messagingSenderId: "1048831257004", 
+        appId: "1:1048831257004:web:8db55b5383206296ad3209" 
+    };
+    
+    const app = initializeApp(firebaseConfig); 
+    const auth = getAuth(app); 
+    const db = getFirestore(app);
     
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec';
     
     window.allStores = JSON.parse(localStorage.getItem('joy_cache_stores')) || []; 
     window.allProducts = JSON.parse(localStorage.getItem('joy_cache_products')) || []; 
     window.allOrdersCache = JSON.parse(localStorage.getItem('joy_orders_cache')) || []; 
-    window.cart = JSON.parse(localStorage.getItem('joy_cart')) || [];
-    window.currentUser = JSON.parse(localStorage.getItem('joy_user')) || null;
+    window.cart = JSON.parse(localStorage.getItem('joy_cart')) || []; 
+    window.currentUser = JSON.parse(localStorage.getItem('joy_user')) || null; 
     window.storeViewMode = localStorage.getItem('joy_view') || 'grid';
     window.firebaseLoadedStores = false;
     window.firebaseLoadedOrders = false;
     window.selectedActionIndex = -1;
     window.tempRegData = {};
     window.isRegistering = false; 
+
+    window.pendingConfirmAction = null;
+    window.openConfirmModal = function(msg, callback) {
+        document.getElementById('custom-confirm-msg').innerText = msg;
+        document.getElementById('custom-confirm-modal').style.display = 'flex';
+        window.pendingConfirmAction = callback;
+    };
+    window.closeConfirmModal = function() {
+        document.getElementById('custom-confirm-modal').style.display = 'none';
+        window.pendingConfirmAction = null;
+    };
+    document.getElementById('custom-confirm-yes').addEventListener('click', () => {
+        if (window.pendingConfirmAction) window.pendingConfirmAction();
+        window.closeConfirmModal();
+    });
 
     window.switchTab = function(tabId) { 
         sessionStorage.setItem('joy_active_tab', tabId);
@@ -704,7 +851,14 @@
     window.execClientLogin = async function() {
         const email = document.getElementById('log-email').value.trim().toLowerCase(); 
         const senha = document.getElementById('log-senha').value;
-        if(!email || !senha) return;
+        const msg = document.getElementById('msg-login');
+        msg.style.display = 'none';
+
+        if(!email || !senha) {
+            msg.innerText = "Senha ou e-mail incorretos!";
+            msg.style.display = 'block';
+            return;
+        }
         
         const btn = document.getElementById('btn-login-action'); btn.disabled = true; btn.innerText = "Entrando...";
         try {
@@ -724,8 +878,7 @@
             }, 1000);
         } catch(e) {
             window.isRegistering = false;
-            const msg = document.getElementById('msg-login'); 
-            msg.innerText = (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') ? "Senha ou e-mail incorretos!" : "Erro ao entrar."; 
+            msg.innerText = "Senha ou e-mail incorretos!"; 
             msg.style.display = 'block';
         }
         btn.disabled = false; btn.innerText = "Entrar";
@@ -770,9 +923,19 @@
         } else {
             window.switchTab(savedTab);
         }
+
+        /* ==========================================================
+           ⏱️ TEMPO DE ESPERA DO VÍDEO DE ABERTURA
+           1800 = 1,8 segundos. Altere para 3000 para 3 segundos, etc.
+           ========================================================= */
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            if (splash) splash.classList.add('fade-out'); 
+        }, 1800); 
     };
 
     window.showToast = function(msg) { const toast = document.getElementById('toast'); toast.innerText = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+    
     window.setStoreView = function(mode) { window.storeViewMode = mode; localStorage.setItem('joy_view', mode); document.getElementById('btn-view-list').classList.toggle('active', mode === 'list'); document.getElementById('btn-view-grid').classList.toggle('active', mode === 'grid'); document.getElementById('stores-container').className = mode === 'list' ? 'stores-list' : 'stores-grid'; }
     
     window.checkLoginStatus = function() {
@@ -831,6 +994,7 @@
             if(p.status === 'Novo') statusClass = 'novo';
             if(p.status === 'Preparando') statusClass = 'prep';
             if(p.status === 'Entrega') statusClass = 'saiu';
+            if(p.status === 'Cancelado') statusClass = 'canc';
             
             html += `
             <div class="order-history-card">
@@ -843,9 +1007,13 @@
                 </div>
                 <div style="font-weight:900; font-size:1.15rem; color:#111; margin-top:10px;">${nomeLoja}</div>
                 <div style="font-size:0.85rem; color:#666; margin-top:6px; line-height:1.4;">${p.itens}</div>
+                ${p.status === 'Cancelado' && p.motivoCancelamento ? `<div style="margin-top:8px; padding:8px 10px; background:#fef2f2; border:1px solid #fee2e2; border-radius:8px; font-size:0.8rem; color:#b91c1c; font-weight:700;">⚠️ ${p.motivoCancelamento}</div>` : ''}
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; border-top: 1px solid #eee; padding-top: 15px;">
                     <div style="font-weight:900; color:var(--success); font-size:1.1rem;">Total: ${p.total}</div>
-                    <button style="background:var(--success); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:900; font-size:0.85rem; cursor:pointer;" onclick="openTracking('${p.id}')">Acompanhar</button>
+                    <div style="display:flex; gap:8px;">
+                        ${p.status === 'Novo' ? `<button style="background:#fee2e2; color:var(--primary); border:none; padding:8px 12px; border-radius:8px; font-weight:900; font-size:0.85rem; cursor:pointer;" onclick="cancelarPedidoCliente('${p.id}')">Cancelar</button>` : ''}
+                        <button style="background:var(--success); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-weight:900; font-size:0.85rem; cursor:pointer;" onclick="openTracking('${p.id}')">Acompanhar</button>
+                    </div>
                 </div>
             </div>`;
         });
@@ -876,17 +1044,41 @@
         if(!p) return;
         let steps = '';
         const s = p.status;
-        const isN = s === 'Novo', isP = s === 'Preparando', isE = s === 'Entrega', isC = s === 'Concluido';
-        steps += `<div class="step-item ${isN?'active':(isP||isE||isC?'done':'')}"><div class="step-icon">✓</div><div><h4 style="font-weight:800; color:#111;">Pedido Recebido</h4><p style="font-size:0.8rem;">Aguardando restaurante</p></div></div>`;
-        steps += `<div class="step-item ${isP?'active':(isE||isC?'done':'')}"><div class="step-icon">🍳</div><div><h4 style="font-weight:800; color:#111;">Preparando</h4><p style="font-size:0.8rem;">Seu pedido está na cozinha</p></div></div>`;
-        steps += `<div class="step-item ${isE?'active':(isC?'done':'')}"><div class="step-icon">🛵</div><div><h4 style="font-weight:800; color:#111;">A Caminho</h4><p style="font-size:0.8rem;">Saiu para entrega</p></div></div>`;
-        steps += `<div class="step-item ${isC?'active':''}"><div class="step-icon">🎉</div><div><h4 style="font-weight:800; color:#111;">Entregue</h4><p style="font-size:0.8rem;">Bom apetite!</p></div></div>`;
+        if (s === 'Cancelado') {
+            steps = `<div class="step-item active"><div class="step-icon" style="background:var(--primary); color:#fff; box-shadow:0 0 0 4px rgba(234,29,44,0.2);">✕</div><div><h4 style="font-weight:800; color:var(--primary);">Pedido Cancelado</h4><p style="font-size:0.85rem; color:#444; font-weight:700; margin-top:2px;">${p.motivoCancelamento || 'Este pedido foi cancelado.'}</p></div></div>`;
+        } else {
+            const isN = s === 'Novo', isP = s === 'Preparando', isE = s === 'Entrega', isC = s === 'Concluido';
+            steps += `<div class="step-item ${isN?'active':(isP||isE||isC?'done':'')}"><div class="step-icon">✓</div><div><h4 style="font-weight:800; color:#111;">Pedido Recebido</h4><p style="font-size:0.8rem;">Aguardando restaurante</p></div></div>`;
+            steps += `<div class="step-item ${isP?'active':(isE||isC?'done':'')}"><div class="step-icon">🍳</div><div><h4 style="font-weight:800; color:#111;">Preparando</h4><p style="font-size:0.8rem;">Seu pedido está na cozinha</p></div></div>`;
+            steps += `<div class="step-item ${isE?'active':(isC?'done':'')}"><div class="step-icon">🛵</div><div><h4 style="font-weight:800; color:#111;">A Caminho</h4><p style="font-size:0.8rem;">Saiu para entrega</p></div></div>`;
+            steps += `<div class="step-item ${isC?'active':''}"><div class="step-icon">🎉</div><div><h4 style="font-weight:800; color:#111;">Entregue</h4><p style="font-size:0.8rem;">Bom apetite!</p></div></div>`;
+            if (isN) {
+                steps += `<button style="width:100%; background:#fee2e2; color:var(--primary); border:none; padding:12px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer; margin-top:10px;" onclick="cancelarPedidoCliente('${p.id}')">Cancelar Pedido</button>`;
+            }
+        }
         
         document.getElementById('tracking-steps').innerHTML = steps;
         document.getElementById('tracking-overlay').style.display = 'flex';
     }
     window.closeTracking = function() {
         document.getElementById('tracking-overlay').style.display = 'none';
+    }
+
+    window.cancelarPedidoCliente = function(id) {
+        const p = window.allOrdersCache.find(x => x.id === id);
+        if (!p || p.status !== 'Novo') {
+            window.showToast("⚠️ O restaurante já iniciou o preparo. Não é possível cancelar.");
+            return;
+        }
+        window.openConfirmModal("Tem certeza que deseja cancelar este pedido?", async () => {
+            try {
+                await setDoc(doc(db, "pedidos", id), { status: 'Cancelado', motivoCancelamento: 'Cancelado pelo cliente', ocultoKanban: true }, { merge: true });
+                window.closeTracking();
+                window.showToast("Pedido cancelado com sucesso.");
+            } catch(e) {
+                window.showToast("Erro ao cancelar o pedido.");
+            }
+        });
     }
 
     onSnapshot(collection(db, "lojas"), (snapshot) => { 
@@ -953,9 +1145,8 @@
     window.executeSearch = function(val) {
         const term = val.toLowerCase().trim();
         const container = document.getElementById('search-results');
-        if(!term) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800; grid-column: 1 / -1;">Pesquise por lojas ou delícias...</p>'; return; }
+        if(!term) { container.innerHTML = '<p style="text-align:center; padding:40px; color:#999; font-weight:800; grid-column: 1 / -1;">Pesquise por lojas ou pratos...</p>'; return; }
         
-        // Pesquisa Lojas e Produtos simultaneamente
         const storeResults = window.allStores.filter(l => l.nome_loja && l.nome_loja.toLowerCase().includes(term));
         const productResults = window.allProducts.filter(p => p.nome.toLowerCase().includes(term) || (p.categoria && p.categoria.toLowerCase().includes(term)));
         
@@ -963,7 +1154,6 @@
         
         let html = '';
         
-        // 1. Desenha as Lojas encontradas
         if (storeResults.length > 0) {
             html += storeResults.map(loja => {
                 const isFechada = (String(loja.aberto).toLowerCase() === 'false' || loja.aberto === false);
@@ -971,7 +1161,6 @@
             }).join('');
         }
 
-        // 2. Desenha os Produtos encontrados logo a seguir
         if (productResults.length > 0) {
             html += productResults.map(p => {
                 const loja = window.allStores.find(l => l.id === p.lojaId);
@@ -998,6 +1187,7 @@
     window.openProductDetail = function(id) {
         window.currentProduct = window.allProducts.find(p => p.id === id); if(!window.currentProduct) return;
         window.tempQty = 1; window.tempSelections = {};
+        
         try { window.currentProduct.parsedGroups = JSON.parse(window.currentProduct.adicionais || "[]"); if (!Array.isArray(window.currentProduct.parsedGroups)) throw new Error(); } catch(e) { window.currentProduct.parsedGroups = []; }
         window.currentProduct.parsedGroups.forEach(g => window.tempSelections[g.id] = []);
         
@@ -1053,7 +1243,14 @@
     }
 
     window.addToCart = function() {
-        if(window.cart.length > 0 && window.cart[0].lojaId !== window.currentProduct.lojaId) { if(!confirm("Limpar sacola e pedir nesta loja?")) return; window.limparSacola(); }
+        if(window.cart.length > 0 && window.cart[0].lojaId !== window.currentProduct.lojaId) { 
+            window.openConfirmModal("Para pedir nesta loja, precisaremos limpar a sua sacola atual. Continuar?", () => {
+                window.limparSacola();
+                window.addToCart(); 
+            });
+            return;
+        }
+        
         const obs = document.getElementById('pm-obs').value.trim(); let finalAddons = []; let addonsTotal = 0;
         window.currentProduct.parsedGroups.forEach(g => { const selIds = window.tempSelections[g.id] || []; const selItems = g.items.filter(i => selIds.includes(i.id)); if (selItems.length > 0) { if (g.chargeType === 'max') { let maxPrice = Math.max(...selItems.map(i => i.price)); addonsTotal += maxPrice; let charged = false; selItems.forEach(i => { let p = 0; if (i.price === maxPrice && !charged) { p = maxPrice; charged = true; } finalAddons.push({ id: i.id, name: `${g.name}: ${i.name}`, price: p }); }); } else { selItems.forEach(i => { addonsTotal += i.price; finalAddons.push({ id: i.id, name: `${g.name}: ${i.name}`, price: i.price }); }); } } });
         const unitTotal = parseFloat(window.currentProduct.preco||0) + addonsTotal; const addonSig = finalAddons.map(a => a.id).sort().join(',');
@@ -1219,18 +1416,19 @@
     }
 
     window.removeAddress = async function(idx) {
-        if(!confirm("Remover este endereço definitivamente?")) return;
-        const removed = window.currentUser.enderecos.splice(idx, 1)[0];
-        try {
-            const userEmail = window.currentUser.email || (auth.currentUser ? auth.currentUser.email : null);
-            await setDoc(doc(db, "clientes", userEmail), { enderecos: window.currentUser.enderecos }, { merge: true });
-            localStorage.setItem('joy_user', JSON.stringify(window.currentUser));
-            window.renderAddresses(); window.showToast("Endereço removido.");
-        } catch(e) { 
-            console.error(e);
-            window.showToast("Erro ao remover."); 
-            window.currentUser.enderecos.splice(idx, 0, removed); 
-        }
+        window.openConfirmModal("Remover este endereço definitivamente?", async () => {
+            const removed = window.currentUser.enderecos.splice(idx, 1)[0];
+            try {
+                const userEmail = window.currentUser.email || (auth.currentUser ? auth.currentUser.email : null);
+                await setDoc(doc(db, "clientes", userEmail), { enderecos: window.currentUser.enderecos }, { merge: true });
+                localStorage.setItem('joy_user', JSON.stringify(window.currentUser));
+                window.renderAddresses(); window.showToast("Endereço removido.");
+            } catch(e) { 
+                console.error(e);
+                window.showToast("Erro ao remover."); 
+                window.currentUser.enderecos.splice(idx, 0, removed); 
+            }
+        });
     }
 
     window.openAddressSheet = function() {
@@ -1290,6 +1488,7 @@
         if(!enderecoEscolhido) { window.showToast("⚠️ Por favor, escolha onde quer receber."); return; }
 
         const btn = document.getElementById('btn-finalizar'); btn.disabled = true; btn.innerText = "Enviando... ⏳";
+        
         try {
             await addDoc(collection(db, "pedidos"), { 
                 lojaId: window.cart[0].lojaId, 
