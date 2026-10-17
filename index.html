@@ -38,21 +38,52 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
+        .banners-carousel-wrapper {
+            position: relative; width: 100%; margin-bottom: 18px; border-radius: 20px;
+            overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.08); background: #18181b;
+        }
         .banners-row {
-            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px;
-            scroll-snap-type: x mandatory; scrollbar-width: none;
+            display: flex; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory;
+            scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
         .banners-row::-webkit-scrollbar { display: none; }
         .banner-card {
-            min-width: 88%; height: 145px; border-radius: 18px; overflow: hidden; position: relative;
-            scroll-snap-align: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            min-width: 100%; width: 100%; height: 190px; position: relative;
+            scroll-snap-align: center; flex-shrink: 0; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; background: #18181b;
         }
-        .banner-card img { width: 100%; height: 100%; object-fit: cover; }
+        .banner-card .banner-bg-blur {
+            position: absolute; inset: -15px; width: calc(100% + 30px); height: calc(100% + 30px);
+            object-fit: cover; filter: blur(18px) brightness(0.55); z-index: 1; pointer-events: none;
+        }
+        .banner-card .banner-main-img {
+            position: relative; z-index: 2; width: 100%; height: 100%;
+            object-fit: contain; pointer-events: none;
+        }
         .banner-card .banner-title {
-            position: absolute; bottom: 0; inset-inline: 0; padding: 24px 14px 12px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            color: #fff; font-weight: 900; font-size: 1.05rem;
+            position: absolute; bottom: 0; inset-inline: 0; padding: 26px 16px 22px;
+            background: linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.35), transparent);
+            color: #fff; font-weight: 900; font-size: 1.05rem; z-index: 3; text-shadow: 0 2px 6px rgba(0,0,0,0.6);
         }
+        .carousel-nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+            width: 34px; height: 34px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.85); color: #18181b; font-weight: 900;
+            font-size: 0.9rem; cursor: pointer; display: flex; align-items: center;
+            justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.25); transition: 0.15s;
+        }
+        .carousel-nav-btn:active { transform: translateY(-50%) scale(0.92); }
+        .carousel-nav-btn.prev { left: 10px; }
+        .carousel-nav-btn.next { right: 10px; }
+        .carousel-dots {
+            position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
+            z-index: 5; display: flex; gap: 6px; align-items: center;
+        }
+        .carousel-dot {
+            width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.45);
+            border: none; cursor: pointer; transition: all 0.25s ease; padding: 0;
+        }
+        .carousel-dot.active { width: 20px; background: var(--primary); }
 
         .categories-row {
             display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 10px; margin-bottom: 12px;
@@ -290,8 +321,9 @@
             }
 
             .view-section { max-width: 1320px; padding: 24px 28px; }
-            .banners-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; overflow: visible; }
-            .banner-card { min-width: 100%; height: 200px; }
+            .banners-carousel-wrapper { max-width: 100%; margin-bottom: 24px; }
+            .banner-card { height: 290px; }
+            .carousel-nav-btn { width: 42px; height: 42px; font-size: 1.05rem; }
             .categories-row { justify-content: flex-start; gap: 16px; }
             .cat-item { width: 96px; }
             .cat-icon-box { width: 80px; height: 80px; font-size: 2rem; }
@@ -361,7 +393,12 @@
 
 <!-- ABA 1: INÍCIO (VITRINE) -->
 <main id="sec-home" class="view-section active">
-    <div class="banners-row" id="home-banners"></div>
+    <div class="banners-carousel-wrapper" id="home-banners-wrapper" onmouseenter="pauseBannerAutoplay()" onmouseleave="resumeBannerAutoplay()" ontouchstart="pauseBannerAutoplay()" ontouchend="resumeBannerAutoplay()">
+        <button type="button" class="carousel-nav-btn prev" id="banner-prev-btn" onclick="stepBannerCarousel(-1)" aria-label="Banner anterior">❮</button>
+        <div class="banners-row" id="home-banners" onscroll="onBannerCarouselScroll()"></div>
+        <button type="button" class="carousel-nav-btn next" id="banner-next-btn" onclick="stepBannerCarousel(1)" aria-label="Próximo banner">❯</button>
+        <div class="carousel-dots" id="home-banners-dots"></div>
+    </div>
 
     <div class="categories-row" id="home-categories">
         <div class="cat-item" onclick="openCategoryFullScreen('Lanches')">
@@ -536,12 +573,18 @@
     <div id="profile-logged-out" style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:22px;">
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
-        <div class="input-group" id="auth-name-group" style="display:none;">
-            <label>Seu Nome Completo</label>
-            <input type="text" id="cli-auth-name" placeholder="Ex: João Silva">
+        <div id="auth-name-group" style="display:none; gap:10px; flex-wrap:wrap;">
+            <div class="input-group" style="flex:1; min-width:140px;">
+                <label>Nome *</label>
+                <input type="text" id="cli-auth-first-name" placeholder="Ex: João">
+            </div>
+            <div class="input-group" style="flex:1; min-width:140px;">
+                <label>Sobrenome *</label>
+                <input type="text" id="cli-auth-last-name" placeholder="Ex: Silva">
+            </div>
         </div>
         <div class="input-group" id="auth-phone-group" style="display:none;">
-            <label>Seu WhatsApp (com DDD)</label>
+            <label>Seu WhatsApp (com DDD) *</label>
             <input type="text" id="cli-auth-phone" placeholder="Ex: 91988887777">
         </div>
         <div class="input-group">
@@ -614,11 +657,40 @@
         <div id="profile-sub-enderecos" style="display:none;">
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
-                <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:12px;">📍 Meus Endereços Salvos</h3>
-                <div style="display:flex; gap:8px; margin-bottom:16px;">
-                    <input type="text" id="new-addr-input" placeholder="Rua, Número, Bairro, Ponto de ref..." style="flex:1; padding:12px; border:1px solid #d4d4d8; border-radius:12px; font-weight:600;">
-                    <button onclick="saveAddressFromProfile()" style="background:#18181b; color:#fff; border:none; padding:0 16px; border-radius:12px; font-weight:900; cursor:pointer;" id="btn-save-addr">+ Adicionar</button>
+                <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:12px;">📍 Meus Endereços de Entrega</h3>
+
+                <div style="background:#f8fafc; border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:16px;">
+                    <div style="font-weight:900; font-size:0.88rem; color:#18181b; margin-bottom:10px;" id="addr-form-title">➕ Cadastrar Novo Endereço</div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <div class="input-group" style="flex:2; min-width:180px;">
+                            <label>Rua / Avenida / Passagem *</label>
+                            <input type="text" id="addr-rua" placeholder="Ex: Rua Oeiras do Pará">
+                        </div>
+                        <div class="input-group" style="flex:1; min-width:95px;">
+                            <label>Número *</label>
+                            <input type="text" id="addr-numero" placeholder="Ex: 136">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <div class="input-group" style="flex:1; min-width:140px;">
+                            <label>Bairro *</label>
+                            <input type="text" id="addr-bairro" placeholder="Ex: Primavera">
+                        </div>
+                        <div class="input-group" style="flex:1; min-width:140px;">
+                            <label>Complemento (Casa, Apto)</label>
+                            <input type="text" id="addr-comp" placeholder="Ex: Casa B, Apto 102">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Ponto de Referência (Opcional)</label>
+                        <input type="text" id="addr-ref" placeholder="Ex: Próximo à praça / Portão branco">
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" onclick="saveAddressFromProfile()" class="btn-primary" style="background:#18181b; flex:1;" id="btn-save-addr">+ Salvar Endereço</button>
+                        <button type="button" onclick="cancelEditAddress()" id="btn-cancel-addr" style="display:none; background:#e4e4e7; color:#18181b; border:none; padding:0 16px; border-radius:14px; font-weight:800; cursor:pointer;">Cancelar</button>
+                    </div>
                 </div>
+
                 <div id="saved-addresses-list"></div>
             </div>
         </div>
@@ -627,13 +699,19 @@
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
                 <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:14px;">⚙️ Dados da Minha Conta</h3>
-                <div class="input-group">
-                    <label>Nome de Usuário</label>
-                    <input type="text" id="acc-edit-name">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div class="input-group" style="flex:1; min-width:140px;">
+                        <label>Nome *</label>
+                        <input type="text" id="acc-edit-first-name" placeholder="Seu Nome">
+                    </div>
+                    <div class="input-group" style="flex:1; min-width:140px;">
+                        <label>Sobrenome *</label>
+                        <input type="text" id="acc-edit-last-name" placeholder="Seu Sobrenome">
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label>Telefone / WhatsApp</label>
-                    <input type="text" id="acc-edit-phone">
+                    <label>Telefone / WhatsApp *</label>
+                    <input type="text" id="acc-edit-phone" placeholder="Ex: 91988887777">
                 </div>
                 <button class="btn-primary" onclick="saveAccountDetails()" style="background:var(--success);">💾 Salvar Alterações</button>
             </div>
@@ -826,26 +904,26 @@
             <label>Seu E-mail Cadastrado</label>
             <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
         </div>
-        <button type="button" class="btn-primary" id="btn-send-reset" onclick="sendClientPasswordReset()">
-            📩 Enviar E-mail de Recuperação
-        </button>
-    </div>
-</div>
+<!-- Modal para completar Nome, Sobrenome e Telefone/WhatsApp após entrar com Google -->
+<div class="modal-overlay" id="modal-complete-profile" style="z-index: 6500;">
+    <div class="modal-sheet" style="text-align:center; max-width:430px; border-radius:24px; margin:auto;">
+        <div style="font-size:2.4rem; margin-bottom:6px;">👤</div>
+        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Complete seu Cadastro</h3>
+        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">Informe seu Nome, Sobrenome e WhatsApp para identificação nos seus pedidos e entregas:</p>
 
-<!-- Modal para completar Nome e Telefone/WhatsApp após entrar com Google -->
-<div class="modal-overlay" id="modal-complete-profile">
-    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
-        <div style="font-size:2.4rem; margin-bottom:6px;">📱</div>
-        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Quase lá! Confirme seu contato</h3>
-        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">O Google não compartilha seu número. Informe seu WhatsApp para que a loja e o entregador possam falar com você:</p>
-
-        <div class="input-group">
-            <label>Como prefere ser chamado(a)?</label>
-            <input type="text" id="google-complete-name" placeholder="Seu Nome e Sobrenome">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Nome *</label>
+                <input type="text" id="google-complete-first-name" placeholder="Ex: Eder">
+            </div>
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Sobrenome *</label>
+                <input type="text" id="google-complete-last-name" placeholder="Ex: Garcia">
+            </div>
         </div>
         <div class="input-group">
             <label>Seu WhatsApp (com DDD) *</label>
-            <input type="tel" id="google-complete-phone" placeholder="Ex: 91988887777">
+            <input type="tel" id="google-complete-phone" placeholder="Ex: 91988887777" onkeypress="if(event.key==='Enter') saveGoogleCompleteProfile()">
         </div>
         <button type="button" class="btn-primary" onclick="saveGoogleCompleteProfile()" style="background:var(--success); margin-top:8px;">
             ✅ Salvar e Continuar
@@ -923,6 +1001,10 @@
         { img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80", text: "Festival de Pizzas" },
         { img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80", text: "Artesanais Suculentos" }
     ];
+    window.currentBannerIdx = 0;
+    window.totalBannersCount = 0;
+    window.bannerAutoplayTimer = null;
+    window.bannerAutoplayPaused = false;
 
     window.showToast = function(msg) {
         const t = document.getElementById('toast');
@@ -1088,14 +1170,81 @@
 
     window.renderBanners = function(bannersArr) {
         const box = document.getElementById('home-banners');
+        const dotsBox = document.getElementById('home-banners-dots');
+        const prevBtn = document.getElementById('banner-prev-btn');
+        const nextBtn = document.getElementById('banner-next-btn');
         if (!box) return;
+
         const list = (Array.isArray(bannersArr) && bannersArr.length > 0) ? bannersArr : window.defaultBanners;
-        box.innerHTML = list.map(b => `
+        window.totalBannersCount = list.length;
+        if (window.currentBannerIdx >= list.length) window.currentBannerIdx = 0;
+
+        const fallbackImg = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80";
+        box.innerHTML = list.map(b => {
+            const imgUrl = b.img || fallbackImg;
+            return `
             <div class="banner-card">
-                <img src="${b.img}" onerror="this.src='https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80'">
-                <div class="banner-title">${b.text || ''}</div>
-            </div>
-        `).join('');
+                <img class="banner-bg-blur" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="">
+                <img class="banner-main-img" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="${(b.text || 'Banner').replace(/"/g, '&quot;')}">
+                ${b.text ? `<div class="banner-title">${b.text}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        if (dotsBox) {
+            dotsBox.innerHTML = list.length > 1
+                ? list.map((_, idx) => `<button type="button" class="carousel-dot ${idx === window.currentBannerIdx ? 'active' : ''}" onclick="goToBannerSlide(${idx})"></button>`).join('')
+                : '';
+        }
+        if (prevBtn) prevBtn.style.display = list.length > 1 ? 'flex' : 'none';
+        if (nextBtn) nextBtn.style.display = list.length > 1 ? 'flex' : 'none';
+
+        window.startBannerAutoplay();
+    };
+
+    window.goToBannerSlide = function(idx) {
+        const box = document.getElementById('home-banners');
+        if (!box || window.totalBannersCount <= 0) return;
+        window.currentBannerIdx = (idx + window.totalBannersCount) % window.totalBannersCount;
+        const slideWidth = box.clientWidth;
+        box.scrollTo({ left: slideWidth * window.currentBannerIdx, behavior: 'smooth' });
+        window.updateBannerDotsUI();
+    };
+
+    window.stepBannerCarousel = function(delta) {
+        window.goToBannerSlide((window.currentBannerIdx || 0) + delta);
+    };
+
+    window.onBannerCarouselScroll = function() {
+        const box = document.getElementById('home-banners');
+        if (!box || !box.clientWidth) return;
+        const newIdx = Math.round(box.scrollLeft / box.clientWidth);
+        if (newIdx !== window.currentBannerIdx && newIdx >= 0 && newIdx < window.totalBannersCount) {
+            window.currentBannerIdx = newIdx;
+            window.updateBannerDotsUI();
+        }
+    };
+
+    window.updateBannerDotsUI = function() {
+        const dots = document.querySelectorAll('#home-banners-dots .carousel-dot');
+        dots.forEach((d, i) => d.classList.toggle('active', i === window.currentBannerIdx));
+    };
+
+    window.startBannerAutoplay = function() {
+        if (window.bannerAutoplayTimer) clearInterval(window.bannerAutoplayTimer);
+        if (window.totalBannersCount <= 1) return;
+        window.bannerAutoplayTimer = setInterval(() => {
+            if (!window.bannerAutoplayPaused && document.getElementById('sec-home').classList.contains('active')) {
+                window.stepBannerCarousel(1);
+            }
+        }, 4000);
+    };
+
+    window.pauseBannerAutoplay = function() {
+        window.bannerAutoplayPaused = true;
+    };
+
+    window.resumeBannerAutoplay = function() {
+        window.bannerAutoplayPaused = false;
     };
 
     window.openCategoryFullScreen = function(cat) {
@@ -2155,7 +2304,7 @@
 
     window.toggleClientAuthMode = function() {
         window.isRegisterMode = !window.isRegisterMode;
-        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'block' : 'none';
+        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'flex' : 'none';
         document.getElementById('auth-phone-group').style.display = window.isRegisterMode ? 'block' : 'none';
         const forgotBox = document.getElementById('forgot-pass-link-box');
         if (forgotBox) forgotBox.style.display = window.isRegisterMode ? 'none' : 'block';
@@ -2163,14 +2312,32 @@
         document.getElementById('cli-auth-toggle-btn').innerText = window.isRegisterMode ? 'Já tem conta? Faça Login' : 'Ainda não tem conta? Cadastre-se grátis';
     };
 
+    window.splitFullName = function(fullNameStr) {
+        const clean = String(fullNameStr || '').trim();
+        if (!clean || clean === 'Cliente') return { primeiroNome: '', sobrenome: '' };
+        const parts = clean.split(/\s+/);
+        const primeiroNome = parts[0] || '';
+        const sobrenome = parts.slice(1).join(' ') || '';
+        return { primeiroNome, sobrenome };
+    };
+
     // Salva e sincroniza os dados do cliente tanto no navegador quanto no Firebase
     window.saveClientProfileEverywhere = async function(uid, profileObj) {
         if (!uid) return;
+        const splitted = window.splitFullName(profileObj.nome);
+        const primeiroNome = (profileObj.primeiroNome || splitted.primeiroNome || '').trim();
+        const sobrenome = (profileObj.sobrenome || splitted.sobrenome || '').trim();
+        const fullNome = [primeiroNome, sobrenome].filter(Boolean).join(' ').trim() ||
+            ((profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : 'Cliente');
+
         const cleanObj = {
             email: profileObj.email || (window.currentClient ? window.currentClient.email : ''),
-            nome: (profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : 'Cliente',
+            nome: fullNome,
+            primeiroNome: primeiroNome,
+            sobrenome: sobrenome,
             telefone: (profileObj.telefone || '').trim(),
-            enderecos: Array.isArray(profileObj.enderecos) ? profileObj.enderecos : []
+            enderecos: Array.isArray(profileObj.enderecos) ? profileObj.enderecos : [],
+            perfilConfirmado: Boolean(profileObj.perfilConfirmado || (primeiroNome && sobrenome && profileObj.telefone))
         };
         window.clientProfileData = cleanObj;
         try {
@@ -2191,7 +2358,7 @@
     };
 
     window.loadClientProfileEverywhere = async function(user) {
-        if (!user) return { nome: 'Cliente', email: '', telefone: '', enderecos: [] };
+        if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
 
         let localData = {};
         try {
@@ -2215,16 +2382,23 @@
             (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
             (user.email ? user.email.split('@')[0] : 'Cliente');
 
+        const splitted = window.splitFullName(bestName);
+        const bestFirst = pending.primeiroNome || remoteData.primeiroNome || localData.primeiroNome || splitted.primeiroNome || '';
+        const bestLast = pending.sobrenome || remoteData.sobrenome || localData.sobrenome || splitted.sobrenome || '';
         const bestPhone = pending.telefone || remoteData.telefone || localData.telefone || user.phoneNumber || '';
         const bestAddrs = (Array.isArray(remoteData.enderecos) && remoteData.enderecos.length > 0)
             ? remoteData.enderecos
             : (Array.isArray(localData.enderecos) ? localData.enderecos : []);
+        const confirmed = Boolean(pending.perfilConfirmado || remoteData.perfilConfirmado || localData.perfilConfirmado);
 
         const merged = {
             email: user.email || remoteData.email || localData.email || '',
-            nome: bestName,
+            nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
+            primeiroNome: bestFirst,
+            sobrenome: bestLast,
             telefone: bestPhone,
-            enderecos: bestAddrs
+            enderecos: bestAddrs,
+            perfilConfirmado: confirmed
         };
 
         try {
@@ -2314,7 +2488,7 @@
         }
         if (!window.pendingRegistrationData) return;
 
-        const { email, pass, nome, telefone } = window.pendingRegistrationData;
+        const { email, pass, nome, primeiroNome, sobrenome, telefone } = window.pendingRegistrationData;
         const btn = document.getElementById('btn-confirm-pin');
         btn.disabled = true;
         btn.innerText = "Criando sua conta...";
@@ -2324,14 +2498,17 @@
             await window.saveClientProfileEverywhere(cred.user.uid, {
                 email,
                 nome,
+                primeiroNome,
+                sobrenome,
                 telefone,
-                enderecos: []
+                enderecos: [],
+                perfilConfirmado: true
             });
             window.pendingRegistrationData = null;
             window.generatedEmailPin = null;
             window.closeVerifyPinModal();
             window.updateClientHeaderUI();
-            window.showToast(`🎉 Bem-vindo(a), ${nome.split(' ')[0]}! Conta verificada!`);
+            window.showToast(`🎉 Bem-vindo(a), ${primeiroNome || nome.split(' ')[0]}! Conta verificada!`);
         } catch (err) {
             console.error("Erro ao criar conta após PIN:", err);
             const msg = (err.code === 'auth/email-already-in-use')
@@ -2351,9 +2528,11 @@
 
         try {
             if (window.isRegisterMode) {
-                const nome = document.getElementById('cli-auth-name').value.trim();
+                const primeiroNome = document.getElementById('cli-auth-first-name').value.trim();
+                const sobrenome = document.getElementById('cli-auth-last-name').value.trim();
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
-                if (!nome) { window.showToast("⚠️ Informe seu Nome Completo!"); return; }
+                if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
+                if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
                 if (!telefone || telefone.replace(/\D/g, '').length < 8) {
                     window.showToast("⚠️ Informe seu WhatsApp com DDD!");
                     return;
@@ -2363,8 +2542,10 @@
                     return;
                 }
 
+                const nome = `${primeiroNome} ${sobrenome}`.trim();
+
                 // Gera o PIN de 4 dígitos e abre o modal de confirmação antes de concluir o cadastro
-                window.pendingRegistrationData = { email, pass, nome, telefone };
+                window.pendingRegistrationData = { email, pass, nome, primeiroNome, sobrenome, telefone, perfilConfirmado: true };
                 window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
                 document.getElementById('pin-target-email').innerText = email;
                 document.getElementById('pin-code-input').value = '';
@@ -2449,34 +2630,57 @@
 
     window.openCompleteProfileModal = function() {
         if (!window.currentClient) return;
-        const currentName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
-            ? window.clientProfileData.nome
-            : (window.currentClient.displayName || '');
-        document.getElementById('google-complete-name').value = currentName;
+        const savedFirst = (window.clientProfileData && window.clientProfileData.primeiroNome) || '';
+        const savedLast = (window.clientProfileData && window.clientProfileData.sobrenome) || '';
+        const fallbackSplit = window.splitFullName(
+            (window.clientProfileData && window.clientProfileData.nome !== 'Cliente')
+                ? window.clientProfileData.nome
+                : (window.currentClient.displayName || '')
+        );
+
+        document.getElementById('google-complete-first-name').value = savedFirst || fallbackSplit.primeiroNome || '';
+        document.getElementById('google-complete-last-name').value = savedLast || fallbackSplit.sobrenome || '';
         document.getElementById('google-complete-phone').value = (window.clientProfileData && window.clientProfileData.telefone) || '';
         document.getElementById('modal-complete-profile').style.display = 'flex';
     };
 
     window.saveGoogleCompleteProfile = async function() {
         if (!window.currentClient) return;
-        const nome = document.getElementById('google-complete-name').value.trim() || window.currentClient.displayName || 'Cliente';
+        const primeiroNome = document.getElementById('google-complete-first-name').value.trim();
+        const sobrenome = document.getElementById('google-complete-last-name').value.trim();
         const telefone = document.getElementById('google-complete-phone').value.trim();
 
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
-            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
+        if (!primeiroNome) {
+            window.showToast("⚠️ Digite seu Nome!");
+            document.getElementById('google-complete-first-name').focus();
             return;
         }
+        if (!sobrenome) {
+            window.showToast("⚠️ Digite seu Sobrenome!");
+            document.getElementById('google-complete-last-name').focus();
+            return;
+        }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
+            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
+            document.getElementById('google-complete-phone').focus();
+            return;
+        }
+
+        const nome = `${primeiroNome} ${sobrenome}`.trim();
 
         await window.saveClientProfileEverywhere(window.currentClient.uid, {
             email: window.currentClient.email || '',
             nome,
+            primeiroNome,
+            sobrenome,
             telefone,
-            enderecos: window.clientProfileData.enderecos || []
+            enderecos: window.clientProfileData.enderecos || [],
+            perfilConfirmado: true
         });
 
         document.getElementById('modal-complete-profile').style.display = 'none';
         window.updateClientHeaderUI();
-        window.showToast("✅ Nome e WhatsApp salvos com sucesso!");
+        window.showToast(`✅ Cadastro concluído! Bem-vindo(a), ${primeiroNome}!`);
     };
 
     window.loginWithGoogle = async function() {
@@ -2487,23 +2691,28 @@
             const user = cred.user;
             if (user) {
                 const loaded = await window.loadClientProfileEverywhere(user);
-                const realName = (user.displayName && user.displayName !== 'Cliente')
-                    ? user.displayName
-                    : loaded.nome;
+                const realName = (loaded.nome && loaded.nome !== 'Cliente')
+                    ? loaded.nome
+                    : ((user.displayName && user.displayName !== 'Cliente') ? user.displayName : 'Cliente');
                 const realPhone = loaded.telefone || user.phoneNumber || '';
 
                 await window.saveClientProfileEverywhere(user.uid, {
                     email: user.email || '',
                     nome: realName,
+                    primeiroNome: loaded.primeiroNome || '',
+                    sobrenome: loaded.sobrenome || '',
                     telefone: realPhone,
-                    enderecos: loaded.enderecos || []
+                    enderecos: loaded.enderecos || [],
+                    perfilConfirmado: loaded.perfilConfirmado
                 });
 
                 window.updateClientHeaderUI();
-                window.showToast(`👋 Bem-vindo(a), ${realName.split(' ')[0]}!`);
 
-                if (!realPhone) {
+                // Sempre abre para confirmar Nome, Sobrenome e Telefone caso ainda não tenha confirmado os 3 campos
+                if (!loaded.perfilConfirmado || !loaded.primeiroNome || !loaded.sobrenome || !realPhone) {
                     window.openCompleteProfileModal();
+                } else {
+                    window.showToast(`👋 Bem-vindo(a), ${loaded.primeiroNome}!`);
                 }
             }
         } catch (err) {
@@ -2525,7 +2734,6 @@
             return;
         }
 
-        // Ativa a seção perfil sem chamar openProfileSubView recursivamente
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         const secPerfil = document.getElementById('sec-perfil');
         if (secPerfil) secPerfil.classList.add('active');
@@ -2537,11 +2745,28 @@
         document.getElementById('profile-sub-enderecos').style.display = (sub === 'enderecos') ? 'block' : 'none';
         document.getElementById('profile-sub-conta').style.display = (sub === 'conta') ? 'block' : 'none';
 
-        if (sub === 'enderecos') window.renderSavedAddresses();
+        if (sub === 'enderecos') {
+            window.cancelEditAddress();
+            window.renderSavedAddresses();
+        }
         if (sub === 'conta') {
-            document.getElementById('acc-edit-name').value = window.clientProfileData.nome || '';
+            const sp = window.splitFullName(window.clientProfileData.nome || '');
+            document.getElementById('acc-edit-first-name').value = window.clientProfileData.primeiroNome || sp.primeiroNome || '';
+            document.getElementById('acc-edit-last-name').value = window.clientProfileData.sobrenome || sp.sobrenome || '';
             document.getElementById('acc-edit-phone').value = window.clientProfileData.telefone || '';
         }
+    };
+
+    window.formatAddressDisplay = function(a) {
+        if (!a) return '';
+        if (a.logradouro || a.bairro) {
+            const numPart = a.numero ? `, Nº ${a.numero}` : '';
+            const bairroPart = a.bairro ? ` - ${a.bairro}` : '';
+            const compPart = a.complemento ? ` (${a.complemento})` : '';
+            const refPart = a.referencia ? ` [Ref: ${a.referencia}]` : '';
+            return `${a.logradouro || ''}${numPart}${bairroPart}${compPart}${refPart}`.trim();
+        }
+        return a.rua || '';
     };
 
     window.renderSavedAddresses = function() {
@@ -2551,16 +2776,28 @@
             listEl.innerHTML = `<p style="color:#71717a; font-weight:700; text-align:center; padding:16px;">Nenhum endereço cadastrado ainda.</p>`;
             return;
         }
-        listEl.innerHTML = addrs.map((a, idx) => `
+        listEl.innerHTML = addrs.map((a, idx) => {
+            const mainLine = a.logradouro
+                ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}`
+                : (a.rua || '');
+            const subDetails = [
+                a.complemento ? `Compl: ${a.complemento}` : '',
+                a.referencia ? `Ref: ${a.referencia}` : ''
+            ].filter(Boolean).join(' • ');
+
+            return `
             <div class="addr-card">
-                <div style="font-weight:800; font-size:0.9rem; color:#18181b;">📍 ${a.rua}</div>
+                <div style="flex:1;">
+                    <div style="font-weight:900; font-size:0.92rem; color:#18181b;">📍 ${mainLine}</div>
+                    ${subDetails ? `<div style="font-size:0.76rem; color:#71717a; font-weight:700; margin-top:3px;">${subDetails}</div>` : ''}
+                </div>
                 <button type="button" class="dots-btn" onclick="toggleAddrMenu(${idx}); event.stopPropagation();">⋮</button>
                 <div class="dots-dropdown" id="addr-menu-${idx}">
                     <button type="button" onclick="startEditAddress(${idx})">✏️ Editar</button>
                     <button type="button" onclick="deleteAddress(${idx})" style="color:#dc2626;">🗑️ Excluir</button>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     };
 
     window.toggleAddrMenu = function(idx) {
@@ -2577,11 +2814,32 @@
 
     window.startEditAddress = function(idx) {
         const addrs = window.clientProfileData.enderecos || [];
-        if (!addrs[idx]) return;
+        const a = addrs[idx];
+        if (!a) return;
         window.editingAddressIndex = idx;
-        document.getElementById('new-addr-input').value = addrs[idx].rua;
-        document.getElementById('btn-save-addr').innerText = '💾 Salvar';
-        document.getElementById('new-addr-input').focus();
+
+        document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
+        document.getElementById('addr-numero').value = a.numero || '';
+        document.getElementById('addr-bairro').value = a.bairro || '';
+        document.getElementById('addr-comp').value = a.complemento || '';
+        document.getElementById('addr-ref').value = a.referencia || '';
+
+        document.getElementById('addr-form-title').innerText = '✏️ Editando Endereço';
+        document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
+        document.getElementById('btn-cancel-addr').style.display = 'inline-block';
+        document.getElementById('addr-rua').focus();
+    };
+
+    window.cancelEditAddress = function() {
+        window.editingAddressIndex = -1;
+        document.getElementById('addr-rua').value = '';
+        document.getElementById('addr-numero').value = '';
+        document.getElementById('addr-bairro').value = '';
+        document.getElementById('addr-comp').value = '';
+        document.getElementById('addr-ref').value = '';
+        document.getElementById('addr-form-title').innerText = '➕ Cadastrar Novo Endereço';
+        document.getElementById('btn-save-addr').innerText = '+ Salvar Endereço';
+        document.getElementById('btn-cancel-addr').style.display = 'none';
     };
 
     window.deleteAddress = async function(idx) {
@@ -2589,37 +2847,59 @@
         window.clientProfileData.enderecos.splice(idx, 1);
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
+        window.updateClientHeaderUI();
         window.showToast("🗑️ Endereço removido!");
     };
 
     window.saveAddressFromProfile = async function() {
         if (!window.currentClient) return;
-        const val = document.getElementById('new-addr-input').value.trim();
-        if (!val) { window.showToast("Digite o endereço!"); return; }
+        const logradouro = document.getElementById('addr-rua').value.trim();
+        const numero = document.getElementById('addr-numero').value.trim();
+        const bairro = document.getElementById('addr-bairro').value.trim();
+        const complemento = document.getElementById('addr-comp').value.trim();
+        const referencia = document.getElementById('addr-ref').value.trim();
+
+        if (!logradouro) { window.showToast("⚠️ Informe a Rua / Logradouro!"); document.getElementById('addr-rua').focus(); return; }
+        if (!numero) { window.showToast("⚠️ Informe o Número (ou S/N)!"); document.getElementById('addr-numero').focus(); return; }
+        if (!bairro) { window.showToast("⚠️ Informe o Bairro!"); document.getElementById('addr-bairro').focus(); return; }
+
+        const addrObj = {
+            logradouro,
+            numero,
+            bairro,
+            complemento,
+            referencia,
+            rua: window.formatAddressDisplay({ logradouro, numero, bairro, complemento, referencia })
+        };
 
         if (!Array.isArray(window.clientProfileData.enderecos)) window.clientProfileData.enderecos = [];
         if (window.editingAddressIndex > -1) {
-            window.clientProfileData.enderecos[window.editingAddressIndex] = { rua: val };
-            window.editingAddressIndex = -1;
-            document.getElementById('btn-save-addr').innerText = '+ Adicionar';
+            window.clientProfileData.enderecos[window.editingAddressIndex] = addrObj;
         } else {
-            window.clientProfileData.enderecos.push({ rua: val });
+            window.clientProfileData.enderecos.push(addrObj);
         }
-        document.getElementById('new-addr-input').value = '';
+
+        window.cancelEditAddress();
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
         window.updateClientHeaderUI();
-        window.showToast("✅ Endereço salvo!");
+        window.showToast("✅ Endereço salvo com sucesso!");
     };
 
     window.saveAccountDetails = async function() {
         if (!window.currentClient) return;
-        const nome = document.getElementById('acc-edit-name').value.trim();
+        const primeiroNome = document.getElementById('acc-edit-first-name').value.trim();
+        const sobrenome = document.getElementById('acc-edit-last-name').value.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
-        if (!nome) { window.showToast("Informe seu nome!"); return; }
+        if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
+        if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
 
-        window.clientProfileData.nome = nome;
+        window.clientProfileData.primeiroNome = primeiroNome;
+        window.clientProfileData.sobrenome = sobrenome;
+        window.clientProfileData.nome = `${primeiroNome} ${sobrenome}`.trim();
         window.clientProfileData.telefone = telefone;
+        window.clientProfileData.perfilConfirmado = true;
+
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.updateClientHeaderUI();
         window.showToast("✅ Dados da conta atualizados!");
@@ -2653,7 +2933,7 @@
             await window.saveClientProfileEverywhere(user.uid, fullProfile);
             window.updateClientHeaderUI();
 
-            if (!window.clientProfileData.telefone) {
+            if (!window.clientProfileData.perfilConfirmado || !window.clientProfileData.primeiroNome || !window.clientProfileData.sobrenome || !window.clientProfileData.telefone) {
                 window.openCompleteProfileModal();
             }
 
