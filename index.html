@@ -813,17 +813,48 @@
 <div class="modal-overlay" id="modal-chat" onclick="if(event.target===this) closeClientChat()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.1rem;">💬 Chat com a Loja</h3>
-            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
+            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">💬 Chat com a Loja</h3>
+            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0;">✕</button>
         </div>
         <div class="chat-msgs-box" id="client-chat-msgs"></div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="display:flex; gap:6px; align-items:center; width:100%;">
             <input type="file" id="chat-file-input" accept="image/*,application/pdf,.pdf" style="display:none;" onchange="handleClientReceiptUpload(this)">
-            <button type="button" onclick="document.getElementById('chat-file-input').click()" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; padding:11px 12px; border-radius:12px; font-weight:900; font-size:0.78rem; cursor:pointer; white-space:nowrap;">
+            <button type="button" onclick="document.getElementById('chat-file-input').click()" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; padding:11px 10px; border-radius:12px; font-weight:900; font-size:0.75rem; cursor:pointer; white-space:nowrap; flex-shrink:0;">
                 📎 Comprovante
             </button>
-            <input type="text" id="client-chat-input" placeholder="Digite uma mensagem..." style="flex:1; padding:11px 12px; border:1px solid #d4d4d8; border-radius:12px; font-weight:600;" onkeypress="if(event.key==='Enter') sendClientChatMsg()">
-            <button type="button" onclick="sendClientChatMsg()" style="background:var(--primary); color:#fff; border:none; padding:11px 16px; border-radius:12px; font-weight:900; cursor:pointer;">Enviar</button>
+            <input type="text" id="client-chat-input" placeholder="Mensagem..." style="flex:1; min-width:0; width:100%; padding:11px 10px; border:1px solid #d4d4d8; border-radius:12px; font-weight:600; font-size:0.88rem;" onkeypress="if(event.key==='Enter') sendClientChatMsg()">
+            <button type="button" onclick="sendClientChatMsg()" style="background:var(--primary); color:#fff; border:none; padding:11px 14px; border-radius:12px; font-weight:900; font-size:0.84rem; cursor:pointer; flex-shrink:0;">Enviar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para o Cliente Cancelar o Pedido informando o Motivo -->
+<div class="modal-overlay" id="modal-client-cancel-order" style="z-index:2500;" onclick="if(event.target===this) closeClientCancelModal()">
+    <div class="modal-sheet" style="max-width:440px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-weight:900; font-size:1.15rem; color:#dc2626;">❌ Cancelar Pedido</h3>
+            <button type="button" onclick="closeClientCancelModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
+        </div>
+        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:12px;">
+            Selecione ou digite o motivo pelo qual deseja cancelar este pedido:
+        </p>
+        <div class="input-group">
+            <label>Motivo do Cancelamento</label>
+            <select id="client-cancel-reason-select" onchange="document.getElementById('client-cancel-custom-box').style.display = this.value === 'OUTRO' ? 'block' : 'none'">
+                <option value="Pedi por engano">Pedi por engano</option>
+                <option value="Quero alterar os itens ou forma de pagamento">Quero alterar os itens ou forma de pagamento</option>
+                <option value="Tempo de espera muito longo">Tempo de espera muito longo</option>
+                <option value="Desisti da compra">Desisti da compra</option>
+                <option value="OUTRO">Outro motivo...</option>
+            </select>
+        </div>
+        <div class="input-group" id="client-cancel-custom-box" style="display:none;">
+            <label>Qual o motivo?</label>
+            <input type="text" id="client-cancel-custom-input" placeholder="Digite o motivo do cancelamento...">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" onclick="closeClientCancelModal()" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:13px; border-radius:12px; font-weight:800; cursor:pointer;">Voltar</button>
+            <button type="button" onclick="confirmClientCancelOrder()" style="flex:1; background:#dc2626; color:#fff; border:none; padding:13px; border-radius:12px; font-weight:900; cursor:pointer;">Confirmar Cancelamento</button>
         </div>
     </div>
 </div>
@@ -904,6 +935,10 @@
             <label>Seu E-mail Cadastrado</label>
             <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
         </div>
+        <button type="button" class="btn-primary" id="btn-send-reset" onclick="sendClientPasswordReset()">📩 Enviar E-mail de Recuperação</button>
+    </div>
+</div>
+
 <!-- Modal para completar Nome, Sobrenome e Telefone/WhatsApp após entrar com Google -->
 <div class="modal-overlay" id="modal-complete-profile" style="z-index: 6500;">
     <div class="modal-sheet" style="text-align:center; max-width:430px; border-radius:24px; margin:auto;">
@@ -2035,13 +2070,14 @@
 
         const loja = window.allStores.find(s => s.id === o.lojaId);
         const st = o.status || 'Novo';
-        const s1 = true;
-        const s2 = ['Preparando', 'Entrega', 'Concluido'].includes(st) || window.isOrderDone(st);
-        const s3 = ['Entrega', 'Concluido'].includes(st) || window.isOrderDone(st);
-        const s4 = window.isOrderDone(st);
+        const isCanceled = (st === 'Cancelado');
+        const s1 = !isCanceled;
+        const s2 = !isCanceled && (['Preparando', 'Entrega', 'Concluido'].includes(st) || window.isOrderDone(st));
+        const s3 = !isCanceled && (['Entrega', 'Concluido'].includes(st) || window.isOrderDone(st));
+        const s4 = !isCanceled && window.isOrderDone(st);
 
         let pixHtml = '';
-        if (String(o.pagamento || '').toUpperCase().includes('PIX') && st === 'Novo' && loja && loja.chave_pix) {
+        if (!isCanceled && String(o.pagamento || '').toUpperCase().includes('PIX') && st === 'Novo' && loja && loja.chave_pix) {
             const valNum = parseFloat(String(o.total || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
             const pixPayload = window.generatePixCopiaECola(loja.chave_pix, loja.nome_loja, valNum, o.id.substring(0, 8));
             pixHtml = `
@@ -2056,27 +2092,105 @@
             </div>`;
         }
 
-        const receiptBtnHtml = (st === 'Novo')
-            ? `<button class="btn-primary" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
+        let canceledBannerHtml = '';
+        if (isCanceled) {
+            const quemCancelou = o.canceladoPor === 'Cliente' ? 'Cancelado por você' : 'Cancelado pela loja';
+            canceledBannerHtml = `
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px; margin:12px 0; color:#991b1b;">
+                <div style="font-weight:900; font-size:0.92rem; margin-bottom:4px;">❌ Pedido Cancelado (${quemCancelou})</div>
+                <div style="font-size:0.82rem; font-weight:700;"><b>Motivo:</b> ${o.motivoCancelamento || 'Não informado'}</div>
+            </div>`;
+        }
+
+        const receiptBtnHtml = (!isCanceled && st === 'Novo')
+            ? `<button class="btn-primary" style="margin-bottom:8px;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
+            : `<button class="btn-primary" style="margin-bottom:8px; background:#18181b;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Abrir Chat com a Loja</button>`;
+
+        const canClientCancel = (!isCanceled && st === 'Novo');
+        const cancelBtnHtml = canClientCancel
+            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:12px; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer;">❌ Cancelar Pedido</button>`
             : '';
 
         document.getElementById('track-order-body').innerHTML = `
             <div style="font-weight:900; font-size:1rem; margin-bottom:4px;">${o.nomeLoja || (loja ? loja.nome_loja : 'Loja')} • #${o.id.substring(0,6).toUpperCase()}</div>
             <div style="font-size:0.82rem; color:#71717a; margin-bottom:12px;">${o.itens || ''}</div>
+            ${canceledBannerHtml}
+            ${!isCanceled ? `
             <div style="margin:14px 0;">
                 <div class="step-row ${s1 ? 'done' : ''}"><div class="step-dot">1</div><span>Pedido enviado à loja</span></div>
                 <div class="step-row ${s2 ? 'done' : ''}"><div class="step-dot">2</div><span>Loja preparando seu pedido</span></div>
                 <div class="step-row ${s3 ? 'done' : ''}"><div class="step-dot">3</div><span>Saiu para entrega</span></div>
                 <div class="step-row ${s4 ? 'done' : ''}"><div class="step-dot">4</div><span>Pedido concluído</span></div>
-            </div>
+            </div>` : ''}
             ${pixHtml}
             ${receiptBtnHtml}
+            ${cancelBtnHtml}
         `;
         document.getElementById('modal-track-order').style.display = 'flex';
     };
 
+    window.clientCancelTargetOrderId = null;
+    window.openClientCancelModal = function(orderId) {
+        window.clientCancelTargetOrderId = orderId;
+        document.getElementById('client-cancel-reason-select').value = 'Pedi por engano';
+        document.getElementById('client-cancel-custom-box').style.display = 'none';
+        document.getElementById('client-cancel-custom-input').value = '';
+        document.getElementById('modal-client-cancel-order').style.display = 'flex';
+    };
+
+    window.closeClientCancelModal = function() {
+        window.clientCancelTargetOrderId = null;
+        document.getElementById('modal-client-cancel-order').style.display = 'none';
+    };
+
+    window.confirmClientCancelOrder = async function() {
+        const orderId = window.clientCancelTargetOrderId;
+        if (!orderId) return;
+        const o = window.myOrders.find(x => x.id === orderId);
+        if (!o) return;
+
+        if (o.status && o.status !== 'Novo') {
+            window.showToast("⚠️ O pedido já entrou em preparo. Fale com a loja no chat!");
+            window.closeClientCancelModal();
+            return;
+        }
+
+        const selVal = document.getElementById('client-cancel-reason-select').value;
+        const customVal = document.getElementById('client-cancel-custom-input').value.trim();
+        const motivo = (selVal === 'OUTRO') ? (customVal || 'Solicitado pelo cliente') : selVal;
+
+        const myName = (window.clientProfileData && window.clientProfileData.nome) || o.cliente || 'Cliente';
+        const now = new Date();
+        const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        const chatArr = Array.isArray(o.chat) ? [...o.chat] : [];
+        chatArr.push({
+            sender: 'cliente',
+            senderName: myName,
+            text: `❌ Pedido cancelado pelo cliente. Motivo: ${motivo}`,
+            time: timeStr
+        });
+
+        try {
+            await setDoc(doc(db, "pedidos", orderId), {
+                status: 'Cancelado',
+                motivoCancelamento: motivo,
+                canceladoPor: 'Cliente',
+                chat: chatArr
+            }, { merge: true });
+            window.closeClientCancelModal();
+            document.getElementById('modal-track-order').style.display = 'none';
+            window.showToast("❌ Seu pedido foi cancelado.");
+        } catch (e) {
+            window.showToast("⚠️ Erro ao cancelar o pedido.");
+        }
+    };
+
     window.openClientChat = function(orderId) {
         window.activeChatOrderId = orderId;
+        const o = window.myOrders.find(x => x.id === orderId);
+        const loja = o ? window.allStores.find(s => s.id === o.lojaId) : null;
+        const nomeLoja = (o && o.nomeLoja) ? o.nomeLoja : (loja ? loja.nome_loja : 'Loja');
+        document.getElementById('chat-modal-title').innerText = `💬 Chat — ${nomeLoja}`;
         document.getElementById('modal-chat').style.display = 'flex';
         window.renderClientChatMessages();
     };
@@ -2095,6 +2209,10 @@
         const box = document.getElementById('client-chat-msgs');
         const o = window.myOrders.find(x => x.id === window.activeChatOrderId);
         if (!box || !o) return;
+        const loja = window.allStores.find(s => s.id === o.lojaId);
+        const nomeLoja = o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante');
+        const nomeCliente = o.cliente || (window.clientProfileData && window.clientProfileData.nome) || 'Cliente';
+
         const msgs = Array.isArray(o.chat) ? o.chat : [];
         if (msgs.length === 0) {
             box.innerHTML = `<p style="text-align:center; color:#71717a; margin:auto; font-weight:700;">Envie uma mensagem ou anexe o comprovante PIX (Foto ou PDF).</p>`;
@@ -2102,6 +2220,9 @@
         }
         box.innerHTML = msgs.map(m => {
             const isMe = m.sender === 'cliente';
+            const senderLabel = isMe
+                ? `👤 ${m.senderName || nomeCliente} (Você)`
+                : `🏪 ${m.senderName || nomeLoja}`;
             let mediaHtml = '';
             if (m.fileType === 'pdf' && m.fileData) {
                 mediaHtml = `
@@ -2115,6 +2236,9 @@
             }
             return `
             <div class="chat-bubble ${isMe ? 'me' : 'them'}">
+                <div style="font-size:0.68rem; font-weight:900; opacity:0.85; margin-bottom:3px; border-bottom:1px solid ${isMe ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)'}; padding-bottom:2px;">
+                    ${senderLabel}
+                </div>
                 <div>${m.text || ''}</div>
                 ${mediaHtml}
                 <div style="font-size:0.65rem; opacity:0.75; text-align:right; margin-top:3px;">${m.time || ''}</div>
@@ -2132,9 +2256,11 @@
 
         const o = window.myOrders.find(x => x.id === window.activeChatOrderId);
         const chatArr = (o && Array.isArray(o.chat)) ? [...o.chat] : [];
+        const nomeCliente = (window.clientProfileData && window.clientProfileData.nome) || (o && o.cliente) || 'Cliente';
         const now = new Date();
         chatArr.push({
             sender: 'cliente',
+            senderName: nomeCliente,
             text: txt,
             time: now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0')
         });
@@ -2145,6 +2271,8 @@
         if (!fileInput.files || !fileInput.files[0] || !window.activeChatOrderId) return;
         const file = fileInput.files[0];
         const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        const oCurr = window.myOrders.find(x => x.id === window.activeChatOrderId);
+        const nomeCliente = (window.clientProfileData && window.clientProfileData.nome) || (oCurr && oCurr.cliente) || 'Cliente';
 
         if (isPdf) {
             if (file.size > 900 * 1024) {
@@ -2158,6 +2286,7 @@
                 const now = new Date();
                 chatArr.push({
                     sender: 'cliente',
+                    senderName: nomeCliente,
                     text: '🧾 Comprovante em PDF enviado',
                     fileType: 'pdf',
                     fileName: file.name,
@@ -2187,6 +2316,7 @@
                     const now = new Date();
                     chatArr.push({
                         sender: 'cliente',
+                        senderName: nomeCliente,
                         text: '🧾 Comprovante enviado',
                         fileType: 'image',
                         img: dataUrl,
@@ -2268,10 +2398,13 @@
             const loja = window.allStores.find(s => s.id === o.lojaId);
             const logo = (loja && loja.logo_loja) ? loja.logo_loja : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
             const isDone = window.isOrderDone(o.status);
+            const isCanceled = (o.status === 'Cancelado');
             const hasEvaluated = Boolean(o.avaliacao);
+            const badgeBg = isCanceled ? '#fee2e2' : (isDone ? '#dcfce7' : '#fef3c7');
+            const badgeColor = isCanceled ? '#dc2626' : (isDone ? '#15803d' : '#b45309');
 
             return `
-            <div style="background:#fff; border:1px solid var(--border); border-radius:18px; padding:16px; margin-bottom:12px;">
+            <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:16px; margin-bottom:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="${logo}" style="width:42px; height:42px; border-radius:50%; object-fit:cover;">
@@ -2280,22 +2413,29 @@
                             <div style="font-size:0.75rem; color:#71717a; font-weight:700;">Pedido #${o.id.substring(0,6).toUpperCase()} • ${o.data || ''}</div>
                         </div>
                     </div>
-                    <span style="background:${isDone ? '#dcfce7' : '#fef3c7'}; color:${isDone ? '#15803d' : '#b45309'}; padding:5px 12px; border-radius:20px; font-weight:900; font-size:0.75rem;">${o.status || 'Novo'}</span>
+                    <span style="background:${badgeBg}; color:${badgeColor}; padding:5px 12px; border-radius:20px; font-weight:900; font-size:0.75rem;">${isCanceled ? '❌ Cancelado' : (o.status || 'Novo')}</span>
                 </div>
 
                 <div style="background:#f8fafc; padding:12px; border-radius:12px; font-weight:700; font-size:0.86rem; color:#334155; margin-bottom:12px;">
                     ${o.itens || ''}
                 </div>
 
+                ${isCanceled ? `
+                <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:12px; margin-bottom:12px; color:#991b1b; font-size:0.8rem; font-weight:700;">
+                    <div><b>❌ Pedido Cancelado (${o.canceladoPor === 'Cliente' ? 'Por você' : 'Pela loja'})</b></div>
+                    <div style="margin-top:2px;">Motivo: ${o.motivoCancelamento || 'Não informado'}</div>
+                </div>` : ''}
+
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                     <span style="font-size:0.82rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
-                    <span style="font-size:1.1rem; font-weight:900; color:var(--success);">Total: ${o.total || 'R$ 0,00'}</span>
+                    <span style="font-size:1.1rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
                 </div>
 
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <button onclick="openClientChat('${o.id}')" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">💬 Chat</button>
-                    <button onclick="openTrackModal('${o.id}')" style="flex:1; background:var(--success); color:#fff; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">Acompanhar</button>
-                    ${isDone && !hasEvaluated ? `<button onclick="openRateOrderModal('${o.id}')" style="flex:1; background:#fef3c7; color:#b45309; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">⭐ Avaliar</button>` : ''}
+                    <button onclick="openTrackModal('${o.id}')" style="flex:1; background:${isCanceled ? '#64748b' : 'var(--success)'}; color:#fff; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">${isCanceled ? 'Ver Detalhes' : 'Acompanhar'}</button>
+                    ${(!isCanceled && o.status === 'Novo') ? `<button onclick="openClientCancelModal('${o.id}')" style="flex:1; background:#fee2e2; color:#dc2626; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">❌ Cancelar</button>` : ''}
+                    ${isDone && !isCanceled && !hasEvaluated ? `<button onclick="openRateOrderModal('${o.id}')" style="flex:1; background:#fef3c7; color:#b45309; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">⭐ Avaliar</button>` : ''}
                     ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.8rem; font-weight:800; color:#d97706; padding:8px 12px; background:#fef3c7; border-radius:12px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
                 </div>
             </div>`;
