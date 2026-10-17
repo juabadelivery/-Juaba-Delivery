@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
-    <link rel="icon" type="image/png" href="https://github.com/juabadelivery/Bd_imagens/blob/main/SeuDelivery.png?raw=true">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <script>
         // Gera o Manifest internamente na memória do navegador sem precisar do arquivo manifest.json externo
@@ -25,8 +25,8 @@
                     theme_color: "#ea1d2c",
                     orientation: "portrait-primary",
                     icons: [
-                        { src: "https://github.com/juabadelivery/Bd_imagens/blob/main/SeuDelivery.png?raw=true", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                        { src: "https://github.com/juabadelivery/Bd_imagens/blob/main/SeuDelivery.png?raw=true", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
                     ]
                 };
                 const blob = new Blob([JSON.stringify(inlineManifest)], { type: 'application/manifest+json' });
@@ -1133,7 +1133,7 @@
 
     // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
     // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec') || "";
 
     window.allStores = [];
     window.allProducts = [];
