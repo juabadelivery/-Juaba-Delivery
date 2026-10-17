@@ -280,6 +280,38 @@
         .step-row.done { color: var(--success); font-weight: 900; }
         .step-row.done .step-dot { background: var(--success); color: #fff; }
 
+        /* Botões Elegantes dos Cards de Pedido */
+        .order-card-actions {
+            display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+            padding-top: 10px; border-top: 1px solid #f1f5f9; flex-wrap: wrap;
+        }
+        .btn-order-sleek {
+            padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 0.78rem;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            gap: 5px; border: 1px solid transparent; transition: all 0.15s ease;
+        }
+        .btn-order-sleek:active { transform: scale(0.96); }
+        .btn-order-sleek.chat { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
+        .btn-order-sleek.track { background: #18181b; color: #ffffff; box-shadow: 0 2px 6px rgba(24,24,27,0.12); }
+        .btn-order-sleek.track.active-green { background: var(--success); color: #ffffff; box-shadow: 0 2px 8px rgba(22,163,74,0.2); }
+        .btn-order-sleek.rate { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+
+        /* Seletor Customizado de Endereço na Sacola */
+        .delivery-picker-trigger {
+            width: 100%; padding: 12px 14px; border: 1px solid #d4d4d8; border-radius: 14px;
+            background: #f8fafc; display: flex; align-items: center; justify-content: space-between;
+            gap: 10px; cursor: pointer; text-align: left; transition: 0.15s;
+        }
+        .delivery-picker-trigger:active { transform: scale(0.99); border-color: var(--primary); }
+        .delivery-option-card {
+            border: 2px solid var(--border); border-radius: 14px; padding: 12px 14px;
+            margin-bottom: 10px; cursor: pointer; display: flex; align-items: center;
+            justify-content: space-between; gap: 10px; background: #fff; transition: 0.15s;
+        }
+        .delivery-option-card.selected {
+            border-color: var(--primary); background: var(--primary-light);
+        }
+
         .toast {
             position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-150%);
             background: #18181b; color: #fff; padding: 12px 22px; border-radius: 999px;
@@ -657,38 +689,14 @@
         <div id="profile-sub-enderecos" style="display:none;">
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
-                <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:12px;">📍 Meus Endereços de Entrega</h3>
-
-                <div style="background:#f8fafc; border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:16px;">
-                    <div style="font-weight:900; font-size:0.88rem; color:#18181b; margin-bottom:10px;" id="addr-form-title">➕ Cadastrar Novo Endereço</div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <div class="input-group" style="flex:2; min-width:180px;">
-                            <label>Rua / Avenida / Passagem *</label>
-                            <input type="text" id="addr-rua" placeholder="Ex: Rua Oeiras do Pará">
-                        </div>
-                        <div class="input-group" style="flex:1; min-width:95px;">
-                            <label>Número *</label>
-                            <input type="text" id="addr-numero" placeholder="Ex: 136">
-                        </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                    <div>
+                        <h3 style="font-weight:900; font-size:1.08rem;">📍 Meus Endereços</h3>
+                        <p style="font-size:0.76rem; color:#71717a; font-weight:600;">Locais salvos para entrega dos seus pedidos</p>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <div class="input-group" style="flex:1; min-width:140px;">
-                            <label>Bairro *</label>
-                            <input type="text" id="addr-bairro" placeholder="Ex: Primavera">
-                        </div>
-                        <div class="input-group" style="flex:1; min-width:140px;">
-                            <label>Complemento (Casa, Apto)</label>
-                            <input type="text" id="addr-comp" placeholder="Ex: Casa B, Apto 102">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>Ponto de Referência (Opcional)</label>
-                        <input type="text" id="addr-ref" placeholder="Ex: Próximo à praça / Portão branco">
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" onclick="saveAddressFromProfile()" class="btn-primary" style="background:#18181b; flex:1;" id="btn-save-addr">+ Salvar Endereço</button>
-                        <button type="button" onclick="cancelEditAddress()" id="btn-cancel-addr" style="display:none; background:#e4e4e7; color:#18181b; border:none; padding:0 16px; border-radius:14px; font-weight:800; cursor:pointer;">Cancelar</button>
-                    </div>
+                    <button type="button" onclick="openAddressFormModal()" style="background:var(--primary); color:#fff; border:none; padding:10px 15px; border-radius:12px; font-weight:900; font-size:0.8rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(234,29,44,0.22);">
+                        + Adicionar Endereço
+                    </button>
                 </div>
 
                 <div id="saved-addresses-list"></div>
@@ -759,7 +767,20 @@
 
         <div class="input-group">
             <label>📍 Como deseja receber?</label>
-            <select id="cart-delivery-select"></select>
+            <input type="hidden" id="cart-delivery-select" value="">
+            <div class="delivery-picker-trigger" onclick="openCartDeliveryModal()">
+                <div style="min-width:0; flex:1;">
+                    <div id="cart-delivery-title" style="font-weight:900; font-size:0.88rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        🛵 Selecionar endereço de entrega
+                    </div>
+                    <div id="cart-delivery-sub" style="font-size:0.74rem; color:#71717a; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">
+                        Toque para escolher ou retirar na loja
+                    </div>
+                </div>
+                <span style="background:#fff; border:1px solid #e4e4e7; padding:5px 10px; border-radius:8px; font-weight:800; font-size:0.74rem; color:var(--primary); flex-shrink:0;">
+                    Trocar ▾
+                </span>
+            </div>
         </div>
 
         <div class="input-group">
@@ -797,6 +818,61 @@
         </div>
 
         <button class="btn-primary" onclick="checkoutOrder()">✅ Finalizar Pedido</button>
+    </div>
+</div>
+
+<!-- Modal para Escolher Endereço de Entrega na Sacola -->
+<div class="modal-overlay" id="modal-select-delivery-address" style="z-index:2400;" onclick="if(event.target===this) closeCartDeliveryModal()">
+    <div class="modal-sheet" style="max-width:460px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+                <h3 style="font-weight:900; font-size:1.12rem;">📍 Onde deseja receber?</h3>
+                <p style="font-size:0.76rem; color:#71717a; font-weight:600;">Escolha um dos seus endereços ou retirada</p>
+            </div>
+            <button type="button" onclick="closeCartDeliveryModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
+        </div>
+        <div id="cart-delivery-options-list" style="max-height:55vh; overflow-y:auto; margin-bottom:12px;"></div>
+        <button type="button" onclick="closeCartDeliveryModal(); openAddressFormModal(true);" style="width:100%; background:#f8fafc; color:#18181b; border:1px dashed #a1a1aa; padding:12px; border-radius:12px; font-weight:900; font-size:0.84rem; cursor:pointer;">
+            + Cadastrar Novo Endereço
+        </button>
+    </div>
+</div>
+
+<!-- Modal com o Formulário para Cadastrar / Editar Endereço -->
+<div class="modal-overlay" id="modal-address-form" style="z-index:2600;" onclick="if(event.target===this) closeAddressFormModal()">
+    <div class="modal-sheet" style="max-width:460px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="font-weight:900; font-size:1.1rem; color:#18181b;" id="addr-form-title">➕ Novo Endereço</h3>
+            <button type="button" onclick="closeAddressFormModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="input-group" style="flex:2; min-width:170px;">
+                <label>Rua / Avenida / Passagem *</label>
+                <input type="text" id="addr-rua" placeholder="Ex: Rua Oeiras do Pará">
+            </div>
+            <div class="input-group" style="flex:1; min-width:90px;">
+                <label>Número *</label>
+                <input type="text" id="addr-numero" placeholder="Ex: 136">
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Bairro *</label>
+                <input type="text" id="addr-bairro" placeholder="Ex: Primavera">
+            </div>
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Complemento (Casa, Apto)</label>
+                <input type="text" id="addr-comp" placeholder="Ex: Casa B, Apto 102">
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Ponto de Referência (Opcional)</label>
+            <input type="text" id="addr-ref" placeholder="Ex: Próximo à praça / Portão branco">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+            <button type="button" onclick="closeAddressFormModal()" id="btn-cancel-addr" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">Cancelar</button>
+            <button type="button" onclick="saveAddressFromProfile()" class="btn-primary" style="background:var(--primary); flex:1.5; padding:12px;" id="btn-save-addr">💾 Salvar Endereço</button>
+        </div>
     </div>
 </div>
 
@@ -986,7 +1062,7 @@
 
     // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
     // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec') || "";
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
 
     window.allStores = [];
     window.allProducts = [];
@@ -1802,13 +1878,108 @@
             </div>`;
         }).join('');
 
-        const sel = document.getElementById('cart-delivery-select');
-        const addrs = (window.clientProfileData && Array.isArray(window.clientProfileData.enderecos)) ? window.clientProfileData.enderecos : [];
-        let opts = addrs.map(a => `<option value="Entregar em: ${a.rua}">🛵 Entregar em: ${a.rua}</option>`).join('');
-        opts += `<option value="Retirar na Loja">🏪 Vou Retirar na Loja</option>`;
-        sel.innerHTML = opts;
-
+        window.syncCartDeliveryDisplay();
         window.updateCartTotals();
+    };
+
+    window.selectedDeliveryIdx = 0; // -1 = Retirar na Loja, 0..N = índice do endereço salvo
+    window.reopenDeliveryModalAfterSave = false;
+
+    window.syncCartDeliveryDisplay = function() {
+        const addrs = (window.clientProfileData && Array.isArray(window.clientProfileData.enderecos)) ? window.clientProfileData.enderecos : [];
+        const hiddenInput = document.getElementById('cart-delivery-select');
+        const titleEl = document.getElementById('cart-delivery-title');
+        const subEl = document.getElementById('cart-delivery-sub');
+        if (!hiddenInput || !titleEl || !subEl) return;
+
+        if (addrs.length === 0) {
+            if (window.selectedDeliveryIdx === -1) {
+                hiddenInput.value = 'Retirar na Loja';
+                titleEl.innerText = '🏪 Vou Retirar na Loja';
+                subEl.innerText = 'Você busca o pedido no balcão do restaurante';
+            } else {
+                hiddenInput.value = 'Entregar em: ';
+                titleEl.innerText = '📍 Nenhum endereço cadastrado';
+                subEl.innerText = 'Toque aqui para cadastrar seu endereço ou escolher retirada';
+            }
+            return;
+        }
+
+        if (window.selectedDeliveryIdx >= addrs.length) {
+            window.selectedDeliveryIdx = 0;
+        }
+
+        if (window.selectedDeliveryIdx === -1) {
+            hiddenInput.value = 'Retirar na Loja';
+            titleEl.innerText = '🏪 Vou Retirar na Loja';
+            subEl.innerText = 'Você busca o pedido no balcão do restaurante';
+        } else {
+            const a = addrs[window.selectedDeliveryIdx] || addrs[0];
+            const fullStr = a.rua || window.formatAddressDisplay(a);
+            hiddenInput.value = `Entregar em: ${fullStr}`;
+            const mainTitle = a.logradouro
+                ? `🛵 ${a.logradouro}, Nº ${a.numero || 'S/N'}`
+                : `🛵 ${fullStr}`;
+            const subInfo = a.bairro
+                ? `Bairro ${a.bairro}${a.complemento ? ' • ' + a.complemento : ''}${a.referencia ? ' • Ref: ' + a.referencia : ''}`
+                : 'Endereço selecionado para entrega';
+            titleEl.innerText = mainTitle;
+            subEl.innerText = subInfo;
+        }
+    };
+
+    window.openCartDeliveryModal = function() {
+        const addrs = (window.clientProfileData && Array.isArray(window.clientProfileData.enderecos)) ? window.clientProfileData.enderecos : [];
+        const box = document.getElementById('cart-delivery-options-list');
+        if (!box) return;
+
+        let html = '';
+        if (addrs.length === 0) {
+            html += `<div style="padding:14px; text-align:center; color:#71717a; font-weight:700; font-size:0.82rem; background:#f8fafc; border-radius:12px; margin-bottom:10px;">Você ainda não tem endereços salvos. Cadastre abaixo ou escolha retirar na loja:</div>`;
+        } else {
+            html += addrs.map((a, idx) => {
+                const isSel = window.selectedDeliveryIdx === idx;
+                const mainLine = a.logradouro
+                    ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}`
+                    : (a.rua || '');
+                const subDetails = [
+                    a.complemento ? `Compl: ${a.complemento}` : '',
+                    a.referencia ? `Ref: ${a.referencia}` : ''
+                ].filter(Boolean).join(' • ');
+
+                return `
+                <div class="delivery-option-card ${isSel ? 'selected' : ''}" onclick="selectCartDeliveryOption(${idx})">
+                    <div style="min-width:0; flex:1;">
+                        <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🛵 ${mainLine}</div>
+                        ${subDetails ? `<div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">${subDetails}</div>` : ''}
+                    </div>
+                    <span style="font-size:1.1rem;">${isSel ? '🔘' : '⚪'}</span>
+                </div>`;
+            }).join('');
+        }
+
+        const isPickup = window.selectedDeliveryIdx === -1;
+        html += `
+        <div class="delivery-option-card ${isPickup ? 'selected' : ''}" onclick="selectCartDeliveryOption(-1)">
+            <div style="min-width:0; flex:1;">
+                <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🏪 Vou Retirar na Loja</div>
+                <div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">Sem taxa de entrega • Buscar no estabelecimento</div>
+            </div>
+            <span style="font-size:1.1rem;">${isPickup ? '🔘' : '⚪'}</span>
+        </div>`;
+
+        box.innerHTML = html;
+        document.getElementById('modal-select-delivery-address').style.display = 'flex';
+    };
+
+    window.closeCartDeliveryModal = function() {
+        document.getElementById('modal-select-delivery-address').style.display = 'none';
+    };
+
+    window.selectCartDeliveryOption = function(idx) {
+        window.selectedDeliveryIdx = idx;
+        window.syncCartDeliveryDisplay();
+        window.closeCartDeliveryModal();
     };
 
     window.applyCoupon = function() {
@@ -2103,12 +2274,12 @@
         }
 
         const receiptBtnHtml = (!isCanceled && st === 'Novo')
-            ? `<button class="btn-primary" style="margin-bottom:8px;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
-            : `<button class="btn-primary" style="margin-bottom:8px; background:#18181b;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Abrir Chat com a Loja</button>`;
+            ? `<button class="btn-primary" style="margin-bottom:8px; padding:11px 14px; font-size:0.88rem; border-radius:12px;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
+            : `<button class="btn-primary" style="margin-bottom:8px; padding:11px 14px; font-size:0.88rem; border-radius:12px; background:#18181b;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Abrir Chat com a Loja</button>`;
 
         const canClientCancel = (!isCanceled && st === 'Novo');
         const cancelBtnHtml = canClientCancel
-            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fee2e2; color:#dc2626; border:1px solid #fecaca; padding:12px; border-radius:14px; font-weight:900; font-size:0.9rem; cursor:pointer;">❌ Cancelar Pedido</button>`
+            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">✕ Solicitar Cancelamento do Pedido</button>`
             : '';
 
         document.getElementById('track-order-body').innerHTML = `
@@ -2406,37 +2577,22 @@
             return `
             <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:16px; margin-bottom:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${logo}" style="width:42px; height:42px; border-radius:50%; object-fit:cover;">
-                        <div>
-                            <div style="font-weight:900; font-size:1rem;">${o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante')}</div>
-                            <div style="font-size:0.75rem; color:#71717a; font-weight:700;">Pedido #${o.id.substring(0,6).toUpperCase()} • ${o.data || ''}</div>
-                        </div>
-                    </div>
-                    <span style="background:${badgeBg}; color:${badgeColor}; padding:5px 12px; border-radius:20px; font-weight:900; font-size:0.75rem;">${isCanceled ? '❌ Cancelado' : (o.status || 'Novo')}</span>
+                    <span style="font-size:0.8rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
+                    <span style="font-size:1.02rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
                 </div>
 
-                <div style="background:#f8fafc; padding:12px; border-radius:12px; font-weight:700; font-size:0.86rem; color:#334155; margin-bottom:12px;">
-                    ${o.itens || ''}
-                </div>
-
-                ${isCanceled ? `
-                <div style="background:#fef2f2; border:1px solid #fecaca; padding:10px 12px; border-radius:12px; margin-bottom:12px; color:#991b1b; font-size:0.8rem; font-weight:700;">
-                    <div><b>❌ Pedido Cancelado (${o.canceladoPor === 'Cliente' ? 'Por você' : 'Pela loja'})</b></div>
-                    <div style="margin-top:2px;">Motivo: ${o.motivoCancelamento || 'Não informado'}</div>
-                </div>` : ''}
-
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <span style="font-size:0.82rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
-                    <span style="font-size:1.1rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
-                </div>
-
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    <button onclick="openClientChat('${o.id}')" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">💬 Chat</button>
-                    <button onclick="openTrackModal('${o.id}')" style="flex:1; background:${isCanceled ? '#64748b' : 'var(--success)'}; color:#fff; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">${isCanceled ? 'Ver Detalhes' : 'Acompanhar'}</button>
-                    ${(!isCanceled && o.status === 'Novo') ? `<button onclick="openClientCancelModal('${o.id}')" style="flex:1; background:#fee2e2; color:#dc2626; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">❌ Cancelar</button>` : ''}
-                    ${isDone && !isCanceled && !hasEvaluated ? `<button onclick="openRateOrderModal('${o.id}')" style="flex:1; background:#fef3c7; color:#b45309; border:none; padding:11px; border-radius:12px; font-weight:900; cursor:pointer;">⭐ Avaliar</button>` : ''}
-                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.8rem; font-weight:800; color:#d97706; padding:8px 12px; background:#fef3c7; border-radius:12px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
+                <div class="order-card-actions">
+                    <button type="button" class="btn-order-sleek chat" onclick="openClientChat('${o.id}')">
+                        💬 Chat
+                    </button>
+                    <button type="button" class="btn-order-sleek track ${!isCanceled && !isDone ? 'active-green' : ''}" onclick="openTrackModal('${o.id}')">
+                        ${isCanceled ? '🔍 Ver Detalhes' : '🛵 Acompanhar'}
+                    </button>
+                    ${isDone && !isCanceled && !hasEvaluated ? `
+                    <button type="button" class="btn-order-sleek rate" onclick="openRateOrderModal('${o.id}')">
+                        ⭐ Avaliar
+                    </button>` : ''}
+                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -2635,6 +2791,12 @@
 
         try {
             const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            const lojaCheck = await getDoc(doc(db, "lojas", cred.user.uid));
+            if (lojaCheck.exists() && !lojaCheck.data().isSystemConfig) {
+                await signOut(auth);
+                window.showToast("⚠️ Este e-mail pertence a uma Loja! Use o Painel do Lojista.");
+                return;
+            }
             await window.saveClientProfileEverywhere(cred.user.uid, {
                 email,
                 nome,
@@ -2694,7 +2856,13 @@
 
                 await window.sendPinViaGoogleSheets(email, nome, window.generatedEmailPin);
             } else {
-                await signInWithEmailAndPassword(auth, email, pass);
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                const lojaSnap = await getDoc(doc(db, "lojas", cred.user.uid));
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                    await signOut(auth);
+                    window.showToast("🏪 Esta conta é de um Lojista! Acesse pelo Painel do Gestor.");
+                    return;
+                }
                 window.showToast("👋 Bem-vindo de volta!");
             }
         } catch (err) {
@@ -2830,6 +2998,13 @@
             const cred = await signInWithPopup(auth, provider);
             const user = cred.user;
             if (user) {
+                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                    await signOut(auth);
+                    window.showToast("🏪 Esta conta Google pertence a um Lojista! Use o Painel Gestor.");
+                    return;
+                }
+
                 const loaded = await window.loadClientProfileEverywhere(user);
                 const realName = (loaded.nome && loaded.nome !== 'Cliente')
                     ? loaded.nome
@@ -2952,11 +3127,30 @@
         document.querySelectorAll('.dots-dropdown').forEach(el => el.classList.remove('show'));
     });
 
+    window.openAddressFormModal = function(fromDeliveryPicker = false) {
+        if (!window.currentClient) {
+            window.closeCartModal();
+            window.switchTab('perfil');
+            window.showToast("👤 Entre na sua conta para cadastrar um endereço!");
+            return;
+        }
+        window.reopenDeliveryModalAfterSave = Boolean(fromDeliveryPicker);
+        window.cancelEditAddress();
+        document.getElementById('modal-address-form').style.display = 'flex';
+        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
+    };
+
+    window.closeAddressFormModal = function() {
+        document.getElementById('modal-address-form').style.display = 'none';
+        window.cancelEditAddress();
+    };
+
     window.startEditAddress = function(idx) {
         const addrs = window.clientProfileData.enderecos || [];
         const a = addrs[idx];
         if (!a) return;
         window.editingAddressIndex = idx;
+        window.reopenDeliveryModalAfterSave = false;
 
         document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
         document.getElementById('addr-numero').value = a.numero || '';
@@ -2964,10 +3158,10 @@
         document.getElementById('addr-comp').value = a.complemento || '';
         document.getElementById('addr-ref').value = a.referencia || '';
 
-        document.getElementById('addr-form-title').innerText = '✏️ Editando Endereço';
+        document.getElementById('addr-form-title').innerText = '✏️ Editar Endereço';
         document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
-        document.getElementById('btn-cancel-addr').style.display = 'inline-block';
-        document.getElementById('addr-rua').focus();
+        document.getElementById('modal-address-form').style.display = 'flex';
+        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
     };
 
     window.cancelEditAddress = function() {
@@ -2977,9 +3171,8 @@
         document.getElementById('addr-bairro').value = '';
         document.getElementById('addr-comp').value = '';
         document.getElementById('addr-ref').value = '';
-        document.getElementById('addr-form-title').innerText = '➕ Cadastrar Novo Endereço';
-        document.getElementById('btn-save-addr').innerText = '+ Salvar Endereço';
-        document.getElementById('btn-cancel-addr').style.display = 'none';
+        document.getElementById('addr-form-title').innerText = '➕ Novo Endereço';
+        document.getElementById('btn-save-addr').innerText = '💾 Salvar Endereço';
     };
 
     window.deleteAddress = async function(idx) {
@@ -2988,6 +3181,7 @@
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
         window.updateClientHeaderUI();
+        window.syncCartDeliveryDisplay();
         window.showToast("🗑️ Endereço removido!");
     };
 
@@ -3015,15 +3209,25 @@
         if (!Array.isArray(window.clientProfileData.enderecos)) window.clientProfileData.enderecos = [];
         if (window.editingAddressIndex > -1) {
             window.clientProfileData.enderecos[window.editingAddressIndex] = addrObj;
+            window.selectedDeliveryIdx = window.editingAddressIndex;
         } else {
             window.clientProfileData.enderecos.push(addrObj);
+            window.selectedDeliveryIdx = window.clientProfileData.enderecos.length - 1;
         }
 
-        window.cancelEditAddress();
+        const shouldReopenPicker = window.reopenDeliveryModalAfterSave;
+        window.reopenDeliveryModalAfterSave = false;
+        window.closeAddressFormModal();
+
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
         window.updateClientHeaderUI();
+        window.syncCartDeliveryDisplay();
         window.showToast("✅ Endereço salvo com sucesso!");
+
+        if (shouldReopenPicker) {
+            window.openCartDeliveryModal();
+        }
     };
 
     window.saveAccountDetails = async function() {
@@ -3047,6 +3251,17 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                    await signOut(auth);
+                    window.showToast("🏪 Conta de Lojista detectada! Use o Painel do Gestor.");
+                    return;
+                }
+            } catch (e) {}
+        }
+
         window.currentClient = user;
         const tabPed = document.getElementById('tab-pedidos');
         const dnavPed = document.getElementById('dnav-pedidos');
