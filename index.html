@@ -576,6 +576,7 @@
                 <div>
                     <h3 id="prof-header-name" style="font-weight:900; font-size:1.15rem;">Cliente</h3>
                     <div id="prof-header-email" style="font-size:0.8rem; color:#71717a; font-weight:600;"></div>
+                    <div id="prof-header-phone" style="font-size:0.78rem; color:var(--success); font-weight:800; margin-top:3px;"></div>
                 </div>
                 <button onclick="logoutClient()" style="background:#fee2e2; color:#dc2626; border:none; padding:9px 14px; border-radius:12px; font-weight:900; cursor:pointer;">Sair</button>
             </div>
@@ -760,6 +761,27 @@
             <textarea id="rate-comment" rows="2" placeholder="Deixe um elogio ou comentário (opcional)..."></textarea>
         </div>
         <button class="btn-primary" onclick="submitOrderRating()">Enviar Avaliação</button>
+    </div>
+</div>
+
+<!-- Modal para completar Nome e Telefone/WhatsApp após entrar com Google -->
+<div class="modal-overlay" id="modal-complete-profile">
+    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
+        <div style="font-size:2.4rem; margin-bottom:6px;">📱</div>
+        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Quase lá! Confirme seu contato</h3>
+        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">O Google não compartilha seu número. Informe seu WhatsApp para que a loja e o entregador possam falar com você:</p>
+
+        <div class="input-group">
+            <label>Como prefere ser chamado(a)?</label>
+            <input type="text" id="google-complete-name" placeholder="Seu Nome e Sobrenome">
+        </div>
+        <div class="input-group">
+            <label>Seu WhatsApp (com DDD) *</label>
+            <input type="tel" id="google-complete-phone" placeholder="Ex: 91988887777">
+        </div>
+        <button type="button" class="btn-primary" onclick="saveGoogleCompleteProfile()" style="background:var(--success); margin-top:8px;">
+            ✅ Salvar e Continuar
+        </button>
     </div>
 </div>
 
@@ -1657,6 +1679,13 @@
             return;
         }
 
+        if (!window.clientProfileData.telefone || String(window.clientProfileData.telefone).trim().length < 8) {
+            window.closeCartModal();
+            window.openCompleteProfileModal();
+            window.showToast("📱 Informe seu WhatsApp para finalizar o pedido!");
+            return;
+        }
+
         const deliveryChoice = document.getElementById('cart-delivery-select').value;
         if (deliveryChoice.startsWith('Entregar em:') && (!window.clientProfileData.enderecos || window.clientProfileData.enderecos.length === 0)) {
             window.closeCartModal();
@@ -2076,23 +2105,102 @@
         }
     };
 
+    window.updateClientHeaderUI = function() {
+        if (!window.currentClient) return;
+        const user = window.currentClient;
+        const googleName = user.displayName || '';
+        const savedName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
+            ? window.clientProfileData.nome
+            : '';
+        const finalName = savedName || googleName || (user.email ? user.email.split('@')[0] : 'Cliente');
+        window.clientProfileData.nome = finalName;
+
+        const firstName = finalName.split(' ')[0];
+        const mobBtn = document.getElementById('mobile-user-btn');
+        const deskBtn = document.getElementById('desktop-user-btn');
+        const profName = document.getElementById('prof-header-name');
+        const profEmail = document.getElementById('prof-header-email');
+        const profPhone = document.getElementById('prof-header-phone');
+
+        if (mobBtn) mobBtn.innerText = `👤 ${firstName}`;
+        if (deskBtn) deskBtn.innerText = `👤 ${firstName}`;
+        if (profName) profName.innerText = finalName;
+        if (profEmail) profEmail.innerText = user.email || '';
+        if (profPhone) {
+            profPhone.innerText = window.clientProfileData.telefone
+                ? `📱 WhatsApp: ${window.clientProfileData.telefone}`
+                : `⚠️ WhatsApp não informado (Toque em Conta para adicionar)`;
+            profPhone.style.color = window.clientProfileData.telefone ? 'var(--success)' : '#d97706';
+        }
+    };
+
+    window.openCompleteProfileModal = function() {
+        if (!window.currentClient) return;
+        const currentName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
+            ? window.clientProfileData.nome
+            : (window.currentClient.displayName || '');
+        document.getElementById('google-complete-name').value = currentName;
+        document.getElementById('google-complete-phone').value = (window.clientProfileData && window.clientProfileData.telefone) || '';
+        document.getElementById('modal-complete-profile').style.display = 'flex';
+    };
+
+    window.saveGoogleCompleteProfile = async function() {
+        if (!window.currentClient) return;
+        const nome = document.getElementById('google-complete-name').value.trim() || window.currentClient.displayName || 'Cliente';
+        const telefone = document.getElementById('google-complete-phone').value.trim();
+
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
+            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
+            return;
+        }
+
+        window.clientProfileData.nome = nome;
+        window.clientProfileData.telefone = telefone;
+
+        await setDoc(doc(db, "clientes", window.currentClient.uid), {
+            email: window.currentClient.email || '',
+            nome,
+            telefone
+        }, { merge: true });
+
+        document.getElementById('modal-complete-profile').style.display = 'none';
+        window.updateClientHeaderUI();
+        window.showToast("✅ Nome e WhatsApp salvos com sucesso!");
+    };
+
     window.loginWithGoogle = async function() {
         try {
             const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
             const cred = await signInWithPopup(auth, provider);
             const user = cred.user;
             if (user) {
                 const ref = doc(db, "clientes", user.uid);
                 const snap = await getDoc(ref);
-                if (!snap.exists()) {
-                    await setDoc(ref, {
-                        email: user.email || '',
-                        nome: user.displayName || (user.email ? user.email.split('@')[0] : 'Cliente'),
-                        telefone: user.phoneNumber || '',
-                        enderecos: []
-                    }, { merge: true });
+                const existingData = snap.exists() ? snap.data() : {};
+
+                const realName = (existingData.nome && existingData.nome !== 'Cliente')
+                    ? existingData.nome
+                    : (user.displayName || (user.email ? user.email.split('@')[0] : 'Cliente'));
+                const realPhone = existingData.telefone || user.phoneNumber || '';
+                const realAddrs = Array.isArray(existingData.enderecos) ? existingData.enderecos : [];
+
+                const updatedProfile = {
+                    email: user.email || '',
+                    nome: realName,
+                    telefone: realPhone,
+                    enderecos: realAddrs
+                };
+
+                await setDoc(ref, updatedProfile, { merge: true });
+                window.clientProfileData = updatedProfile;
+                window.updateClientHeaderUI();
+                window.showToast(`👋 Bem-vindo(a), ${realName.split(' ')[0]}!`);
+
+                // Se a conta Google ainda não tiver um WhatsApp salvo, pede para completar na hora
+                if (!realPhone) {
+                    window.openCompleteProfileModal();
                 }
-                window.showToast("👋 Conectado com sua Conta Google!");
             }
         } catch (err) {
             console.error("Erro Login Google:", err);
@@ -2201,7 +2309,7 @@
             nome,
             telefone
         }, { merge: true });
-        document.getElementById('prof-header-name').innerText = nome || 'Cliente';
+        window.updateClientHeaderUI();
         window.showToast("✅ Dados da conta atualizados!");
         window.openProfileSubView('main');
     };
@@ -2219,20 +2327,44 @@
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            const snap = await getDoc(doc(db, "clientes", user.uid));
+            const ref = doc(db, "clientes", user.uid);
+            const snap = await getDoc(ref);
+            const googleName = user.displayName || '';
+
             if (snap.exists()) {
-                window.clientProfileData = { enderecos: [], ...snap.data() };
+                const data = snap.data();
+                const bestName = (data.nome && data.nome !== 'Cliente')
+                    ? data.nome
+                    : (googleName || (user.email ? user.email.split('@')[0] : 'Cliente'));
+
+                window.clientProfileData = { enderecos: [], ...data, nome: bestName };
+
+                // Se no banco estava salvo apenas "Cliente" e o Google trouxe o nome real, atualiza no banco
+                if (data.nome !== bestName) {
+                    await setDoc(ref, { nome: bestName }, { merge: true });
+                }
             } else {
-                window.clientProfileData = { nome: user.email.split('@')[0], email: user.email, telefone: '', enderecos: [] };
+                const initialName = googleName || (user.email ? user.email.split('@')[0] : 'Cliente');
+                window.clientProfileData = {
+                    nome: initialName,
+                    email: user.email || '',
+                    telefone: user.phoneNumber || '',
+                    enderecos: []
+                };
+                await setDoc(ref, window.clientProfileData, { merge: true });
             }
-            const firstName = (window.clientProfileData.nome || user.email.split('@')[0]).split(' ')[0];
-            mobBtn.innerText = `👤 ${firstName}`;
-            deskBtn.innerText = `👤 ${firstName}`;
-            document.getElementById('prof-header-name').innerText = window.clientProfileData.nome || firstName;
-            document.getElementById('prof-header-email').innerText = user.email;
+
+            window.updateClientHeaderUI();
+
             if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
                 document.getElementById('desktop-addr-label').innerText = window.clientProfileData.enderecos[0].rua.substring(0, 18) + '...';
             }
+
+            // Se o usuário logou com Google e ainda não tem telefone cadastrado, abre o modal para pedir o WhatsApp
+            if (!window.clientProfileData.telefone) {
+                window.openCompleteProfileModal();
+            }
+
             window.filterMyOrders();
         } else {
             if (tabPed) tabPed.style.display = 'none';
