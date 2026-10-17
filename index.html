@@ -294,6 +294,7 @@
         .btn-order-sleek.chat { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
         .btn-order-sleek.track { background: #18181b; color: #ffffff; box-shadow: 0 2px 6px rgba(24,24,27,0.12); }
         .btn-order-sleek.track.active-green { background: var(--success); color: #ffffff; box-shadow: 0 2px 8px rgba(22,163,74,0.2); }
+        .btn-order-sleek.reorder { background: var(--primary-light); color: var(--primary); border-color: #fecdd3; font-weight: 900; }
         .btn-order-sleek.rate { background: #fffbeb; color: #b45309; border-color: #fde68a; }
 
         /* Seletor Customizado de Endereço na Sacola */
@@ -1844,6 +1845,19 @@
         document.getElementById('modal-cart').style.display = 'none';
     };
 
+    window.removeCartItem = function(idx) {
+        if (!window.cart[idx]) return;
+        const removedName = window.cart[idx].nome;
+        window.cart.splice(idx, 1);
+        window.updateCartFloatingBar();
+        window.showToast(`🗑️ "${removedName}" removido da sacola.`);
+        if (window.cart.length === 0) {
+            window.closeCartModal();
+        } else {
+            window.renderCartModal();
+        }
+    };
+
     window.changeCartItemQty = function(idx, delta) {
         if (!window.cart[idx]) return;
         window.cart[idx].qty += delta;
@@ -1864,16 +1878,21 @@
             const lineTotal = item.unitPrice * item.qty;
             return `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9; gap:10px;">
-                <div style="flex:1;">
-                    <div style="font-weight:900; font-size:0.95rem;">${item.nome}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:900; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.nome}</div>
                     ${item.addonsNames.length > 0 ? `<div style="font-size:0.75rem; color:#71717a; font-weight:600;">+ ${item.addonsNames.join(', ')}</div>` : ''}
                     ${item.obs ? `<div style="font-size:0.74rem; color:#d97706; font-weight:700;">Obs: ${item.obs}</div>` : ''}
                     <div style="font-weight:900; color:var(--success); font-size:0.9rem; margin-top:2px;">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>
                 </div>
-                <div style="display:flex; align-items:center; gap:8px; background:#f4f4f5; padding:6px 10px; border-radius:12px; font-weight:900;">
-                    <button type="button" onclick="changeCartItemQty(${idx}, -1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--primary); cursor:pointer; width:22px;">−</button>
-                    <span style="min-width:16px; text-align:center;">${item.qty}</span>
-                    <button type="button" onclick="changeCartItemQty(${idx}, 1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--success); cursor:pointer; width:22px;">+</button>
+                <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                    <div style="display:flex; align-items:center; gap:8px; background:#f4f4f5; padding:6px 10px; border-radius:12px; font-weight:900;">
+                        <button type="button" onclick="changeCartItemQty(${idx}, -1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--primary); cursor:pointer; width:22px;">−</button>
+                        <span style="min-width:16px; text-align:center;">${item.qty}</span>
+                        <button type="button" onclick="changeCartItemQty(${idx}, 1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--success); cursor:pointer; width:22px;">+</button>
+                    </div>
+                    <button type="button" onclick="removeCartItem(${idx})" title="Excluir produto da sacola" style="width:34px; height:34px; border-radius:10px; border:1px solid #fecaca; background:#fee2e2; color:#dc2626; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        🗑️
+                    </button>
                 </div>
             </div>`;
         }).join('');
@@ -2147,6 +2166,16 @@
             telefone: window.clientProfileData.telefone || '',
             endereco: deliveryChoice.replace('Entregar em: ', ''),
             itens: itensStr,
+            itensCart: window.cart.map(i => ({
+                prodId: i.prodId,
+                lojaId: i.lojaId,
+                nome: i.nome,
+                unitPrice: i.unitPrice,
+                qty: i.qty,
+                addonsNames: i.addonsNames || [],
+                addonsKey: i.addonsKey || '',
+                obs: i.obs || ''
+            })),
             pagamento: paymentStr,
             total: finalTotalTxt,
             status: 'Novo',
@@ -2552,6 +2581,94 @@
         }
     };
 
+    window.reorderToCart = function(orderId) {
+        const o = window.myOrders.find(x => x.id === orderId);
+        if (!o) return;
+
+        const loja = window.allStores.find(s => s.id === o.lojaId);
+        if (loja && !window.isStoreOpenBySchedule(loja)) {
+            window.showToast("🔴 Esta loja está fechada no momento.");
+            return;
+        }
+
+        if (window.cart.length > 0 && window.cart[0].lojaId !== o.lojaId) {
+            window.cart = [];
+            window.appliedCoupon = null;
+        }
+
+        let addedCount = 0;
+
+        if (Array.isArray(o.itensCart) && o.itensCart.length > 0) {
+            o.itensCart.forEach(savedItem => {
+                const existingIdx = window.cart.findIndex(item =>
+                    item.prodId === savedItem.prodId &&
+                    item.addonsKey === (savedItem.addonsKey || '') &&
+                    item.obs.toLowerCase() === String(savedItem.obs || '').toLowerCase()
+                );
+                if (existingIdx > -1) {
+                    window.cart[existingIdx].qty += (parseInt(savedItem.qty) || 1);
+                } else {
+                    window.cart.push({
+                        prodId: savedItem.prodId,
+                        lojaId: o.lojaId,
+                        nome: savedItem.nome,
+                        unitPrice: parseFloat(savedItem.unitPrice) || 0,
+                        qty: parseInt(savedItem.qty) || 1,
+                        addonsNames: Array.isArray(savedItem.addonsNames) ? savedItem.addonsNames : [],
+                        addonsKey: savedItem.addonsKey || '',
+                        obs: savedItem.obs || ''
+                    });
+                }
+                addedCount++;
+            });
+        } else if (o.itens) {
+            const parts = String(o.itens).split(',');
+            parts.forEach(part => {
+                const clean = part.trim();
+                const match = clean.match(/^(\d+)x\s+(.+)$/i);
+                const qty = match ? (parseInt(match[1]) || 1) : 1;
+                let rawName = match ? match[2].trim() : clean;
+                rawName = rawName.replace(/\[.*?\]/g, '').replace(/\(Obs:.*?\)/gi, '').trim();
+
+                const foundProd = window.allProducts.find(p =>
+                    p.lojaId === o.lojaId &&
+                    String(p.nome || '').toLowerCase().trim() === rawName.toLowerCase()
+                ) || window.allProducts.find(p =>
+                    p.lojaId === o.lojaId &&
+                    String(p.nome || '').toLowerCase().includes(rawName.toLowerCase())
+                );
+
+                if (foundProd) {
+                    const existingIdx = window.cart.findIndex(item => item.prodId === foundProd.id && !item.addonsKey && !item.obs);
+                    if (existingIdx > -1) {
+                        window.cart[existingIdx].qty += qty;
+                    } else {
+                        window.cart.push({
+                            prodId: foundProd.id,
+                            lojaId: o.lojaId,
+                            nome: foundProd.nome,
+                            unitPrice: parseFloat(foundProd.preco) || 0,
+                            qty: qty,
+                            addonsNames: [],
+                            addonsKey: '',
+                            obs: ''
+                        });
+                    }
+                    addedCount++;
+                }
+            });
+        }
+
+        if (addedCount > 0) {
+            window.updateCartFloatingBar();
+            window.openCartModal();
+            window.showToast("🛍️ Itens adicionados na sacola!");
+        } else {
+            window.openStoreMenu(o.lojaId);
+            window.showToast("🏪 Abrindo cardápio da loja para escolher seus itens!");
+        }
+    };
+
     window.renderClientOrders = function() {
         const box = document.getElementById('client-orders-list');
         if (!box) return;
@@ -2568,14 +2685,24 @@
         box.innerHTML = list.map(o => {
             const loja = window.allStores.find(s => s.id === o.lojaId);
             const logo = (loja && loja.logo_loja) ? loja.logo_loja : 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
+            const nomeLoja = o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante');
             const isDone = window.isOrderDone(o.status);
             const isCanceled = (o.status === 'Cancelado');
             const hasEvaluated = Boolean(o.avaliacao);
-            const badgeBg = isCanceled ? '#fee2e2' : (isDone ? '#dcfce7' : '#fef3c7');
-            const badgeColor = isCanceled ? '#dc2626' : (isDone ? '#15803d' : '#b45309');
 
             return `
-            <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:16px; margin-bottom:12px;">
+            <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;">
+                    <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
+                        <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
+                        <div style="font-weight:900; font-size:0.98rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            ${nomeLoja}
+                        </div>
+                    </div>
+                    ${isDone && !isCanceled ? `<span style="font-size:0.72rem; font-weight:700; color:#71717a; white-space:nowrap;">✔️ Pedido finalizado</span>` : ''}
+                    ${isCanceled ? `<span style="font-size:0.72rem; font-weight:800; color:#dc2626; white-space:nowrap;">❌ Cancelado</span>` : ''}
+                </div>
+
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <span style="font-size:0.8rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
                     <span style="font-size:1.02rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
@@ -2585,9 +2712,13 @@
                     <button type="button" class="btn-order-sleek chat" onclick="openClientChat('${o.id}')">
                         💬 Chat
                     </button>
-                    <button type="button" class="btn-order-sleek track ${!isCanceled && !isDone ? 'active-green' : ''}" onclick="openTrackModal('${o.id}')">
+                    ${isDone && !isCanceled ? `
+                    <button type="button" class="btn-order-sleek reorder" onclick="reorderToCart('${o.id}')">
+                        🛍️ Adicionar na sacola
+                    </button>` : `
+                    <button type="button" class="btn-order-sleek track ${!isCanceled ? 'active-green' : ''}" onclick="openTrackModal('${o.id}')">
                         ${isCanceled ? '🔍 Ver Detalhes' : '🛵 Acompanhar'}
-                    </button>
+                    </button>`}
                     ${isDone && !isCanceled && !hasEvaluated ? `
                     <button type="button" class="btn-order-sleek rate" onclick="openRateOrderModal('${o.id}')">
                         ⭐ Avaliar
@@ -2638,6 +2769,12 @@
         window.clientProfileData = cleanObj;
         try {
             localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
+            localStorage.setItem('juaba_cli_active_session', JSON.stringify({
+                uid,
+                email: cleanObj.email,
+                displayName: cleanObj.nome,
+                profile: cleanObj
+            }));
         } catch (e) {}
 
         if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
@@ -3037,6 +3174,9 @@
     };
 
     window.logoutClient = async function() {
+        try {
+            localStorage.removeItem('juaba_cli_active_session');
+        } catch (e) {}
         await signOut(auth);
         window.showToast("Você saiu da conta.");
         window.switchTab('home');
@@ -3202,23 +3342,20 @@
             numero,
             bairro,
             complemento,
-            referencia,
-            rua: window.formatAddressDisplay({ logradouro, numero, bairro, complemento, referencia })
+            referencia
         };
+        addrObj.rua = window.formatAddressDisplay(addrObj);
 
         if (!Array.isArray(window.clientProfileData.enderecos)) window.clientProfileData.enderecos = [];
         if (window.editingAddressIndex > -1) {
             window.clientProfileData.enderecos[window.editingAddressIndex] = addrObj;
-            window.selectedDeliveryIdx = window.editingAddressIndex;
         } else {
             window.clientProfileData.enderecos.push(addrObj);
             window.selectedDeliveryIdx = window.clientProfileData.enderecos.length - 1;
         }
 
         const shouldReopenPicker = window.reopenDeliveryModalAfterSave;
-        window.reopenDeliveryModalAfterSave = false;
         window.closeAddressFormModal();
-
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
         window.updateClientHeaderUI();
@@ -3226,6 +3363,7 @@
         window.showToast("✅ Endereço salvo com sucesso!");
 
         if (shouldReopenPicker) {
+            window.reopenDeliveryModalAfterSave = false;
             window.openCartDeliveryModal();
         }
     };
@@ -3235,12 +3373,15 @@
         const primeiroNome = document.getElementById('acc-edit-first-name').value.trim();
         const sobrenome = document.getElementById('acc-edit-last-name').value.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
+
         if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
         if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
 
+        const nome = `${primeiroNome} ${sobrenome}`.trim();
+        window.clientProfileData.nome = nome;
         window.clientProfileData.primeiroNome = primeiroNome;
         window.clientProfileData.sobrenome = sobrenome;
-        window.clientProfileData.nome = `${primeiroNome} ${sobrenome}`.trim();
         window.clientProfileData.telefone = telefone;
         window.clientProfileData.perfilConfirmado = true;
 
@@ -3250,11 +3391,56 @@
         window.openProfileSubView('main');
     };
 
+    window.restoreInstantSessionUI = function() {
+        try {
+            const cachedStores = localStorage.getItem('juaba_cache_stores');
+            if (cachedStores) {
+                window.allStores = JSON.parse(cachedStores) || [];
+                window.renderHomeView();
+            }
+            const cachedProds = localStorage.getItem('juaba_cache_products');
+            if (cachedProds) {
+                window.allProducts = JSON.parse(cachedProds) || [];
+                window.renderHomeView();
+            }
+            const rawSession = localStorage.getItem('juaba_cli_active_session');
+            if (!rawSession) return;
+            const sess = JSON.parse(rawSession);
+            if (!sess || !sess.uid) return;
+
+            window.currentClient = {
+                uid: sess.uid,
+                email: sess.email || '',
+                displayName: sess.displayName || (sess.profile && sess.profile.nome) || 'Cliente'
+            };
+            if (sess.profile) {
+                window.clientProfileData = sess.profile;
+            }
+            const tabPed = document.getElementById('tab-pedidos');
+            const dnavPed = document.getElementById('dnav-pedidos');
+            if (tabPed) tabPed.style.display = 'flex';
+            if (dnavPed) dnavPed.style.display = 'inline-block';
+            document.getElementById('profile-logged-out').style.display = 'none';
+            document.getElementById('profile-logged-in').style.display = 'block';
+            window.updateClientHeaderUI();
+
+            const cachedOrders = localStorage.getItem('juaba_cache_orders_' + sess.uid);
+            if (cachedOrders) {
+                window.myOrders = JSON.parse(cachedOrders) || [];
+                window.renderClientOrders();
+            }
+        } catch (e) {}
+    };
+
+    // Executa imediatamente antes mesmo do Firebase responder para não piscar "Entrar"
+    window.restoreInstantSessionUI();
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
                 const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
                 if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                    localStorage.removeItem('juaba_cli_active_session');
                     await signOut(auth);
                     window.showToast("🏪 Conta de Lojista detectada! Use o Painel do Gestor.");
                     return;
@@ -3274,15 +3460,14 @@
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            // 1º: Atualiza imediatamente a interface com os dados disponíveis (sem travar esperando rede)
             const quickName =
                 (window.pendingRegistrationData && window.pendingRegistrationData.nome) ||
+                (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente' ? window.clientProfileData.nome : '') ||
                 user.displayName ||
                 (user.email ? user.email.split('@')[0] : 'Cliente');
             window.clientProfileData.nome = quickName;
             window.updateClientHeaderUI();
 
-            // 2º: Carrega dados completos (LocalStorage + Firestore com proteção try/catch)
             const fullProfile = await window.loadClientProfileEverywhere(user);
             window.clientProfileData = fullProfile;
             await window.saveClientProfileEverywhere(user.uid, fullProfile);
@@ -3294,6 +3479,7 @@
 
             window.filterMyOrders();
         } else {
+            localStorage.removeItem('juaba_cli_active_session');
             if (tabPed) tabPed.style.display = 'none';
             if (dnavPed) dnavPed.style.display = 'none';
             document.getElementById('profile-logged-out').style.display = 'block';
@@ -3339,6 +3525,8 @@
             }
         });
 
+        try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
+
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
     });
@@ -3346,6 +3534,7 @@
     onSnapshot(collection(db, "produtos"), (snap) => {
         window.allProducts = [];
         snap.forEach(d => window.allProducts.push({ id: d.id, ...d.data() }));
+        try { localStorage.setItem('juaba_cache_products', JSON.stringify(window.allProducts)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
         if (window.detailProduct) window.renderProductSuggestions(window.detailProduct);
@@ -3361,6 +3550,11 @@
         if (!window.currentClient) { window.myOrders = []; return; }
         const myEmail = (window.currentClient.email || '').toLowerCase();
         window.myOrders = window.rawAllOrders.filter(o => (o.emailCliente || '').toLowerCase() === myEmail);
+        try {
+            if (window.currentClient.uid) {
+                localStorage.setItem('juaba_cache_orders_' + window.currentClient.uid, JSON.stringify(window.myOrders));
+            }
+        } catch (e) {}
         window.renderClientOrders();
         if (window.activeTrackOrderId) {
             const found = window.myOrders.find(x => x.id === window.activeTrackOrderId);
