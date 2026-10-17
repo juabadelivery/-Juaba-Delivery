@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SeuDelivery | Peça Online</title>
-    <link rel="icon" type="image/png" href="https://github.com/juabadelivery/Bd_imagens/blob/main/SeuDelivery.png?raw=true">
-    <link rel="manifest" href="manifest.json">
+    <title>JuabaDelivery | Peça Online</title>
+    <meta name="theme-color" content="#ea1d2c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
+    <script>
+        // Gera o Manifest internamente na memória do navegador sem precisar do arquivo manifest.json externo
+        (function() {
+            try {
+                const inlineManifest = {
+                    name: "JuabaDelivery | Peça Online",
+                    short_name: "JuabaDelivery",
+                    description: "Peça os seus pratos favoritos das melhores lojas da região.",
+                    start_url: window.location.href,
+                    display: "standalone",
+                    background_color: "#ffffff",
+                    theme_color: "#ea1d2c",
+                    orientation: "portrait-primary",
+                    icons: [
+                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                    ]
+                };
+                const blob = new Blob([JSON.stringify(inlineManifest)], { type: 'application/manifest+json' });
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = URL.createObjectURL(blob);
+                document.head.appendChild(link);
+            } catch (e) {}
+        })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -418,7 +449,7 @@
 </header>
 
 <header class="mobile-header">
-    <div class="brand-logo" onclick="switchTab('home')">Seu<span>Delivery</span></div>
+    <div class="brand-logo" onclick="switchTab('home')">Juaba<span>Delivery</span></div>
     <button onclick="switchTab('perfil')" id="mobile-user-btn" style="background:#f4f4f5; border:none; padding:8px 14px; border-radius:999px; font-weight:800; font-size:0.8rem; cursor:pointer;">
         👤 Entrar
     </button>
@@ -1063,7 +1094,7 @@
 
     // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
     // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec') || "";
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
 
     window.allStores = [];
     window.allProducts = [];
