@@ -23,7 +23,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--dark); font-size: 14px; padding-bottom: calc(135px + var(--safe-bottom)); overflow-x: hidden; }
 
-        /* Cabeçalho Mobile */
         .mobile-header {
             background: var(--white); padding: 14px 16px; position: sticky; top: 0; z-index: 100;
             display: flex; justify-content: space-between; align-items: center;
@@ -32,16 +31,13 @@
         .brand-logo { font-weight: 900; font-size: 1.25rem; letter-spacing: -0.5px; color: var(--dark); cursor: pointer; }
         .brand-logo span { color: var(--primary); }
 
-        /* Cabeçalho Desktop (Oculto no Mobile) */
         .desktop-header { display: none; }
         .desktop-footer { display: none; }
 
-        /* Seções de Navegação */
         .view-section { display: none; max-width: 600px; margin: 0 auto; padding: 14px 16px; animation: fadeIn 0.2s ease; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Banners Promocionais */
         .banners-row {
             display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px;
             scroll-snap-type: x mandatory; scrollbar-width: none;
@@ -58,7 +54,6 @@
             color: #fff; font-weight: 900; font-size: 1.05rem;
         }
 
-        /* Carrossel de Categorias (Com respiro no topo para não cortar a borda vermelha) */
         .categories-row {
             display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 10px; margin-bottom: 12px;
             scrollbar-width: none;
@@ -80,7 +75,6 @@
         .cat-item span { font-size: 0.76rem; font-weight: 800; color: #3f3f46; }
         .cat-item.active span { color: var(--primary); font-weight: 900; }
 
-        /* Filtros Rápidos */
         .quick-filters-bar {
             display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 12px;
             scrollbar-width: none;
@@ -95,23 +89,19 @@
             border-color: var(--primary); background: var(--primary-light); color: var(--primary);
         }
 
-        /* Seletor Lista / Grade (☰ / ⊞) */
         .section-header-row {
             display: flex; justify-content: space-between; align-items: center; margin: 10px 0 12px;
         }
-        .view-toggle-group {
-            display: inline-flex; background: #f1f5f9; padding: 3px; border-radius: 12px; border: 1px solid var(--border);
+        .single-view-toggle-btn {
+            width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--border);
+            background: var(--white); color: var(--primary); font-weight: 900; font-size: 1.15rem;
+            line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: transform 0.15s, background 0.15s;
         }
-        .view-toggle-btn {
-            border: none; background: transparent; padding: 6px 10px; border-radius: 9px;
-            cursor: pointer; color: #64748b; font-weight: 900; font-size: 0.9rem; line-height: 1;
-            display: flex; align-items: center; justify-content: center; transition: 0.15s;
-        }
-        .view-toggle-btn.active {
-            background: var(--white); color: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        .single-view-toggle-btn:active {
+            transform: scale(0.93);
         }
 
-        /* Lista e Grade de Lojas */
         .stores-container.list-mode { display: flex; flex-direction: column; gap: 12px; }
         .stores-container.grid-mode { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .store-card {
@@ -128,7 +118,6 @@
             flex-direction: column; text-align: center; padding: 16px 12px; gap: 10px;
         }
 
-        /* Lista e Grade de Produtos */
         .products-container.list-mode { display: flex; flex-direction: column; gap: 12px; }
         .products-container.grid-mode { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .prod-card {
@@ -148,7 +137,6 @@
             width: 100%; height: 110px;
         }
 
-        /* Barra de Categorias Internas da Loja */
         .store-cats-bar {
             display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; margin-bottom: 8px;
             scrollbar-width: none;
@@ -163,14 +151,13 @@
             background: var(--primary); color: #fff; border-color: var(--primary);
         }
 
-        /* Tela Cheia de Detalhes do Produto (#sec-product-detail) */
         .product-full-page-card {
             background: var(--white); border: 1px solid var(--border); border-radius: 22px;
             padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 20px;
         }
         .product-hero-img-box {
-            width: 100%; height: 210px; background: #f8fafc; border-radius: 16px;
-            display: flex; align-items: center; justify-content: center; padding: 12px;
+            width: 100%; height: 135px; background: #f8fafc; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; padding: 8px;
             margin-bottom: 14px; border: 1px solid #f1f5f9; position: relative;
         }
         .product-hero-img-box img {
@@ -185,16 +172,14 @@
         }
         .addon-option-row:last-child { border-bottom: none; }
 
-        /* Sacola Flutuante Colada no Menu Inferior */
         .cart-float-bar {
-            position: fixed; bottom: calc(62px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: calc(60px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
             width: calc(100% - 24px); max-width: 560px; background: var(--primary); color: #fff;
             padding: 13px 18px; border-radius: 16px; display: none; justify-content: space-between;
             align-items: center; z-index: 850; cursor: pointer;
             box-shadow: 0 8px 25px rgba(234, 29, 44, 0.35);
         }
 
-        /* Menu Inferior Fixo */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: calc(60px + var(--safe-bottom));
             background: var(--white); border-top: 1px solid var(--border);
@@ -207,7 +192,6 @@
         }
         .nav-tab.active { color: var(--primary); }
 
-        /* Modais (Sacola, Acompanhamento, Chat, Avaliação) */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000;
             display: none; align-items: flex-end; justify-content: center;
@@ -230,7 +214,6 @@
             border-radius: 14px; font-weight: 900; font-size: 0.98rem; cursor: pointer;
         }
 
-        /* Menu 3 Pontinhos dos Endereços */
         .addr-card {
             background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px;
             display: flex; justify-content: space-between; align-items: center; gap: 10px;
@@ -252,7 +235,6 @@
         }
         .dots-dropdown button:hover { background: #f8fafc; }
 
-        /* Chat e Acompanhamento */
         .chat-msgs-box {
             height: 310px; overflow-y: auto; background: #f1f5f9; border-radius: 14px;
             padding: 12px; display: flex; flex-direction: column; gap: 8px; margin: 12px 0;
@@ -275,9 +257,6 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* ==========================================================
-           LAYOUT DESKTOP ESTILO IFOOD WEB (Telas >= 768px)
-           ========================================================== */
         @media (min-width: 768px) {
             body { padding-bottom: 40px; }
             .mobile-header { display: none !important; }
@@ -298,9 +277,7 @@
                 color: #3f3f46; cursor: pointer; padding: 6px 10px; border-radius: 8px;
             }
             .desktop-nav-links button.active { color: var(--primary); background: var(--primary-light); }
-            .desktop-search-box {
-                flex: 1; max-width: 480px; position: relative;
-            }
+            .desktop-search-box { flex: 1; max-width: 480px; position: relative; }
             .desktop-search-box input {
                 width: 100%; padding: 11px 16px 11px 40px; border-radius: 12px;
                 border: 1px solid #e4e4e7; background: #f4f4f5; font-weight: 600; outline: none;
@@ -324,23 +301,16 @@
             .products-container.list-mode { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
             .products-container.grid-mode { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 
-            .product-full-page-grid {
-                display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; align-items: start;
-            }
-            .product-hero-img-box { height: 320px; margin-bottom: 0; }
+            .product-full-page-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; align-items: start; }
+            .product-hero-img-box { height: 240px; margin-bottom: 0; }
 
-            .cart-float-bar {
-                bottom: 24px; right: 28px; left: auto; transform: none; width: 380px;
-            }
+            .cart-float-bar { bottom: 24px; right: 28px; left: auto; transform: none; width: 380px; }
 
             #modal-cart { justify-content: flex-end; align-items: stretch; }
-            #modal-cart .modal-sheet {
-                max-width: 430px; height: 100vh; max-height: 100vh; border-radius: 24px 0 0 24px;
-            }
+            #modal-cart .modal-sheet { max-width: 430px; height: 100vh; max-height: 100vh; border-radius: 24px 0 0 24px; }
             .desktop-footer {
                 display: block; max-width: 1320px; margin: 40px auto 0; padding: 24px 28px;
-                border-top: 1px solid var(--border); color: #71717a; font-size: 0.82rem; font-weight: 600;
-                text-align: center;
+                border-top: 1px solid var(--border); color: #71717a; font-size: 0.82rem; font-weight: 600; text-align: center;
             }
         }
     </style>
@@ -349,7 +319,6 @@
 
 <div class="toast" id="toast">Aviso</div>
 
-<!-- Cabeçalho Desktop Estilo iFood Web -->
 <header class="desktop-header">
     <div class="desktop-header-inner">
         <div style="display:flex; align-items:center; gap:24px;">
@@ -383,7 +352,6 @@
     </div>
 </header>
 
-<!-- Cabeçalho Mobile -->
 <header class="mobile-header">
     <div class="brand-logo" onclick="switchTab('home')">Juaba<span>Delivery</span></div>
     <button onclick="switchTab('perfil')" id="mobile-user-btn" style="background:#f4f4f5; border:none; padding:8px 14px; border-radius:999px; font-weight:800; font-size:0.8rem; cursor:pointer;">
@@ -395,35 +363,30 @@
 <main id="sec-home" class="view-section active">
     <div class="banners-row" id="home-banners"></div>
 
-    <!-- Categorias -->
     <div class="categories-row" id="home-categories">
-        <div class="cat-item active" onclick="selectCategory('TODOS', this)">
-            <div class="cat-icon-box">🍽️</div><span>Tudo</span>
-        </div>
-        <div class="cat-item" onclick="selectCategory('Lanches', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Lanches')">
             <div class="cat-icon-box">🍔</div><span>Lanches</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Pizzas', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Pizzas')">
             <div class="cat-icon-box">🍕</div><span>Pizzas</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Bebidas', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Bebidas')">
             <div class="cat-icon-box">🥤</div><span>Bebidas</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Petiscos', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Petiscos')">
             <div class="cat-icon-box">🍟</div><span>Petiscos</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Açaí', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Açaí')">
             <div class="cat-icon-box">🍨</div><span>Açaí</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Refeições', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Refeições')">
             <div class="cat-icon-box">🍲</div><span>Refeições</span>
         </div>
-        <div class="cat-item" onclick="selectCategory('Doces', this)">
+        <div class="cat-item" onclick="openCategoryFullScreen('Doces')">
             <div class="cat-icon-box">🍰</div><span>Doces</span>
         </div>
     </div>
 
-    <!-- Filtros Rápidos -->
     <div class="quick-filters-bar">
         <button class="filter-chip active" onclick="setQuickFilter('ALL', this)">🏪 Todas as Lojas</button>
         <button class="filter-chip" onclick="setQuickFilter('OPEN', this)">🟢 Abertas Agora</button>
@@ -431,39 +394,55 @@
         <button class="filter-chip" onclick="setQuickFilter('COUPON', this)">🎟️ Com Cupom de Desconto</button>
     </div>
 
-    <!-- Vitrine de Produtos da Categoria Selecionada (Com seletor Lista/Grade) -->
-    <div id="home-category-products-box" style="display:none; margin-bottom:22px;">
-        <div class="section-header-row">
-            <div>
-                <h3 id="home-category-products-title" style="font-weight:900; font-size:1.1rem;">🍴 Produtos na Categoria</h3>
-                <span id="home-category-products-count" style="font-size:0.76rem; color:#71717a; font-weight:700;"></span>
-            </div>
-            <div class="view-toggle-group">
-                <button type="button" class="view-toggle-btn" id="btn-catprod-list" onclick="setCategoryProductsViewMode('list')" title="Um embaixo do outro">☰</button>
-                <button type="button" class="view-toggle-btn active" id="btn-catprod-grid" onclick="setCategoryProductsViewMode('grid')" title="Um ao lado do outro">⊞</button>
-            </div>
-        </div>
-        <div id="home-category-products-list" class="products-container grid-mode"></div>
-    </div>
-
-    <!-- Vitrine de Lojas Disponíveis -->
     <div class="section-header-row">
         <div style="display:flex; align-items:baseline; gap:8px;">
             <h3 style="font-weight:900; font-size:1.12rem;">Lojas Disponíveis</h3>
             <span id="stores-count-label" style="font-size:0.78rem; color:#71717a; font-weight:700;">0 loja(s)</span>
         </div>
-        <div class="view-toggle-group">
-            <button type="button" class="view-toggle-btn" id="btn-view-list" onclick="setStoresViewMode('list')" title="Uma embaixo da outra">☰</button>
-            <button type="button" class="view-toggle-btn active" id="btn-view-grid" onclick="setStoresViewMode('grid')" title="Uma ao lado da outra">⊞</button>
-        </div>
+        <button type="button" class="single-view-toggle-btn" id="btn-toggle-home-view" onclick="toggleUnifiedViewMode()" title="Alternar visualização">⊞</button>
     </div>
     <div id="stores-list" class="stores-container grid-mode">Carregando lojas...</div>
 </main>
 
-<!-- ABA INTERNA: CARDÁPIO DA LOJA -->
+<!-- TELA CHEIA: CATEGORIA SELECIONADA -->
+<section id="sec-category-view" class="view-section">
+    <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:14px; border-radius:18px; border:1px solid var(--border); margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <button onclick="closeCategoryFullScreen()" style="background:#f4f4f5; border:none; width:38px; height:38px; border-radius:50%; font-weight:900; font-size:1.1rem; cursor:pointer; flex-shrink:0;">←</button>
+        <div id="cat-fullscreen-icon" style="width:46px; height:46px; border-radius:14px; background:var(--primary-light); border:1px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;">🍽️</div>
+        <div style="flex:1;">
+            <h2 id="cat-fullscreen-title" style="font-weight:900; font-size:1.15rem; color:#111; line-height:1.2;">Categoria</h2>
+            <div id="cat-fullscreen-subtitle" style="font-size:0.76rem; color:#71717a; font-weight:700; margin-top:2px;">Produtos e lojas disponíveis</div>
+        </div>
+    </div>
+
+    <div class="store-cats-bar" id="cat-fullscreen-pills" style="margin-bottom:14px;"></div>
+
+    <div style="margin-bottom:26px;">
+        <div class="section-header-row">
+            <div>
+                <h3 id="home-category-products-title" style="font-weight:900; font-size:1.08rem; color:#111;">🍴 Produtos na Categoria</h3>
+                <span id="home-category-products-count" style="font-size:0.76rem; color:#71717a; font-weight:700;">0 produto(s) encontrado(s)</span>
+            </div>
+            <button type="button" class="single-view-toggle-btn" id="btn-toggle-cat-view" onclick="toggleUnifiedViewMode()" title="Alternar visualização de produtos e lojas">⊞</button>
+        </div>
+        <div id="home-category-products-list" class="products-container grid-mode"></div>
+    </div>
+
+    <div>
+        <div class="section-header-row">
+            <div>
+                <h3 id="cat-stores-title" style="font-weight:900; font-size:1.08rem; color:#111;">🏪 Lojas com esta Categoria</h3>
+                <span id="cat-stores-count-label" style="font-size:0.76rem; color:#71717a; font-weight:700;">0 loja(s) encontrada(s)</span>
+            </div>
+        </div>
+        <div id="cat-stores-list" class="stores-container grid-mode"></div>
+    </div>
+</section>
+
+<!-- CARDÁPIO DA LOJA -->
 <section id="sec-store-menu" class="view-section">
     <div style="display:flex; align-items:center; gap:12px; background:#fff; padding:14px; border-radius:18px; border:1px solid var(--border); margin-bottom:14px;">
-        <button onclick="switchTab('home')" style="background:#f4f4f5; border:none; width:38px; height:38px; border-radius:50%; font-weight:900; font-size:1.1rem; cursor:pointer;">←</button>
+        <button onclick="goBackFromStoreMenu()" style="background:#f4f4f5; border:none; width:38px; height:38px; border-radius:50%; font-weight:900; font-size:1.1rem; cursor:pointer;">←</button>
         <img id="menu-store-logo" src="" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:1px solid var(--border);">
         <div style="flex:1;">
             <h2 id="menu-store-name" style="font-weight:900; font-size:1.12rem; line-height:1.2;">Loja</h2>
@@ -471,16 +450,12 @@
         </div>
     </div>
 
-    <!-- Abas de Categorias Internas da Loja -->
     <div id="menu-categories-bar" class="store-cats-bar"></div>
-
-    <!-- Produtos da Loja -->
     <div id="menu-products-list" class="products-container list-mode"></div>
 </section>
 
-<!-- NOVA TELA CHEIA: DETALHES DO PRODUTO + SUGESTÕES ESTILO IFOOD -->
+<!-- TELA CHEIA DE DETALHES DO PRODUTO -->
 <section id="sec-product-detail" class="view-section">
-    <!-- Barra Superior da Página do Produto -->
     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
         <button onclick="goBackFromProductDetail()" style="background:#fff; border:1px solid var(--border); padding:9px 14px; border-radius:999px; font-weight:900; font-size:0.84rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
             ← Voltar
@@ -490,7 +465,6 @@
         </div>
     </div>
 
-    <!-- Card Principal do Produto Selecionado -->
     <div class="product-full-page-card">
         <div class="product-full-page-grid">
             <div class="product-hero-img-box">
@@ -508,16 +482,13 @@
                     <span id="detail-prod-old-price" style="display:none; font-size:0.9rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ 0,00</span>
                 </div>
 
-                <!-- Grupos de Adicionais / Opções -->
                 <div id="detail-addons-container"></div>
 
-                <!-- Observações -->
                 <div class="input-group" style="margin-top:10px;">
                     <label>Observações do item (Opcional)</label>
                     <input type="text" id="detail-prod-obs" placeholder="Ex: Sem cebola, bem gelada, ponto da carne...">
                 </div>
 
-                <!-- Seletor de Quantidade + Botão Adicionar ao Carrinho -->
                 <div style="display:flex; gap:10px; align-items:center; margin-top:14px;">
                     <div style="display:flex; align-items:center; gap:12px; background:#f4f4f5; padding:10px 14px; border-radius:14px; font-weight:900;">
                         <button type="button" onclick="changeDetailQty(-1)" style="border:none; background:none; font-size:1.2rem; font-weight:900; cursor:pointer; width:24px;">−</button>
@@ -532,17 +503,13 @@
         </div>
     </div>
 
-    <!-- SEÇÃO ESTILO IFOOD: OUTRAS SUGESTÕES DE PRODUTOS (MESMA CATEGORIA OU NOME PARECIDO) -->
     <div style="margin-top:8px;">
         <div class="section-header-row">
             <div>
                 <h3 style="font-weight:900; font-size:1.08rem; color:#111;">✨ Outras opções para você</h3>
                 <p style="font-size:0.76rem; color:#71717a; font-weight:700;">Produtos semelhantes ou da mesma categoria nesta e em outras lojas</p>
             </div>
-            <div class="view-toggle-group">
-                <button type="button" class="view-toggle-btn" id="btn-sug-list" onclick="setSuggestedViewMode('list')" title="Um embaixo do outro">☰</button>
-                <button type="button" class="view-toggle-btn active" id="btn-sug-grid" onclick="setSuggestedViewMode('grid')" title="Um ao lado do outro">⊞</button>
-            </div>
+            <button type="button" class="single-view-toggle-btn" id="btn-toggle-sug-view" onclick="toggleUnifiedViewMode()" title="Alternar visualização">⊞</button>
         </div>
         <div id="detail-suggestions-list" class="products-container grid-mode"></div>
     </div>
@@ -564,9 +531,8 @@
     <div id="client-orders-list"></div>
 </section>
 
-<!-- ABA 4: PERFIL (Com sub-abas Endereços e Conta) -->
+<!-- ABA 4: PERFIL (Com sub-abas) -->
 <section id="sec-perfil" class="view-section">
-    <!-- Caixa Deslogado -->
     <div id="profile-logged-out" style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:22px;">
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
@@ -586,20 +552,36 @@
             <label>Senha</label>
             <input type="password" id="cli-auth-pass" placeholder="Sua senha...">
         </div>
+        <div id="forgot-pass-link-box" style="text-align:right; margin-top:-6px; margin-bottom:12px;">
+            <button type="button" onclick="openForgotPasswordModal()" style="background:none; border:none; color:#71717a; font-weight:800; font-size:0.78rem; cursor:pointer; text-decoration:underline;">
+                Esqueci minha senha
+            </button>
+        </div>
         <button class="btn-primary" id="cli-auth-submit-btn" onclick="submitClientAuth()">Entrar na Conta</button>
-        <button type="button" onclick="toggleClientAuthMode()" id="cli-auth-toggle-btn" style="width:100%; background:none; border:none; color:var(--primary); font-weight:800; margin-top:12px; cursor:pointer;">
+
+        <div style="display:flex; align-items:center; gap:10px; margin:14px 0;">
+            <div style="flex:1; height:1px; background:var(--border);"></div>
+            <span style="font-size:0.74rem; font-weight:800; color:#a1a1aa; text-transform:uppercase;">ou</span>
+            <div style="flex:1; height:1px; background:var(--border);"></div>
+        </div>
+
+        <button type="button" onclick="loginWithGoogle()" style="width:100%; background:#fff; color:#18181b; border:1px solid #d4d4d8; padding:13px; border-radius:14px; font-weight:800; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            <span>Entrar com Conta Google</span>
+        </button>
+
+        <button type="button" onclick="toggleClientAuthMode()" id="cli-auth-toggle-btn" style="width:100%; background:none; border:none; color:var(--primary); font-weight:800; margin-top:14px; cursor:pointer;">
             Ainda não tem conta? Cadastre-se grátis
         </button>
     </div>
 
-    <!-- Caixa Logado -->
     <div id="profile-logged-in" style="display:none;">
-        <!-- Menu Principal do Perfil -->
         <div id="profile-main-menu">
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <h3 id="prof-header-name" style="font-weight:900; font-size:1.15rem;">Cliente</h3>
                     <div id="prof-header-email" style="font-size:0.8rem; color:#71717a; font-weight:600;"></div>
+                    <div id="prof-header-phone" style="font-size:0.78rem; color:var(--success); font-weight:800; margin-top:3px;"></div>
                 </div>
                 <button onclick="logoutClient()" style="background:#fee2e2; color:#dc2626; border:none; padding:9px 14px; border-radius:12px; font-weight:900; cursor:pointer;">Sair</button>
             </div>
@@ -629,7 +611,6 @@
             </div>
         </div>
 
-        <!-- Sub-Aba: Endereços -->
         <div id="profile-sub-enderecos" style="display:none;">
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
@@ -642,7 +623,6 @@
             </div>
         </div>
 
-        <!-- Sub-Aba: Conta -->
         <div id="profile-sub-conta" style="display:none;">
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
@@ -661,12 +641,10 @@
     </div>
 </section>
 
-<!-- Rodapé Desktop -->
 <footer class="desktop-footer">
     © 2026 <b>JuabaDelivery</b> • O seu marketplace de restaurantes locais • Rápido, seguro e sem taxas escondidas.
 </footer>
 
-<!-- Barra Flutuante Única da Sacola (Colada no Menu Inferior) -->
 <div class="cart-float-bar" id="cart-float-bar" onclick="openCartModal()">
     <div>
         <div id="float-cart-total" style="font-weight:900; font-size:1.05rem;">R$ 0,00</div>
@@ -677,7 +655,6 @@
     </div>
 </div>
 
-<!-- Menu de Navegação Inferior (Sempre visível no Mobile) -->
 <nav class="bottom-nav">
     <button class="nav-tab active" id="tab-home" onclick="switchTab('home')">
         <span style="font-size:1.2rem;">🏠</span><span>Início</span>
@@ -693,7 +670,6 @@
     </button>
 </nav>
 
-<!-- MODAL: MINHA SACOLA -->
 <div class="modal-overlay" id="modal-cart" onclick="if(event.target===this) closeCartModal()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -719,7 +695,7 @@
         <div class="input-group">
             <label>💳 Forma de Pagamento</label>
             <select id="cart-payment-select" onchange="toggleChangeField()">
-                <option value="PIX">💠 PIX (Copia e Cola ao finalizar)</option>
+                <option value="PIX">💠 PIX</option>
                 <option value="Cartão na Entrega">💳 Cartão na Entrega</option>
                 <option value="Dinheiro">💵 Dinheiro</option>
             </select>
@@ -746,7 +722,6 @@
     </div>
 </div>
 
-<!-- MODAL: ACOMPANHAR PEDIDO + PIX COPIA E COLA PÓS-COMPRA -->
 <div class="modal-overlay" id="modal-track-order" onclick="if(event.target===this) document.getElementById('modal-track-order').style.display='none'">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -757,7 +732,6 @@
     </div>
 </div>
 
-<!-- MODAL: CHAT DO PEDIDO (ENVIO DE FOTO E PDF) -->
 <div class="modal-overlay" id="modal-chat" onclick="if(event.target===this) closeClientChat()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -776,7 +750,6 @@
     </div>
 </div>
 
-<!-- MODAL: AVALIAÇÃO DE 1 A 5 ESTRELAS -->
 <div class="modal-overlay" id="modal-rate-order" onclick="if(event.target===this) closeRateModal()">
     <div class="modal-sheet" style="text-align:center;">
         <div style="font-size:2.8rem; margin-bottom:8px;">⭐</div>
@@ -796,9 +769,93 @@
     </div>
 </div>
 
+<!-- Modal de Verificação de PIN de 4 Dígitos por E-mail (Google Sheets) -->
+<div class="modal-overlay" id="modal-verify-pin">
+    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.75rem; font-weight:900; color:var(--primary); text-transform:uppercase;">Verificação de Segurança</span>
+            <button type="button" onclick="closeVerifyPinModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
+        </div>
+        <div style="font-size:2.4rem; margin-bottom:6px;">📩</div>
+        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Confirme seu E-mail</h3>
+        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
+            Enviamos um código PIN de <b>4 dígitos</b> para:<br>
+            <b id="pin-target-email" style="color:var(--primary);">email@exemplo.com</b>
+        </p>
+
+        <div class="input-group" style="text-align:center;">
+            <label style="text-align:center;">Digite o PIN de 4 dígitos</label>
+            <input type="text" id="pin-code-input" maxlength="4" inputmode="numeric" placeholder="0000" style="text-align:center; font-size:1.6rem; font-weight:900; letter-spacing:10px; padding:12px;" onkeypress="if(event.key==='Enter') confirmEmailPinCode()">
+        </div>
+
+        <div id="pin-script-config-hint" style="display:none; background:#fffbeb; border:1px dashed #f59e0b; padding:10px; border-radius:12px; margin-bottom:12px; text-align:left; font-size:0.75rem; color:#92400e;">
+            <div style="font-weight:900; margin-bottom:4px;">⚙️ Link do Google Sheets (Apps Script):</div>
+            <div style="display:flex; gap:6px;">
+                <input type="text" id="custom-gsheet-url-input" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1; padding:7px 9px; border:1px solid #fcd34d; border-radius:8px; font-size:0.75rem;">
+                <button type="button" onclick="saveCustomGoogleScriptUrl()" style="background:#d97706; color:#fff; border:none; padding:0 10px; border-radius:8px; font-weight:800; cursor:pointer;">Salvar</button>
+            </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="btn-confirm-pin" onclick="confirmEmailPinCode()" style="background:var(--success); margin-bottom:10px;">
+            ✅ Confirmar PIN e Criar Conta
+        </button>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <button type="button" onclick="resendEmailPinCode()" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.8rem; cursor:pointer;">
+                🔄 Reenviar PIN
+            </button>
+            <button type="button" onclick="document.getElementById('pin-script-config-hint').style.display = document.getElementById('pin-script-config-hint').style.display === 'none' ? 'block' : 'none'" style="background:none; border:none; color:#71717a; font-weight:700; font-size:0.75rem; cursor:pointer;">
+                ⚙️ Configurar Planilha
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Recuperação de Senha -->
+<div class="modal-overlay" id="modal-forgot-password" onclick="if(event.target===this) closeForgotPasswordModal()">
+    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
+        <div style="display:flex; justify-content:flex-end;">
+            <button type="button" onclick="closeForgotPasswordModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
+        </div>
+        <div style="font-size:2.4rem; margin-bottom:6px;">🔑</div>
+        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Recuperar Minha Senha</h3>
+        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
+            Informe seu e-mail cadastrado. Enviaremos um link oficial para você criar uma nova senha:
+        </p>
+        <div class="input-group">
+            <label>Seu E-mail Cadastrado</label>
+            <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
+        </div>
+        <button type="button" class="btn-primary" id="btn-send-reset" onclick="sendClientPasswordReset()">
+            📩 Enviar E-mail de Recuperação
+        </button>
+    </div>
+</div>
+
+<!-- Modal para completar Nome e Telefone/WhatsApp após entrar com Google -->
+<div class="modal-overlay" id="modal-complete-profile">
+    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
+        <div style="font-size:2.4rem; margin-bottom:6px;">📱</div>
+        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Quase lá! Confirme seu contato</h3>
+        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">O Google não compartilha seu número. Informe seu WhatsApp para que a loja e o entregador possam falar com você:</p>
+
+        <div class="input-group">
+            <label>Como prefere ser chamado(a)?</label>
+            <input type="text" id="google-complete-name" placeholder="Seu Nome e Sobrenome">
+        </div>
+        <div class="input-group">
+            <label>Seu WhatsApp (com DDD) *</label>
+            <input type="tel" id="google-complete-phone" placeholder="Ex: 91988887777">
+        </div>
+        <button type="button" class="btn-primary" onclick="saveGoogleCompleteProfile()" style="background:var(--success); margin-top:8px;">
+            ✅ Salvar e Continuar
+        </button>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { 
@@ -810,10 +867,13 @@
         appId: "1:1048831257004:web:8db55b5383206296ad3209" 
     };
 
-    // Instância isolada ("JuabaClienteApp") para rodar no mesmo navegador que o Painel Lojista sem deslogar
     const app = initializeApp(firebaseConfig, "JuabaClienteApp");
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
+    // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
 
     window.allStores = [];
     window.allProducts = [];
@@ -823,6 +883,8 @@
     window.globalBillingEnabled = true;
     window.currentClient = null;
     window.clientProfileData = { nome: '', telefone: '', enderecos: [] };
+    window.pendingRegistrationData = null;
+    window.generatedEmailPin = null;
     window.editingAddressIndex = -1;
     window.isRegisterMode = false;
 
@@ -835,6 +897,17 @@
     window.activeStoreId = null;
     window.activeStoreCategory = 'TODOS';
     window.previousSectionBeforeProduct = 'home';
+    window.previousSectionBeforeStore = 'home';
+
+    window.categoryIconsMap = {
+        'Lanches': '🍔',
+        'Pizzas': '🍕',
+        'Bebidas': '🥤',
+        'Petiscos': '🍟',
+        'Açaí': '🍨',
+        'Refeições': '🍲',
+        'Doces': '🍰'
+    };
 
     window.detailProduct = null;
     window.detailQty = 1;
@@ -857,14 +930,12 @@
         setTimeout(() => t.classList.remove('show'), 3000);
     };
 
-    // Gerador Oficial PIX Copia e Cola (Padrão Banco Central EMVCo + CRC16)
     window.generatePixCopiaECola = function(chaveRaw, nomeLojaRaw, valorNum, txidRaw) {
         let key = String(chaveRaw || '').trim();
         if (!key) return '';
         const cleanDigits = key.replace(/\D/g, '');
         if (!key.includes('@') && !key.startsWith('+')) {
             if (cleanDigits.length === 11 && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(key)) {
-                // Se parecer celular com DDD (ex: 3º dígito é 9), podemos manter os 11 dígitos como CPF ou adicionar +55 se tiver formatado com parênteses
                 if (key.includes('(') || key.includes('-')) key = '+55' + cleanDigits;
                 else key = cleanDigits;
             } else if (cleanDigits.length === 14) {
@@ -901,7 +972,6 @@
         }
     };
 
-    // Verifica horário automático da loja e bloqueia pedidos caso a assinatura do painel esteja expirada
     window.isStoreOpenBySchedule = function(loja) {
         if (!loja) return false;
         const cobrancaAtiva = (window.globalBillingEnabled !== false) && !(loja.cobrancaAtiva === false || String(loja.cobrancaAtiva).toLowerCase() === 'false');
@@ -938,7 +1008,6 @@
         }
     };
 
-    // Compara nomes de categorias (singular/plural e sinônimos como Doces/Sobremesas)
     window.categoryMatches = function(prodCat, selectedCat) {
         if (!selectedCat || selectedCat === 'TODOS') return true;
         const a = String(prodCat || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
@@ -951,70 +1020,70 @@
         return false;
     };
 
-    // Navegação entre abas mantendo menu inferior e sacola flutuante
     window.switchTab = function(tab) {
+        if (tab === 'home') {
+            window.selectedCategory = 'TODOS';
+        }
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(`sec-${tab}`);
         if (target) target.classList.add('active');
 
         document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-        const navBtn = document.getElementById(`tab-${tab}`);
+        const navBtn = document.getElementById(`tab-${tab === 'category-view' ? 'home' : tab}`);
         if (navBtn) navBtn.classList.add('active');
 
         const dHome = document.getElementById('dnav-home');
         const dPed = document.getElementById('dnav-pedidos');
-        if (dHome) dHome.classList.toggle('active', tab === 'home');
+        if (dHome) dHome.classList.toggle('active', tab === 'home' || tab === 'category-view');
         if (dPed) dPed.classList.toggle('active', tab === 'pedidos');
 
         if (tab === 'perfil' && window.currentClient) {
-            window.openProfileSubView('main');
+            document.getElementById('profile-main-menu').style.display = 'block';
+            document.getElementById('profile-sub-enderecos').style.display = 'none';
+            document.getElementById('profile-sub-conta').style.display = 'none';
+            window.updateClientHeaderUI();
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Alternar modo Lista (☰) ou Grade (⊞) das Lojas
-    window.setStoresViewMode = function(mode) {
+    window.applyUnifiedViewMode = function(mode) {
         window.storesViewMode = mode;
-        localStorage.setItem('juaba_stores_view', mode);
-        const listEl = document.getElementById('stores-list');
-        if (listEl) {
-            listEl.classList.toggle('list-mode', mode === 'list');
-            listEl.classList.toggle('grid-mode', mode === 'grid');
-        }
-        const bList = document.getElementById('btn-view-list');
-        const bGrid = document.getElementById('btn-view-grid');
-        if (bList) bList.classList.toggle('active', mode === 'list');
-        if (bGrid) bGrid.classList.toggle('active', mode === 'grid');
-    };
-
-    // Alternar modo Lista (☰) ou Grade (⊞) dos Produtos da Categoria na Home
-    window.setCategoryProductsViewMode = function(mode) {
         window.catProductsViewMode = mode;
+        window.suggestedViewMode = mode;
+        localStorage.setItem('juaba_stores_view', mode);
         localStorage.setItem('juaba_catprod_view', mode);
-        const listEl = document.getElementById('home-category-products-list');
-        if (listEl) {
-            listEl.classList.toggle('list-mode', mode === 'list');
-            listEl.classList.toggle('grid-mode', mode === 'grid');
-        }
-        const bList = document.getElementById('btn-catprod-list');
-        const bGrid = document.getElementById('btn-catprod-grid');
-        if (bList) bList.classList.toggle('active', mode === 'list');
-        if (bGrid) bGrid.classList.toggle('active', mode === 'grid');
+        localStorage.setItem('juaba_sug_view', mode);
+
+        ['stores-list', 'cat-stores-list', 'home-category-products-list', 'detail-suggestions-list'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('list-mode', mode === 'list');
+                el.classList.toggle('grid-mode', mode === 'grid');
+            }
+        });
+
+        const iconChar = mode === 'grid' ? '⊞' : '☰';
+        ['btn-toggle-home-view', 'btn-toggle-cat-view', 'btn-toggle-sug-view'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.innerText = iconChar;
+        });
     };
 
-    // Alternar modo Lista (☰) ou Grade (⊞) das Sugestões na Tela do Produto
+    window.toggleUnifiedViewMode = function() {
+        const nextMode = window.storesViewMode === 'grid' ? 'list' : 'grid';
+        window.applyUnifiedViewMode(nextMode);
+    };
+
+    window.setStoresViewMode = function(mode) {
+        window.applyUnifiedViewMode(mode);
+    };
+
+    window.setCategoryProductsViewMode = function(mode) {
+        window.applyUnifiedViewMode(mode);
+    };
+
     window.setSuggestedViewMode = function(mode) {
-        window.suggestedViewMode = mode;
-        localStorage.setItem('juaba_sug_view', mode);
-        const listEl = document.getElementById('detail-suggestions-list');
-        if (listEl) {
-            listEl.classList.toggle('list-mode', mode === 'list');
-            listEl.classList.toggle('grid-mode', mode === 'grid');
-        }
-        const bList = document.getElementById('btn-sug-list');
-        const bGrid = document.getElementById('btn-sug-grid');
-        if (bList) bList.classList.toggle('active', mode === 'list');
-        if (bGrid) bGrid.classList.toggle('active', mode === 'grid');
+        window.applyUnifiedViewMode(mode);
     };
 
     window.renderBanners = function(bannersArr) {
@@ -1029,306 +1098,92 @@
         `).join('');
     };
 
-    window.selectCategory = function(cat, el) {
+    window.openCategoryFullScreen = function(cat) {
         window.selectedCategory = cat;
-        document.querySelectorAll('#home-categories .cat-item').forEach(c => c.classList.remove('active'));
-        if (el) el.classList.add('active');
-        window.renderHomeView();
+        window.renderCategoryFullScreen();
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-category-view').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.setQuickFilter = function(mode, el) {
-        window.quickFilterMode = mode;
-        document.querySelectorAll('.quick-filters-bar .filter-chip').forEach(c => c.classList.remove('active'));
-        if (el) el.classList.add('active');
-        window.renderHomeView();
+    window.closeCategoryFullScreen = function() {
+        window.selectedCategory = 'TODOS';
+        window.switchTab('home');
     };
 
-    window.renderHomeView = function() {
+    window.renderCategoryFullScreen = function() {
+        const cat = window.selectedCategory;
+        if (!cat || cat === 'TODOS') return;
+
         window.setStoresViewMode(window.storesViewMode);
         window.setCategoryProductsViewMode(window.catProductsViewMode);
+
+        const icon = window.categoryIconsMap[cat] || '🍽️';
+        document.getElementById('cat-fullscreen-icon').innerText = icon;
+        document.getElementById('cat-fullscreen-title').innerText = cat;
+
+        const allCats = Object.keys(window.categoryIconsMap);
+        const pillsBox = document.getElementById('cat-fullscreen-pills');
+        if (pillsBox) {
+            pillsBox.innerHTML = allCats.map(c => {
+                const isAct = c === cat;
+                return `<button type="button" class="store-cat-pill ${isAct ? 'active' : ''}" onclick="openCategoryFullScreen('${c}')">${window.categoryIconsMap[c]} ${c}</button>`;
+            }).join('');
+        }
 
         const activeStores = window.allStores.filter(s => !(s.bloqueada === true || String(s.bloqueada).toLowerCase() === 'true'));
         const activeStoreIds = new Set(activeStores.map(s => s.id));
 
-        // 1. Se uma categoria específica estiver selecionada, mostra os produtos dessa categoria
-        const catBox = document.getElementById('home-category-products-box');
-        if (window.selectedCategory !== 'TODOS') {
-            const catProds = window.allProducts.filter(p =>
-                activeStoreIds.has(p.lojaId) &&
-                !(p.ativo === false || String(p.ativo).toLowerCase() === 'false') &&
-                window.categoryMatches(p.categoria, window.selectedCategory)
-            );
-            catBox.style.display = 'block';
-            document.getElementById('home-category-products-title').innerText = `🍴 Opções em ${window.selectedCategory}`;
-            document.getElementById('home-category-products-count').innerText = `${catProds.length} produto(s) encontrado(s)`;
-            window.renderCategoryProducts(catProds);
-        } else {
-            catBox.style.display = 'none';
-        }
-
-        // 2. Filtra as lojas disponíveis
-        let filteredStores = activeStores.filter(s => {
-            if (window.selectedCategory !== 'TODOS') {
-                const storeHasCat = window.allProducts.some(p =>
-                    p.lojaId === s.id &&
-                    !(p.ativo === false || String(p.ativo).toLowerCase() === 'false') &&
-                    window.categoryMatches(p.categoria, window.selectedCategory)
-                );
-                if (!storeHasCat) return false;
-            }
-            if (window.quickFilterMode === 'OPEN') return window.isStoreOpenBySchedule(s);
-            if (window.quickFilterMode === 'TOP') return parseFloat(s.nota || '5.0') >= 4.8;
-            if (window.quickFilterMode === 'COUPON') return window.allCoupons.some(c => c.lojaId === s.id);
-            return true;
-        });
-
-        document.getElementById('stores-count-label').innerText = `${filteredStores.length} loja(s)`;
-        const storesEl = document.getElementById('stores-list');
-
-        if (filteredStores.length === 0) {
-            storesEl.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:26px; color:#71717a; font-weight:700; background:#fff; border-radius:16px; border:1px solid var(--border);">Nenhuma loja encontrada para este filtro.</p>`;
-            return;
-        }
-
-        storesEl.innerHTML = filteredStores.map(s => {
-            const isOpen = window.isStoreOpenBySchedule(s);
-            return `
-            <div class="store-card" onclick="openStoreMenu('${s.id}')">
-                <img src="${s.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
-                <div>
-                    <div style="font-weight:900; font-size:1rem; color:#111;">${s.nome_loja || 'Restaurante'}</div>
-                    <div style="font-size:0.78rem; font-weight:800; margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:inherit;">
-                        <span style="color:#f59e0b;">★ ${s.nota || '5.0'}</span>
-                        <span>•</span>
-                        <span style="color:${isOpen ? 'var(--success)' : '#dc2626'};">${isOpen ? '🟢 Aberta' : '🔴 Fechada'}</span>
-                    </div>
-                </div>
-            </div>`;
-        }).join('');
-    };
-
-    // IMPORTANTE: Ao clicar no produto na categoria da Home, abre APENAS a tela cheia do produto (sem abrir a loja junto!)
-    window.renderCategoryProducts = function(prods) {
-        const listEl = document.getElementById('home-category-products-list');
-        if (!listEl) return;
-        if (prods.length === 0) {
-            listEl.innerHTML = `<p style="grid-column:1/-1; padding:18px; color:#71717a; font-weight:700; background:#fff; border-radius:14px; border:1px solid var(--border);">Nenhum produto cadastrado na categoria "${window.selectedCategory}" no momento.</p>`;
-            return;
-        }
-        listEl.innerHTML = prods.map(p => {
-            const loja = window.allStores.find(s => s.id === p.lojaId);
-            const precoAtual = parseFloat(p.preco || 0);
-            const precoAntigo = parseFloat(p.precoAntigo || 0);
-            const temDesconto = precoAntigo > precoAtual;
-            const pct = temDesconto ? Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100) : 0;
-
-            return `
-            <div class="prod-card" onclick="openProductDetailModal('${p.id}')">
-                <div style="flex:1;">
-                    <div style="font-size:0.74rem; font-weight:800; color:var(--primary); margin-bottom:2px;">🏪 ${loja ? loja.nome_loja : 'Loja'}</div>
-                    <div style="font-weight:900; font-size:0.98rem; color:#111;">${p.nome}</div>
-                    <div style="font-size:0.78rem; color:#71717a; margin:4px 0 8px; line-height:1.35;">${p.descricao || ''}</div>
-                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:inherit;">
-                        <span style="font-weight:900; font-size:0.96rem; color:var(--success);">R$ ${precoAtual.toFixed(2).replace('.', ',')}</span>
-                        ${temDesconto ? `<span style="font-size:0.75rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ ${precoAntigo.toFixed(2).replace('.', ',')}</span>` : ''}
-                        ${temDesconto ? `<span style="background:#fee2e2; color:#dc2626; font-size:0.66rem; font-weight:900; padding:2px 6px; border-radius:6px;">🔥 -${pct}% OFF</span>` : ''}
-                    </div>
-                </div>
-                <img src="${p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
-            </div>`;
-        }).join('');
-    };
-
-    // Abre o cardápio de uma loja
-    window.openStoreMenu = function(storeId) {
-        window.activeStoreId = storeId;
-        window.activeStoreCategory = 'TODOS';
-        window.renderStoreMenu(storeId);
-        window.switchTab('store-menu');
-    };
-
-    window.selectStoreInternalCategory = function(cat) {
-        window.activeStoreCategory = cat;
-        if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
-    };
-
-    window.renderStoreMenu = function(storeId) {
-        const loja = window.allStores.find(s => s.id === storeId);
-        if (!loja) return;
-        const isOpen = window.isStoreOpenBySchedule(loja);
-        document.getElementById('menu-store-logo').src = loja.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
-        document.getElementById('menu-store-name').innerText = loja.nome_loja || 'Loja';
-        const stEl = document.getElementById('menu-store-status');
-        stEl.style.color = isOpen ? '#16a34a' : '#dc2626';
-        stEl.innerText = isOpen ? '🟢 Aberta para pedidos' : `🔴 Fechada no momento${loja.horarioAutoAtivo && loja.horarioAbre ? ` (Abre às ${loja.horarioAbre})` : ''}`;
-
-        const allStoreProds = window.allProducts.filter(p => p.lojaId === storeId && !(p.ativo === false || String(p.ativo).toLowerCase() === 'false'));
-
-        const catBar = document.getElementById('menu-categories-bar');
-        const storeCats = [...new Set(allStoreProds.map(p => (p.categoria || 'Geral').trim()).filter(Boolean))];
-        if (catBar) {
-            if (storeCats.length > 0) {
-                const pills = ['TODOS', ...storeCats];
-                catBar.innerHTML = pills.map(c => {
-                    const isAct = (window.activeStoreCategory || 'TODOS') === c;
-                    const label = c === 'TODOS' ? '🍽️ Todos' : c;
-                    return `<button type="button" class="store-cat-pill ${isAct ? 'active' : ''}" onclick="selectStoreInternalCategory('${c.replace(/'/g, "\\'")}')">${label}</button>`;
-                }).join('');
-            } else {
-                catBar.innerHTML = '';
-            }
-        }
-
-        const prods = (window.activeStoreCategory && window.activeStoreCategory !== 'TODOS')
-            ? allStoreProds.filter(p => (p.categoria || 'Geral').trim().toLowerCase() === window.activeStoreCategory.toLowerCase())
-            : allStoreProds;
-
-        const listEl = document.getElementById('menu-products-list');
-        if (prods.length === 0) {
-            listEl.innerHTML = `<p style="padding:20px; color:#71717a; font-weight:700;">Nenhum produto disponível nesta categoria no momento.</p>`;
-            return;
-        }
-        listEl.innerHTML = prods.map(p => {
-            const precoAtual = parseFloat(p.preco || 0);
-            const precoAntigo = parseFloat(p.precoAntigo || 0);
-            const temDesconto = precoAntigo > precoAtual;
-            const pct = temDesconto ? Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100) : 0;
-
-            return `
-            <div class="prod-card" onclick="openProductDetailModal('${p.id}')">
-                <div style="flex:1;">
-                    <div style="font-weight:900; font-size:1rem; color:#111;">${p.nome}</div>
-                    <div style="font-size:0.8rem; color:#71717a; margin:4px 0 8px; line-height:1.35;">${p.descricao || ''}</div>
-                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <span style="font-weight:900; font-size:0.98rem; color:var(--success);">R$ ${precoAtual.toFixed(2).replace('.', ',')}</span>
-                        ${temDesconto ? `<span style="font-size:0.78rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ ${precoAntigo.toFixed(2).replace('.', ',')}</span>` : ''}
-                        ${temDesconto ? `<span style="background:#fee2e2; color:#dc2626; font-size:0.68rem; font-weight:900; padding:2px 6px; border-radius:6px;">🔥 -${pct}% OFF</span>` : ''}
-                    </div>
-                </div>
-                <img src="${p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
-            </div>`;
-        }).join('');
-    };
-
-    // =========================================================================
-    // TELA CHEIA DO PRODUTO + SUGESTÕES DE PRODUTOS SEMELHANTES / MESMA CATEGORIA
-    // =========================================================================
-    window.openProductDetailModal = function(prodId) {
-        const p = window.allProducts.find(x => x.id === prodId);
-        if (!p) return;
-
-        // Salva de qual tela o cliente veio (exceto se já estiver na própria tela de produto)
-        const currentAct = document.querySelector('.view-section.active');
-        if (currentAct && currentAct.id !== 'sec-product-detail') {
-            window.previousSectionBeforeProduct = currentAct.id.replace('sec-', '');
-        }
-
-        window.detailProduct = p;
-        window.detailQty = 1;
-        window.detailAddonSelections = {};
-
-        const loja = window.allStores.find(s => s.id === p.lojaId);
-        document.getElementById('detail-store-name').innerText = loja ? `${loja.nome_loja} (Ver cardápio)` : 'Ver Loja';
-        document.getElementById('detail-prod-img').src = p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300';
-        document.getElementById('detail-prod-cat-badge').innerText = p.categoria || 'Geral';
-        document.getElementById('detail-prod-name').innerText = p.nome || 'Produto';
-        document.getElementById('detail-prod-desc').innerText = p.descricao || '';
-        document.getElementById('detail-prod-obs').value = '';
-        document.getElementById('detail-prod-qty').innerText = '1';
-
-        const precoAtual = parseFloat(p.preco || 0);
-        const precoAntigo = parseFloat(p.precoAntigo || 0);
-        const temDesconto = precoAntigo > precoAtual;
-        const pct = temDesconto ? Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100) : 0;
-
-        document.getElementById('detail-prod-price').innerText = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
-        const oldPriceEl = document.getElementById('detail-prod-old-price');
-        const discBadgeEl = document.getElementById('detail-prod-discount-badge');
-        if (temDesconto) {
-            oldPriceEl.style.display = 'inline';
-            oldPriceEl.innerText = `R$ ${precoAntigo.toFixed(2).replace('.', ',')}`;
-            discBadgeEl.style.display = 'inline-block';
-            discBadgeEl.innerText = `🔥 -${pct}% OFF`;
-        } else {
-            oldPriceEl.style.display = 'none';
-            discBadgeEl.style.display = 'none';
-        }
-
-        window.renderDetailAddons();
-        window.updateDetailTotalPrice();
-        window.renderProductSuggestions(p);
-
-        // Abre a seção em tela cheia mantendo o menu inferior e o carrinho flutuante!
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        document.getElementById('sec-product-detail').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.goBackFromProductDetail = function() {
-        const prev = window.previousSectionBeforeProduct || 'home';
-        window.switchTab(prev);
-    };
-
-    window.openStoreFromProductDetail = function() {
-        if (window.detailProduct && window.detailProduct.lojaId) {
-            window.openStoreMenu(window.detailProduct.lojaId);
-        }
-    };
-
-    // Renderiza sugestões de produtos da mesma categoria ou nome semelhante (da mesma loja ou outras lojas)
-    window.renderProductSuggestions = function(currentProd) {
-        window.setSuggestedViewMode(window.suggestedViewMode);
-        const box = document.getElementById('detail-suggestions-list');
-        if (!box || !currentProd) return;
-
-        const activeStoreIds = new Set(
-            window.allStores
-                .filter(s => !(s.bloqueada === true || String(s.bloqueada).toLowerCase() === 'true'))
-                .map(s => s.id)
-        );
-
-        const words = String(currentProd.nome || '')
-            .toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .split(/\s+/)
-            .filter(w => w.length >= 3);
-
-        const candidates = window.allProducts.filter(p =>
-            p.id !== currentProd.id &&
+        const catProds = window.allProducts.filter(p =>
             activeStoreIds.has(p.lojaId) &&
-            !(p.ativo === false || String(p.ativo).toLowerCase() === 'false')
+            !(p.ativo === false || String(p.ativo).toLowerCase() === 'false') &&
+            window.categoryMatches(p.categoria, cat)
         );
+        document.getElementById('home-category-products-title').innerText = `🍴 Opções em ${cat}`;
+        document.getElementById('home-category-products-count').innerText = `${catProds.length} produto(s) encontrado(s)`;
+        window.renderCategoryProducts(catProds);
 
-        // Pontua cada produto para mostrar os mais parecidos primeiro (mesmo nome ou mesma categoria)
-        const scored = candidates.map(p => {
-            let score = 0;
-            const pNameNorm = String(p.nome || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            words.forEach(w => {
-                if (pNameNorm.includes(w)) score += 5;
-            });
-            if (window.categoryMatches(p.categoria, currentProd.categoria)) {
-                score += 3;
-            }
-            if (p.lojaId === currentProd.lojaId) {
-                score += 1;
-            }
-            return { prod: p, score };
-        });
+        const catStores = activeStores.filter(s =>
+            window.allProducts.some(p =>
+                p.lojaId === s.id &&
+                !(p.ativo === false || String(p.ativo).toLowerCase() === 'false') &&
+                window.categoryMatches(p.categoria, cat)
+            )
+        );
+        document.getElementById('cat-stores-title').innerText = `🏪 Lojas com ${cat}`;
+        document.getElementById('cat-stores-count-label').innerText = `${catStores.length} loja(s) encontrada(s)`;
+        document.getElementById('cat-fullscreen-subtitle').innerText = `${catProds.length} produto(s) • ${catStores.length} loja(s)`;
 
-        // Filtra os que têm relação (mesma categoria ou nome parecido); se houver poucos, completa com outros
-        let related = scored.filter(x => x.score >= 3).sort((a, b) => b.score - a.score).map(x => x.prod);
-        if (related.length < 4) {
-            const extra = scored.filter(x => x.score < 3).map(x => x.prod);
-            related = [...related, ...extra];
+        const catStoresEl = document.getElementById('cat-stores-list');
+        if (catStores.length === 0) {
+            catStoresEl.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:22px; color:#71717a; font-weight:700; background:#fff; border-radius:16px; border:1px solid var(--border);">Nenhuma loja encontrada com produtos em "${cat}".</p>`;
+        } else {
+            catStoresEl.innerHTML = catStores.map(s => {
+                const isOpen = window.isStoreOpenBySchedule(s);
+                return `
+                <div class="store-card" onclick="openStoreMenu('${s.id}')">
+                    <img src="${s.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
+                    <div>
+                        <div style="font-weight:900; font-size:1rem; color:#111;">${s.nome_loja || 'Restaurante'}</div>
+                        <div style="font-size:0.78rem; font-weight:800; margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:inherit;">
+                            <span style="color:#f59e0b;">★ ${s.nota || '5.0'}</span>
+                            <span>•</span>
+                            <span style="color:${isOpen ? 'var(--success)' : '#dc2626'};">${isOpen ? '🟢 Aberta' : '🔴 Fechada'}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
-        related = related.slice(0, 10);
+    };
 
-        if (related.length === 0) {
-            box.innerHTML = `<p style="grid-column:1/-1; padding:16px; color:#71717a; font-weight:700;">Nenhuma outra opção cadastrada no momento.</p>`;
+    window.renderCategoryProducts = function(prodsArr) {
+        const box = document.getElementById('home-category-products-list');
+        if (!box) return;
+        if (prodsArr.length === 0) {
+            box.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:20px; color:#71717a; font-weight:700; background:#fff; border-radius:16px; border:1px solid var(--border);">Nenhum produto encontrado.</p>`;
             return;
         }
-
-        box.innerHTML = related.map(p => {
+        box.innerHTML = prodsArr.map(p => {
             const loja = window.allStores.find(s => s.id === p.lojaId);
             const precoAtual = parseFloat(p.preco || 0);
             const precoAntigo = parseFloat(p.precoAntigo || 0);
@@ -1354,179 +1209,366 @@
         }).join('');
     };
 
-    window.renderDetailAddons = function() {
-        const container = document.getElementById('detail-addons-container');
-        if (!container || !window.detailProduct) return;
-        let groups = [];
-        try {
-            groups = JSON.parse(window.detailProduct.adicionais || "[]");
-            if (!Array.isArray(groups)) groups = [];
-        } catch (e) { groups = []; }
+    window.setQuickFilter = function(mode, el) {
+        window.quickFilterMode = mode;
+        document.querySelectorAll('.quick-filters-bar .filter-chip').forEach(c => c.classList.remove('active'));
+        if (el) el.classList.add('active');
+        window.renderHomeView();
+    };
 
-        if (groups.length === 0) {
-            container.innerHTML = '';
+    window.renderHomeView = function() {
+        window.setStoresViewMode(window.storesViewMode);
+        const activeStores = window.allStores.filter(s => !(s.bloqueada === true || String(s.bloqueada).toLowerCase() === 'true'));
+
+        let filteredStores = activeStores.filter(s => {
+            if (window.quickFilterMode === 'OPEN') return window.isStoreOpenBySchedule(s);
+            if (window.quickFilterMode === 'TOP') return parseFloat(s.nota || '5.0') >= 4.8;
+            if (window.quickFilterMode === 'COUPON') return window.allCoupons.some(c => c.lojaId === s.id);
+            return true;
+        });
+
+        document.getElementById('stores-count-label').innerText = `${filteredStores.length} loja(s)`;
+        const storesEl = document.getElementById('stores-list');
+
+        if (filteredStores.length === 0) {
+            storesEl.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:26px; color:#71717a; font-weight:700; background:#fff; border-radius:16px; border:1px solid var(--border);">Nenhuma loja encontrada para este filtro.</p>`;
+        } else {
+            storesEl.innerHTML = filteredStores.map(s => {
+                const isOpen = window.isStoreOpenBySchedule(s);
+                return `
+                <div class="store-card" onclick="openStoreMenu('${s.id}')">
+                    <img src="${s.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
+                    <div>
+                        <div style="font-weight:900; font-size:1rem; color:#111;">${s.nome_loja || 'Restaurante'}</div>
+                        <div style="font-size:0.78rem; font-weight:800; margin-top:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:inherit;">
+                            <span style="color:#f59e0b;">★ ${s.nota || '5.0'}</span>
+                            <span>•</span>
+                            <span style="color:${isOpen ? 'var(--success)' : '#dc2626'};">${isOpen ? '🟢 Aberta' : '🔴 Fechada'}</span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        if (window.selectedCategory && window.selectedCategory !== 'TODOS') {
+            window.renderCategoryFullScreen();
+        }
+    };
+
+    window.openStoreMenu = function(storeId) {
+        const currentAct = document.querySelector('.view-section.active');
+        if (currentAct && currentAct.id !== 'sec-store-menu' && currentAct.id !== 'sec-product-detail') {
+            window.previousSectionBeforeStore = currentAct.id.replace('sec-', '');
+        }
+        window.activeStoreId = storeId;
+        window.activeStoreCategory = 'TODOS';
+        window.renderStoreMenu(storeId);
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-store-menu').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.renderStoreMenu = function(storeId) {
+        const loja = window.allStores.find(s => s.id === storeId);
+        if (!loja) return;
+        document.getElementById('menu-store-logo').src = loja.logo_loja || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
+        document.getElementById('menu-store-name').innerText = loja.nome_loja || 'Restaurante';
+        const isOpen = window.isStoreOpenBySchedule(loja);
+        document.getElementById('menu-store-status').innerHTML = `<span style="color:${isOpen ? 'var(--success)' : '#dc2626'};">${isOpen ? '🟢 Aberta para pedidos' : '🔴 Fechada no momento'}</span>`;
+
+        const prods = window.allProducts.filter(p => p.lojaId === storeId && !(p.ativo === false || String(p.ativo).toLowerCase() === 'false'));
+        const cats = ['TODOS', ...new Set(prods.map(p => (p.categoria || 'Geral').trim()).filter(Boolean))];
+
+        const bar = document.getElementById('menu-categories-bar');
+        bar.innerHTML = cats.map(c => `
+            <button type="button" class="store-cat-pill ${window.activeStoreCategory === c ? 'active' : ''}" onclick="window.activeStoreCategory='${c}'; window.renderStoreMenu('${storeId}')">
+                ${c === 'TODOS' ? '🍽️ Todos' : c}
+            </button>
+        `).join('');
+
+        const filtered = prods.filter(p => window.activeStoreCategory === 'TODOS' || window.categoryMatches(p.categoria, window.activeStoreCategory));
+        const listEl = document.getElementById('menu-products-list');
+
+        if (filtered.length === 0) {
+            listEl.innerHTML = `<p style="text-align:center; padding:30px; color:#71717a; font-weight:700;">Nenhum produto nesta categoria.</p>`;
             return;
         }
 
-        container.innerHTML = groups.map((g, gIdx) => {
-            const max = parseInt(g.max) || 1;
-            const min = parseInt(g.min) || 0;
-            const ruleTxt = min > 0 ? `Obrigatório (${min} a ${max})` : `Opcional (até ${max})`;
+        listEl.innerHTML = filtered.map(p => {
+            const precoAtual = parseFloat(p.preco || 0);
+            const precoAntigo = parseFloat(p.precoAntigo || 0);
+            const temDesconto = precoAntigo > precoAtual;
+            const pct = temDesconto ? Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100) : 0;
+
             return `
-            <div class="addon-group-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div style="font-weight:900; font-size:0.9rem;">${g.name || 'Opções'}</div>
-                    <span style="font-size:0.7rem; font-weight:800; background:#e4e4e7; padding:3px 8px; border-radius:6px;">${ruleTxt}</span>
+            <div class="prod-card" onclick="openProductDetailModal('${p.id}')">
+                <div style="flex:1;">
+                    <div style="font-weight:900; font-size:1rem; color:#111;">${p.nome}</div>
+                    <div style="font-size:0.78rem; color:#71717a; margin:4px 0 8px; line-height:1.35;">${p.descricao || ''}</div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:inherit;">
+                        <span style="font-weight:900; font-size:1rem; color:var(--success);">R$ ${precoAtual.toFixed(2).replace('.', ',')}</span>
+                        ${temDesconto ? `<span style="font-size:0.8rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ ${precoAntigo.toFixed(2).replace('.', ',')}</span>` : ''}
+                        ${temDesconto ? `<span style="background:#fee2e2; color:#dc2626; font-size:0.7rem; font-weight:900; padding:2px 6px; border-radius:6px;">🔥 -${pct}% OFF</span>` : ''}
+                    </div>
                 </div>
-                ${(g.items || []).map((item, iIdx) => {
-                    const selectedArr = window.detailAddonSelections[gIdx] || [];
-                    const isChecked = selectedArr.includes(iIdx);
-                    const pVal = parseFloat(item.price) || 0;
-                    return `
-                    <label class="addon-option-row" onclick="toggleAddonOption(${gIdx}, ${iIdx}, ${max}); event.preventDefault();">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="${max === 1 ? 'radio' : 'checkbox'}" ${isChecked ? 'checked' : ''} style="pointer-events:none; accent-color:var(--primary);">
-                            <span style="font-weight:700; font-size:0.86rem;">${item.name}</span>
-                        </div>
-                        <span style="font-weight:800; font-size:0.82rem; color:var(--success);">${pVal > 0 ? `+ R$ ${pVal.toFixed(2).replace('.', ',')}` : 'Grátis'}</span>
-                    </label>`;
-                }).join('')}
+                <img src="${p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
             </div>`;
         }).join('');
     };
 
-    window.toggleAddonOption = function(gIdx, iIdx, max) {
-        let arr = window.detailAddonSelections[gIdx] || [];
-        if (max === 1) {
-            arr = arr.includes(iIdx) ? [] : [iIdx];
+    window.goBackFromStoreMenu = function() {
+        const prev = window.previousSectionBeforeStore || 'home';
+        if (prev === 'category-view' && window.selectedCategory !== 'TODOS') {
+            window.openCategoryFullScreen(window.selectedCategory);
         } else {
-            if (arr.includes(iIdx)) {
-                arr = arr.filter(x => x !== iIdx);
+            window.switchTab('home');
+        }
+    };
+
+    window.openProductDetailModal = function(prodId) {
+        const p = window.allProducts.find(x => x.id === prodId);
+        if (!p) return;
+        window.detailProduct = p;
+        window.detailQty = 1;
+        window.detailAddonSelections = {};
+
+        const currentAct = document.querySelector('.view-section.active');
+        if (currentAct && currentAct.id !== 'sec-product-detail') {
+            window.previousSectionBeforeProduct = currentAct.id.replace('sec-', '');
+        }
+
+        const loja = window.allStores.find(s => s.id === p.lojaId);
+        document.getElementById('detail-store-name').innerText = loja ? loja.nome_loja : 'Restaurante';
+        document.getElementById('detail-prod-img').src = p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150';
+
+        const badge = document.getElementById('detail-prod-discount-badge');
+        const precoAtual = parseFloat(p.preco || 0);
+        const precoAntigo = parseFloat(p.precoAntigo || 0);
+        const temDesconto = precoAntigo > precoAtual;
+        if (temDesconto) {
+            const pct = Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100);
+            badge.innerText = `🔥 -${pct}% OFF`;
+            badge.style.display = 'block';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        document.getElementById('detail-prod-cat-badge').innerText = p.categoria || 'Geral';
+        document.getElementById('detail-prod-name').innerText = p.nome;
+        document.getElementById('detail-prod-desc').innerText = p.descricao || '';
+        document.getElementById('detail-prod-price').innerText = `R$ ${precoAtual.toFixed(2).replace('.', ',')}`;
+
+        const oldPriceEl = document.getElementById('detail-prod-old-price');
+        if (temDesconto) {
+            oldPriceEl.innerText = `R$ ${precoAntigo.toFixed(2).replace('.', ',')}`;
+            oldPriceEl.style.display = 'inline';
+        } else {
+            oldPriceEl.style.display = 'none';
+        }
+
+        document.getElementById('detail-prod-qty').innerText = '1';
+        document.getElementById('detail-prod-obs').value = '';
+
+        window.renderDetailAddons();
+        window.updateDetailTotalPrice();
+        window.renderProductSuggestions(p);
+
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-product-detail').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.goBackFromProductDetail = function() {
+        const prev = window.previousSectionBeforeProduct || 'home';
+        if (prev === 'store-menu' && window.activeStoreId) {
+            window.openStoreMenu(window.activeStoreId);
+        } else if (prev === 'category-view' && window.selectedCategory !== 'TODOS') {
+            window.openCategoryFullScreen(window.selectedCategory);
+        } else {
+            window.switchTab('home');
+        }
+    };
+
+    window.openStoreFromProductDetail = function() {
+        if (window.detailProduct && window.detailProduct.lojaId) {
+            window.openStoreMenu(window.detailProduct.lojaId);
+        }
+    };
+
+    window.renderDetailAddons = function() {
+        const box = document.getElementById('detail-addons-container');
+        if (!box || !window.detailProduct) return;
+        let groups = [];
+        try {
+            groups = JSON.parse(window.detailProduct.adicionais || "[]");
+            if (!Array.isArray(groups)) groups = [];
+        } catch (e) {
+            groups = [];
+        }
+
+        if (groups.length === 0) {
+            box.innerHTML = '';
+            return;
+        }
+
+        box.innerHTML = groups.map((g, gIdx) => {
+            const min = parseInt(g.min) || 0;
+            const max = Math.max(1, parseInt(g.max) || 1);
+            const selectedArr = window.detailAddonSelections[gIdx] || [];
+            const reqBadge = min > 0
+                ? `<span style="background:#fee2e2; color:#dc2626; padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:900;">Obrigatório (${min} a ${max})</span>`
+                : `<span style="background:#f4f4f5; color:#71717a; padding:2px 8px; border-radius:6px; font-size:0.68rem; font-weight:800;">Opcional (até ${max})</span>`;
+
+            const itemsHtml = (g.items || []).map((it, iIdx) => {
+                const isSelected = selectedArr.includes(iIdx);
+                const priceNum = parseFloat(it.price) || 0;
+                return `
+                <div class="addon-option-row" onclick="toggleDetailAddon(${gIdx}, ${iIdx})">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} style="width:18px; height:18px; accent-color:var(--primary); pointer-events:none;">
+                        <span style="font-weight:700; font-size:0.86rem; color:#18181b;">${it.name}</span>
+                    </div>
+                    <span style="font-weight:800; font-size:0.82rem; color:${priceNum > 0 ? 'var(--success)' : '#71717a'};">
+                        ${priceNum > 0 ? `+ R$ ${priceNum.toFixed(2).replace('.', ',')}` : 'Grátis'}
+                    </span>
+                </div>`;
+            }).join('');
+
+            return `
+            <div class="addon-group-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-weight:900; font-size:0.88rem; color:#111;">${g.name || 'Opções'}</span>
+                    ${reqBadge}
+                </div>
+                ${itemsHtml}
+            </div>`;
+        }).join('');
+    };
+
+    window.toggleDetailAddon = function(gIdx, iIdx) {
+        if (!window.detailProduct) return;
+        let groups = [];
+        try { groups = JSON.parse(window.detailProduct.adicionais || "[]"); } catch (e) { groups = []; }
+        const grp = groups[gIdx];
+        if (!grp) return;
+
+        const max = Math.max(1, parseInt(grp.max) || 1);
+        if (!Array.isArray(window.detailAddonSelections[gIdx])) {
+            window.detailAddonSelections[gIdx] = [];
+        }
+
+        const cur = window.detailAddonSelections[gIdx];
+        const pos = cur.indexOf(iIdx);
+        if (pos > -1) {
+            cur.splice(pos, 1);
+        } else {
+            if (max === 1) {
+                window.detailAddonSelections[gIdx] = [iIdx];
+            } else if (cur.length < max) {
+                cur.push(iIdx);
             } else {
-                if (arr.length >= max) {
-                    window.showToast(`Máximo de ${max} opção(ões) neste grupo.`);
-                    return;
-                }
-                arr.push(iIdx);
+                window.showToast(`⚠️ Máximo de ${max} opção(ões) neste grupo.`);
+                return;
             }
         }
-        window.detailAddonSelections[gIdx] = arr;
         window.renderDetailAddons();
         window.updateDetailTotalPrice();
     };
 
     window.changeDetailQty = function(delta) {
         window.detailQty = Math.max(1, (window.detailQty || 1) + delta);
-        document.getElementById('detail-prod-qty').innerText = window.detailQty;
+        document.getElementById('detail-prod-qty').innerText = String(window.detailQty);
         window.updateDetailTotalPrice();
     };
 
     window.calculateUnitWithAddons = function() {
-        if (!window.detailProduct) return { unitPrice: 0, addonsNames: [] };
-        let base = parseFloat(window.detailProduct.preco) || 0;
-        let groups = [];
-        try { groups = JSON.parse(window.detailProduct.adicionais || "[]"); } catch (e) { groups = []; }
+        const p = window.detailProduct;
+        if (!p) return { unitPrice: 0, addonsNames: [] };
 
-        let addonsExtra = 0;
-        let names = [];
+        let base = parseFloat(p.preco || 0);
+        let addonsTotal = 0;
+        const addonsNames = [];
+
+        let groups = [];
+        try { groups = JSON.parse(p.adicionais || "[]"); } catch (e) { groups = []; }
+
         groups.forEach((g, gIdx) => {
-            const sel = window.detailAddonSelections[gIdx] || [];
-            if (sel.length > 0) {
-                const prices = sel.map(iIdx => {
-                    const it = (g.items || [])[iIdx];
-                    if (it) names.push(it.name);
-                    return it ? (parseFloat(it.price) || 0) : 0;
-                });
-                if (g.chargeType === 'max') {
-                    addonsExtra += Math.max(...prices);
-                } else {
-                    addonsExtra += prices.reduce((a, b) => a + b, 0);
+            const selIndices = window.detailAddonSelections[gIdx] || [];
+            if (selIndices.length === 0) return;
+            const prices = [];
+            selIndices.forEach(iIdx => {
+                const it = (g.items || [])[iIdx];
+                if (it) {
+                    addonsNames.push(it.name);
+                    prices.push(parseFloat(it.price) || 0);
                 }
+            });
+            if (g.chargeType === 'max' && prices.length > 0) {
+                addonsTotal += Math.max(...prices);
+            } else {
+                addonsTotal += prices.reduce((a, b) => a + b, 0);
             }
         });
-        return { unitPrice: base + addonsExtra, addonsNames: names };
+
+        return { unitPrice: base + addonsTotal, addonsNames };
     };
 
     window.updateDetailTotalPrice = function() {
         const { unitPrice } = window.calculateUnitWithAddons();
         const total = unitPrice * (window.detailQty || 1);
-        document.getElementById('detail-total-btn-price').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        const btnPrice = document.getElementById('detail-total-btn-price');
+        if (btnPrice) {
+            btnPrice.innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
     };
 
-    // Adiciona ao carrinho somando a quantidade se o mesmo produto já estiver na sacola
-    window.confirmAddToCart = function() {
-        const p = window.detailProduct;
-        if (!p) return;
+    window.renderProductSuggestions = function(currentProd) {
+        const box = document.getElementById('detail-suggestions-list');
+        if (!box || !currentProd) return;
+        window.setSuggestedViewMode(window.suggestedViewMode);
 
-        const loja = window.allStores.find(s => s.id === p.lojaId);
-        if (loja && !window.isStoreOpenBySchedule(loja)) {
-            window.showToast("🔴 Esta loja está fechada no momento.");
+        const activeStores = window.allStores.filter(s => !(s.bloqueada === true || String(s.bloqueada).toLowerCase() === 'true'));
+        const activeStoreIds = new Set(activeStores.map(s => s.id));
+        const firstWord = String(currentProd.nome || '').trim().split(/\s+/)[0].toLowerCase();
+
+        const suggestions = window.allProducts.filter(p => {
+            if (p.id === currentProd.id) return false;
+            if (!activeStoreIds.has(p.lojaId)) return false;
+            if (p.ativo === false || String(p.ativo).toLowerCase() === 'false') return false;
+            const sameCat = window.categoryMatches(p.categoria, currentProd.categoria);
+            const similarName = firstWord.length >= 3 && String(p.nome || '').toLowerCase().includes(firstWord);
+            return sameCat || similarName;
+        }).slice(0, 8);
+
+        if (suggestions.length === 0) {
+            box.innerHTML = `<p style="grid-column:1/-1; text-align:center; padding:18px; color:#71717a; font-weight:700; background:#fff; border-radius:14px; border:1px solid var(--border);">Nenhuma outra sugestão semelhante encontrada no momento.</p>`;
             return;
         }
 
-        // Valida grupos obrigatórios
-        let groups = [];
-        try { groups = JSON.parse(p.adicionais || "[]"); } catch (e) { groups = []; }
-        for (let gIdx = 0; gIdx < groups.length; gIdx++) {
-            const min = parseInt(groups[gIdx].min) || 0;
-            const sel = window.detailAddonSelections[gIdx] || [];
-            if (sel.length < min) {
-                window.showToast(`⚠️ Escolha pelo menos ${min} opção(ões) em "${groups[gIdx].name}".`);
-                return;
-            }
-        }
+        box.innerHTML = suggestions.map(p => {
+            const loja = window.allStores.find(s => s.id === p.lojaId);
+            const precoAtual = parseFloat(p.preco || 0);
+            const precoAntigo = parseFloat(p.precoAntigo || 0);
+            const temDesconto = precoAntigo > precoAtual;
+            const pct = temDesconto ? Math.round(((precoAntigo - precoAtual) / precoAntigo) * 100) : 0;
 
-        // Se o carrinho tiver itens de outra loja, limpa após avisar ou substitui
-        if (window.cart.length > 0 && window.cart[0].lojaId !== p.lojaId) {
-            window.cart = [];
-            window.appliedCoupon = null;
-        }
-
-        const { unitPrice, addonsNames } = window.calculateUnitWithAddons();
-        const obs = document.getElementById('detail-prod-obs').value.trim();
-        const addonsKey = addonsNames.slice().sort().join('|');
-
-        // Verifica se o mesmo produto (com os mesmos adicionais e observação) já está na sacola
-        const existingIdx = window.cart.findIndex(item =>
-            item.prodId === p.id &&
-            item.addonsKey === addonsKey &&
-            item.obs.toLowerCase() === obs.toLowerCase()
-        );
-
-        if (existingIdx > -1) {
-            window.cart[existingIdx].qty += window.detailQty;
-        } else {
-            window.cart.push({
-                prodId: p.id,
-                lojaId: p.lojaId,
-                nome: p.nome,
-                unitPrice,
-                qty: window.detailQty,
-                addonsNames,
-                addonsKey,
-                obs
-            });
-        }
-
-        window.updateCartFloatingBar();
-        window.showToast(`✅ ${window.detailQty}x ${p.nome} adicionado à sacola!`);
-    };
-
-    window.updateCartFloatingBar = function() {
-        const bar = document.getElementById('cart-float-bar');
-        const totalQty = window.cart.reduce((acc, i) => acc + i.qty, 0);
-        const subtotal = window.cart.reduce((acc, i) => acc + (i.unitPrice * i.qty), 0);
-
-        document.getElementById('desktop-cart-total').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-        document.getElementById('desktop-cart-count').innerText = `${totalQty} item(ns)`;
-
-        if (totalQty > 0) {
-            bar.style.display = 'flex';
-            document.getElementById('float-cart-total').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-            document.getElementById('float-cart-count').innerText = `${totalQty} item(ns) na sacola`;
-        } else {
-            bar.style.display = 'none';
-        }
+            return `
+            <div class="prod-card" onclick="openProductDetailModal('${p.id}')">
+                <div style="flex:1;">
+                    <div style="font-size:0.72rem; font-weight:800; color:var(--primary); margin-bottom:2px;">
+                        🏪 ${loja ? loja.nome_loja : 'Restaurante'}
+                    </div>
+                    <div style="font-weight:900; font-size:0.95rem; color:#111;">${p.nome}</div>
+                    <div style="font-size:0.76rem; color:#71717a; margin:3px 0 6px; line-height:1.3;">${p.descricao || ''}</div>
+                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:inherit;">
+                        <span style="font-weight:900; font-size:0.94rem; color:var(--success);">R$ ${precoAtual.toFixed(2).replace('.', ',')}</span>
+                        ${temDesconto ? `<span style="font-size:0.74rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ ${precoAntigo.toFixed(2).replace('.', ',')}</span>` : ''}
+                        ${temDesconto ? `<span style="background:#fee2e2; color:#dc2626; font-size:0.65rem; font-weight:900; padding:2px 6px; border-radius:6px;">🔥 -${pct}% OFF</span>` : ''}
+                    </div>
+                </div>
+                <img src="${p.imagem || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'">
+            </div>`;
+        }).join('');
     };
 
     window.openCartModal = function() {
@@ -1542,7 +1584,6 @@
         document.getElementById('modal-cart').style.display = 'none';
     };
 
-    // Aumenta ou diminui a quantidade de um item direto na Sacola
     window.changeCartItemQty = function(idx, delta) {
         if (!window.cart[idx]) return;
         window.cart[idx].qty += delta;
@@ -1564,7 +1605,7 @@
             return `
             <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9; gap:10px;">
                 <div style="flex:1;">
-                    <div style="font-weight:900; font-size:0.95rem;">${item.qty}x ${item.nome}</div>
+                    <div style="font-weight:900; font-size:0.95rem;">${item.nome}</div>
                     ${item.addonsNames.length > 0 ? `<div style="font-size:0.75rem; color:#71717a; font-weight:600;">+ ${item.addonsNames.join(', ')}</div>` : ''}
                     ${item.obs ? `<div style="font-size:0.74rem; color:#d97706; font-weight:700;">Obs: ${item.obs}</div>` : ''}
                     <div style="font-weight:900; color:var(--success); font-size:0.9rem; margin-top:2px;">R$ ${lineTotal.toFixed(2).replace('.', ',')}</div>
@@ -1577,7 +1618,6 @@
             </div>`;
         }).join('');
 
-        // Popula endereços de entrega
         const sel = document.getElementById('cart-delivery-select');
         const addrs = (window.clientProfileData && Array.isArray(window.clientProfileData.enderecos)) ? window.clientProfileData.enderecos : [];
         let opts = addrs.map(a => `<option value="Entregar em: ${a.rua}">🛵 Entregar em: ${a.rua}</option>`).join('');
@@ -1627,6 +1667,79 @@
         document.getElementById('cart-change-box').style.display = (pay === 'Dinheiro') ? 'block' : 'none';
     };
 
+    window.updateCartFloatingBar = function() {
+        const totalItems = window.cart.reduce((acc, i) => acc + i.qty, 0);
+        const totalPrice = window.cart.reduce((acc, i) => acc + (i.unitPrice * i.qty), 0);
+        const bar = document.getElementById('cart-float-bar');
+        if (totalItems > 0) {
+            document.getElementById('float-cart-count').innerText = `${totalItems} item(ns) na sacola`;
+            document.getElementById('float-cart-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            document.getElementById('desktop-cart-count').innerText = `${totalItems} itens`;
+            document.getElementById('desktop-cart-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            bar.style.display = 'flex';
+        } else {
+            document.getElementById('desktop-cart-count').innerText = `0 itens`;
+            document.getElementById('desktop-cart-total').innerText = `R$ 0,00`;
+            bar.style.display = 'none';
+        }
+    };
+
+    window.confirmAddToCart = function() {
+        const p = window.detailProduct;
+        if (!p) return;
+
+        const loja = window.allStores.find(s => s.id === p.lojaId);
+        if (loja && !window.isStoreOpenBySchedule(loja)) {
+            window.showToast("🔴 Esta loja está fechada no momento.");
+            return;
+        }
+
+        let groups = [];
+        try { groups = JSON.parse(p.adicionais || "[]"); } catch (e) { groups = []; }
+        for (let gIdx = 0; gIdx < groups.length; gIdx++) {
+            const min = parseInt(groups[gIdx].min) || 0;
+            const sel = window.detailAddonSelections[gIdx] || [];
+            if (sel.length < min) {
+                window.showToast(`⚠️ Escolha pelo menos ${min} opção(ões) em "${groups[gIdx].name}".`);
+                return;
+            }
+        }
+
+        if (window.cart.length > 0 && window.cart[0].lojaId !== p.lojaId) {
+            window.cart = [];
+            window.appliedCoupon = null;
+        }
+
+        const { unitPrice, addonsNames } = window.calculateUnitWithAddons();
+        const obs = document.getElementById('detail-prod-obs').value.trim();
+        const addonsKey = addonsNames.slice().sort().join('|');
+
+        const existingIdx = window.cart.findIndex(item =>
+            item.prodId === p.id &&
+            item.addonsKey === addonsKey &&
+            item.obs.toLowerCase() === obs.toLowerCase()
+        );
+
+        if (existingIdx > -1) {
+            window.cart[existingIdx].qty += window.detailQty;
+        } else {
+            window.cart.push({
+                prodId: p.id,
+                lojaId: p.lojaId,
+                nome: p.nome,
+                unitPrice,
+                qty: window.detailQty,
+                addonsNames,
+                addonsKey,
+                obs
+            });
+        }
+
+        window.updateCartFloatingBar();
+        window.showToast("🛍️ Produto adicionado à sacola!");
+        window.goBackFromProductDetail();
+    };
+
     window.checkoutOrder = async function() {
         if (!window.currentClient) {
             window.closeCartModal();
@@ -1640,6 +1753,13 @@
         const loja = window.allStores.find(s => s.id === lojaId);
         if (loja && !window.isStoreOpenBySchedule(loja)) {
             window.showToast("🔴 Esta loja acabou de fechar.");
+            return;
+        }
+
+        if (!window.clientProfileData.telefone || String(window.clientProfileData.telefone).trim().length < 8) {
+            window.closeCartModal();
+            window.openCompleteProfileModal();
+            window.showToast("📱 Informe seu WhatsApp para finalizar o pedido!");
             return;
         }
 
@@ -1692,9 +1812,6 @@
         }
     };
 
-    // =========================================================================
-    // BUSCA DE LOJAS E PRODUTOS (AO CLICAR NO PRODUTO ABRE SÓ A TELA DO PRODUTO)
-    // =========================================================================
     window.handleDesktopSearch = function(val) {
         if (val.trim().length > 0) {
             window.switchTab('busca');
@@ -1757,9 +1874,6 @@
         box.innerHTML = html;
     };
 
-    // =========================================================================
-    // ACOMPANHAMENTO DO PEDIDO + PIX PÓS-COMPRA + CHAT (FOTO E PDF)
-    // =========================================================================
     window.isOrderDone = function(st) {
         const s = String(st || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         return s === 'concluido' || s === 'entregue';
@@ -1777,7 +1891,6 @@
         const s3 = ['Entrega', 'Concluido'].includes(st) || window.isOrderDone(st);
         const s4 = window.isOrderDone(st);
 
-        // PIX Copia e Cola aparece APENAS depois de finalizar a compra e enquanto o pedido está "Novo"
         let pixHtml = '';
         if (String(o.pagamento || '').toUpperCase().includes('PIX') && st === 'Novo' && loja && loja.chave_pix) {
             const valNum = parseFloat(String(o.total || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
@@ -1788,29 +1901,27 @@
                     <span style="font-weight:900; color:#15803d; font-size:0.86rem;">💠 PIX Copia e Cola (Valor já incluso)</span>
                     <span style="background:#dcfce7; color:#166534; font-weight:900; padding:3px 9px; border-radius:8px; font-size:0.82rem;">${o.total}</span>
                 </div>
-                <button type="button" onclick="copyTextToClipboard('${pixPayload}', '✅ Código PIX copiado! Cole no seu banco.')" style="width:100%; background:#16a34a; color:#fff; border:none; padding:13px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer; margin-bottom:8px;">
+                <button type="button" onclick="copyTextToClipboard('${pixPayload}', '✅ Código PIX copiado! Cole no seu banco.')" style="width:100%; background:#16a34a; color:#fff; border:none; padding:13px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer;">
                     📋 Copiar Código PIX
                 </button>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800; color:#166534;">
-                    <span>💬 Envie o comprovante no Chat do Pedido!</span>
-                    <button type="button" onclick="copyTextToClipboard('${loja.chave_pix}', '✅ Chave PIX copiada!')" style="background:none; border:none; color:#15803d; text-decoration:underline; font-weight:800; cursor:pointer;">Copiar só a chave</button>
-                </div>
             </div>`;
         }
+
+        const receiptBtnHtml = (st === 'Novo')
+            ? `<button class="btn-primary" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
+            : '';
 
         document.getElementById('track-order-body').innerHTML = `
             <div style="font-weight:900; font-size:1rem; margin-bottom:4px;">${o.nomeLoja || (loja ? loja.nome_loja : 'Loja')} • #${o.id.substring(0,6).toUpperCase()}</div>
             <div style="font-size:0.82rem; color:#71717a; margin-bottom:12px;">${o.itens || ''}</div>
-            ${pixHtml}
             <div style="margin:14px 0;">
                 <div class="step-row ${s1 ? 'done' : ''}"><div class="step-dot">1</div><span>Pedido enviado à loja</span></div>
                 <div class="step-row ${s2 ? 'done' : ''}"><div class="step-dot">2</div><span>Loja preparando seu pedido</span></div>
                 <div class="step-row ${s3 ? 'done' : ''}"><div class="step-dot">3</div><span>Saiu para entrega</span></div>
                 <div class="step-row ${s4 ? 'done' : ''}"><div class="step-dot">4</div><span>Pedido concluído</span></div>
             </div>
-            <button class="btn-primary" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">
-                💬 Conversar / Enviar Comprovante
-            </button>
+            ${pixHtml}
+            ${receiptBtnHtml}
         `;
         document.getElementById('modal-track-order').style.display = 'flex';
     };
@@ -1828,9 +1939,7 @@
 
     window.openAttachmentViewer = function(dataUrl) {
         const w = window.open();
-        if (w) {
-            w.document.write(`<iframe src="${dataUrl}" style="width:100%; height:100vh; border:none;"></iframe>`);
-        }
+        if (w) w.document.write(`<iframe src="${dataUrl}" style="width:100%; height:100vh; border:none;"></iframe>`);
     };
 
     window.renderClientChatMessages = function() {
@@ -1943,9 +2052,6 @@
         }
     };
 
-    // =========================================================================
-    // AVALIAÇÃO 1 A 5 ESTRELAS E LISTA DE PEDIDOS DO CLIENTE
-    // =========================================================================
     window.openRateOrderModal = function(orderId) {
         window.ratingTargetOrderId = orderId;
         window.selectedStarsCount = 5;
@@ -2047,15 +2153,195 @@
         }).join('');
     };
 
-    // =========================================================================
-    // PERFIL DO CLIENTE: SUB-ABAS "ENDEREÇOS" (COM 3 PONTINHOS) E "CONTA"
-    // =========================================================================
     window.toggleClientAuthMode = function() {
         window.isRegisterMode = !window.isRegisterMode;
         document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'block' : 'none';
         document.getElementById('auth-phone-group').style.display = window.isRegisterMode ? 'block' : 'none';
+        const forgotBox = document.getElementById('forgot-pass-link-box');
+        if (forgotBox) forgotBox.style.display = window.isRegisterMode ? 'none' : 'block';
         document.getElementById('cli-auth-submit-btn').innerText = window.isRegisterMode ? 'Criar Minha Conta' : 'Entrar na Conta';
         document.getElementById('cli-auth-toggle-btn').innerText = window.isRegisterMode ? 'Já tem conta? Faça Login' : 'Ainda não tem conta? Cadastre-se grátis';
+    };
+
+    // Salva e sincroniza os dados do cliente tanto no navegador quanto no Firebase
+    window.saveClientProfileEverywhere = async function(uid, profileObj) {
+        if (!uid) return;
+        const cleanObj = {
+            email: profileObj.email || (window.currentClient ? window.currentClient.email : ''),
+            nome: (profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : 'Cliente',
+            telefone: (profileObj.telefone || '').trim(),
+            enderecos: Array.isArray(profileObj.enderecos) ? profileObj.enderecos : []
+        };
+        window.clientProfileData = cleanObj;
+        try {
+            localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
+        } catch (e) {}
+
+        if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
+            try {
+                await updateProfile(auth.currentUser, { displayName: cleanObj.nome });
+            } catch (e) {}
+        }
+
+        try {
+            await setDoc(doc(db, "clientes", uid), cleanObj, { merge: true });
+        } catch (e) {
+            console.warn("Perfil salvo localmente (coleção clientes restrita nas regras):", e);
+        }
+    };
+
+    window.loadClientProfileEverywhere = async function(user) {
+        if (!user) return { nome: 'Cliente', email: '', telefone: '', enderecos: [] };
+
+        let localData = {};
+        try {
+            const raw = localStorage.getItem('juaba_cli_profile_' + user.uid);
+            if (raw) localData = JSON.parse(raw);
+        } catch (e) {}
+
+        let remoteData = {};
+        try {
+            const snap = await getDoc(doc(db, "clientes", user.uid));
+            if (snap.exists()) remoteData = snap.data() || {};
+        } catch (e) {
+            console.warn("Usando perfil local/Auth para o cliente:", e);
+        }
+
+        const pending = window.pendingRegistrationData || {};
+        const bestName =
+            (pending.nome && pending.nome !== 'Cliente' ? pending.nome : '') ||
+            (remoteData.nome && remoteData.nome !== 'Cliente' ? remoteData.nome : '') ||
+            (localData.nome && localData.nome !== 'Cliente' ? localData.nome : '') ||
+            (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
+            (user.email ? user.email.split('@')[0] : 'Cliente');
+
+        const bestPhone = pending.telefone || remoteData.telefone || localData.telefone || user.phoneNumber || '';
+        const bestAddrs = (Array.isArray(remoteData.enderecos) && remoteData.enderecos.length > 0)
+            ? remoteData.enderecos
+            : (Array.isArray(localData.enderecos) ? localData.enderecos : []);
+
+        const merged = {
+            email: user.email || remoteData.email || localData.email || '',
+            nome: bestName,
+            telefone: bestPhone,
+            enderecos: bestAddrs
+        };
+
+        try {
+            localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
+        } catch (e) {}
+
+        return merged;
+    };
+
+    // Envia o PIN de 4 dígitos para o e-mail do usuário usando o Google Sheets (Apps Script)
+    window.sendPinViaGoogleSheets = async function(email, nome, pin) {
+        const scriptUrl = (window.GOOGLE_SCRIPT_URL || localStorage.getItem('juaba_google_script_url') || '').trim();
+        if (!scriptUrl) {
+            console.warn("URL do Google Apps Script ainda não configurada.");
+            document.getElementById('pin-script-config-hint').style.display = 'block';
+            window.showToast(`⚠️ Configure a URL da Planilha ou use o PIN de teste: ${pin}`);
+            return;
+        }
+
+        const payload = {
+            acao: 'enviar_pin',
+            tipo: 'verificacao',
+            email: email,
+            destinatario: email,
+            nome: nome,
+            pin: String(pin),
+            codigo: String(pin),
+            assunto: `Código de Verificação: ${pin} - JuabaDelivery`,
+            mensagem: `Olá ${nome}, seu código PIN de verificação no JuabaDelivery é: ${pin}`
+        };
+
+        try {
+            const query = new URLSearchParams(payload).toString();
+            const sep = scriptUrl.includes('?') ? '&' : '?';
+            // Dispara via POST (JSON/Form) e fallback GET para máxima compatibilidade com qualquer Apps Script
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            }).catch(() => {});
+
+            fetch(scriptUrl + sep + query, {
+                method: 'GET',
+                mode: 'no-cors'
+            }).catch(() => {});
+
+            window.showToast(`📩 PIN de 4 dígitos enviado para ${email}!`);
+        } catch (err) {
+            console.error("Erro ao acionar Google Sheets:", err);
+        }
+    };
+
+    window.saveCustomGoogleScriptUrl = function() {
+        const val = document.getElementById('custom-gsheet-url-input').value.trim();
+        if (!val) { window.showToast("Cole a URL do seu Google Apps Script!"); return; }
+        window.GOOGLE_SCRIPT_URL = val;
+        localStorage.setItem('juaba_google_script_url', val);
+        document.getElementById('pin-script-config-hint').style.display = 'none';
+        window.showToast("✅ URL da Planilha salva! Reenviando PIN...");
+        window.resendEmailPinCode();
+    };
+
+    window.closeVerifyPinModal = function() {
+        document.getElementById('modal-verify-pin').style.display = 'none';
+    };
+
+    window.resendEmailPinCode = function() {
+        if (!window.pendingRegistrationData) return;
+        window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
+        window.sendPinViaGoogleSheets(
+            window.pendingRegistrationData.email,
+            window.pendingRegistrationData.nome,
+            window.generatedEmailPin
+        );
+    };
+
+    window.confirmEmailPinCode = async function() {
+        const typed = document.getElementById('pin-code-input').value.trim();
+        if (!typed || typed.length < 4) {
+            window.showToast("⚠️ Digite os 4 dígitos do PIN!");
+            return;
+        }
+        if (typed !== String(window.generatedEmailPin)) {
+            window.showToast("❌ Código PIN incorreto! Verifique seu e-mail.");
+            return;
+        }
+        if (!window.pendingRegistrationData) return;
+
+        const { email, pass, nome, telefone } = window.pendingRegistrationData;
+        const btn = document.getElementById('btn-confirm-pin');
+        btn.disabled = true;
+        btn.innerText = "Criando sua conta...";
+
+        try {
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            await window.saveClientProfileEverywhere(cred.user.uid, {
+                email,
+                nome,
+                telefone,
+                enderecos: []
+            });
+            window.pendingRegistrationData = null;
+            window.generatedEmailPin = null;
+            window.closeVerifyPinModal();
+            window.updateClientHeaderUI();
+            window.showToast(`🎉 Bem-vindo(a), ${nome.split(' ')[0]}! Conta verificada!`);
+        } catch (err) {
+            console.error("Erro ao criar conta após PIN:", err);
+            const msg = (err.code === 'auth/email-already-in-use')
+                ? "⚠️ Este e-mail já possui cadastro! Faça login."
+                : "⚠️ Erro ao criar conta. Verifique os dados.";
+            window.showToast(msg);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "✅ Confirmar PIN e Criar Conta";
+        }
     };
 
     window.submitClientAuth = async function() {
@@ -2065,17 +2351,164 @@
 
         try {
             if (window.isRegisterMode) {
-                const nome = document.getElementById('cli-auth-name').value.trim() || email.split('@')[0];
+                const nome = document.getElementById('cli-auth-name').value.trim();
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "clientes", cred.user.uid), { email, nome, telefone, enderecos: [] }, { merge: true });
-                window.showToast("🎉 Conta criada com sucesso!");
+                if (!nome) { window.showToast("⚠️ Informe seu Nome Completo!"); return; }
+                if (!telefone || telefone.replace(/\D/g, '').length < 8) {
+                    window.showToast("⚠️ Informe seu WhatsApp com DDD!");
+                    return;
+                }
+                if (pass.length < 6) {
+                    window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!");
+                    return;
+                }
+
+                // Gera o PIN de 4 dígitos e abre o modal de confirmação antes de concluir o cadastro
+                window.pendingRegistrationData = { email, pass, nome, telefone };
+                window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
+                document.getElementById('pin-target-email').innerText = email;
+                document.getElementById('pin-code-input').value = '';
+                document.getElementById('custom-gsheet-url-input').value = window.GOOGLE_SCRIPT_URL || '';
+                document.getElementById('modal-verify-pin').style.display = 'flex';
+
+                await window.sendPinViaGoogleSheets(email, nome, window.generatedEmailPin);
             } else {
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.showToast("👋 Bem-vindo de volta!");
             }
         } catch (err) {
-            window.showToast("⚠️ Verifique seu e-mail e senha.");
+            window.showToast("⚠️ E-mail ou senha incorretos.");
+        }
+    };
+
+    // Recuperação de Senha do Cliente
+    window.openForgotPasswordModal = function() {
+        const currentEmail = document.getElementById('cli-auth-email').value.trim();
+        document.getElementById('forgot-pass-email').value = currentEmail;
+        document.getElementById('modal-forgot-password').style.display = 'flex';
+    };
+
+    window.closeForgotPasswordModal = function() {
+        document.getElementById('modal-forgot-password').style.display = 'none';
+    };
+
+    window.sendClientPasswordReset = async function() {
+        const email = document.getElementById('forgot-pass-email').value.trim();
+        if (!email) {
+            window.showToast("⚠️ Digite seu e-mail cadastrado!");
+            return;
+        }
+        const btn = document.getElementById('btn-send-reset');
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
+        try {
+            await sendPasswordResetEmail(auth, email);
+            window.closeForgotPasswordModal();
+            window.showToast("✅ Link de recuperação enviado para seu e-mail!");
+        } catch (err) {
+            console.error("Erro ao recuperar senha:", err);
+            window.showToast("⚠️ Não foi possível enviar. Verifique se o e-mail está correto.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "📩 Enviar E-mail de Recuperação";
+        }
+    };
+
+    window.updateClientHeaderUI = function() {
+        if (!window.currentClient) return;
+        const user = window.currentClient;
+        const googleName = user.displayName || '';
+        const savedName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
+            ? window.clientProfileData.nome
+            : '';
+        const finalName = savedName || googleName || (user.email ? user.email.split('@')[0] : 'Cliente');
+        window.clientProfileData.nome = finalName;
+
+        const firstName = finalName.split(' ')[0];
+        const mobBtn = document.getElementById('mobile-user-btn');
+        const deskBtn = document.getElementById('desktop-user-btn');
+        const profName = document.getElementById('prof-header-name');
+        const profEmail = document.getElementById('prof-header-email');
+        const profPhone = document.getElementById('prof-header-phone');
+
+        if (mobBtn) mobBtn.innerText = `👤 ${firstName}`;
+        if (deskBtn) deskBtn.innerText = `👤 ${firstName}`;
+        if (profName) profName.innerText = finalName;
+        if (profEmail) profEmail.innerText = user.email || '';
+        if (profPhone) {
+            profPhone.innerText = window.clientProfileData.telefone
+                ? `📱 WhatsApp: ${window.clientProfileData.telefone}`
+                : `⚠️ WhatsApp não informado (Toque em Conta para adicionar)`;
+            profPhone.style.color = window.clientProfileData.telefone ? 'var(--success)' : '#d97706';
+        }
+        if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
+            const addrLbl = document.getElementById('desktop-addr-label');
+            if (addrLbl) addrLbl.innerText = window.clientProfileData.enderecos[0].rua.substring(0, 18) + '...';
+        }
+    };
+
+    window.openCompleteProfileModal = function() {
+        if (!window.currentClient) return;
+        const currentName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
+            ? window.clientProfileData.nome
+            : (window.currentClient.displayName || '');
+        document.getElementById('google-complete-name').value = currentName;
+        document.getElementById('google-complete-phone').value = (window.clientProfileData && window.clientProfileData.telefone) || '';
+        document.getElementById('modal-complete-profile').style.display = 'flex';
+    };
+
+    window.saveGoogleCompleteProfile = async function() {
+        if (!window.currentClient) return;
+        const nome = document.getElementById('google-complete-name').value.trim() || window.currentClient.displayName || 'Cliente';
+        const telefone = document.getElementById('google-complete-phone').value.trim();
+
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
+            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
+            return;
+        }
+
+        await window.saveClientProfileEverywhere(window.currentClient.uid, {
+            email: window.currentClient.email || '',
+            nome,
+            telefone,
+            enderecos: window.clientProfileData.enderecos || []
+        });
+
+        document.getElementById('modal-complete-profile').style.display = 'none';
+        window.updateClientHeaderUI();
+        window.showToast("✅ Nome e WhatsApp salvos com sucesso!");
+    };
+
+    window.loginWithGoogle = async function() {
+        try {
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            const cred = await signInWithPopup(auth, provider);
+            const user = cred.user;
+            if (user) {
+                const loaded = await window.loadClientProfileEverywhere(user);
+                const realName = (user.displayName && user.displayName !== 'Cliente')
+                    ? user.displayName
+                    : loaded.nome;
+                const realPhone = loaded.telefone || user.phoneNumber || '';
+
+                await window.saveClientProfileEverywhere(user.uid, {
+                    email: user.email || '',
+                    nome: realName,
+                    telefone: realPhone,
+                    enderecos: loaded.enderecos || []
+                });
+
+                window.updateClientHeaderUI();
+                window.showToast(`👋 Bem-vindo(a), ${realName.split(' ')[0]}!`);
+
+                if (!realPhone) {
+                    window.openCompleteProfileModal();
+                }
+            }
+        } catch (err) {
+            console.error("Erro Login Google:", err);
+            window.showToast("⚠️ Não foi possível entrar com o Google.");
         }
     };
 
@@ -2091,10 +2524,19 @@
             window.showToast("Faça login para acessar seus dados!");
             return;
         }
-        window.switchTab('perfil');
+
+        // Ativa a seção perfil sem chamar openProfileSubView recursivamente
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        const secPerfil = document.getElementById('sec-perfil');
+        if (secPerfil) secPerfil.classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+        const tabPerfil = document.getElementById('tab-perfil');
+        if (tabPerfil) tabPerfil.classList.add('active');
+
         document.getElementById('profile-main-menu').style.display = (sub === 'main') ? 'block' : 'none';
         document.getElementById('profile-sub-enderecos').style.display = (sub === 'enderecos') ? 'block' : 'none';
         document.getElementById('profile-sub-conta').style.display = (sub === 'conta') ? 'block' : 'none';
+
         if (sub === 'enderecos') window.renderSavedAddresses();
         if (sub === 'conta') {
             document.getElementById('acc-edit-name').value = window.clientProfileData.nome || '';
@@ -2145,7 +2587,7 @@
     window.deleteAddress = async function(idx) {
         if (!window.currentClient) return;
         window.clientProfileData.enderecos.splice(idx, 1);
-        await setDoc(doc(db, "clientes", window.currentClient.uid), { enderecos: window.clientProfileData.enderecos }, { merge: true });
+        await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
         window.showToast("🗑️ Endereço removido!");
     };
@@ -2164,8 +2606,9 @@
             window.clientProfileData.enderecos.push({ rua: val });
         }
         document.getElementById('new-addr-input').value = '';
-        await setDoc(doc(db, "clientes", window.currentClient.uid), { enderecos: window.clientProfileData.enderecos }, { merge: true });
+        await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
+        window.updateClientHeaderUI();
         window.showToast("✅ Endereço salvo!");
     };
 
@@ -2173,21 +2616,16 @@
         if (!window.currentClient) return;
         const nome = document.getElementById('acc-edit-name').value.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
+        if (!nome) { window.showToast("Informe seu nome!"); return; }
+
         window.clientProfileData.nome = nome;
         window.clientProfileData.telefone = telefone;
-        await setDoc(doc(db, "clientes", window.currentClient.uid), {
-            email: window.currentClient.email,
-            nome,
-            telefone
-        }, { merge: true });
-        document.getElementById('prof-header-name').innerText = nome || 'Cliente';
+        await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
+        window.updateClientHeaderUI();
         window.showToast("✅ Dados da conta atualizados!");
         window.openProfileSubView('main');
     };
 
-    // =========================================================================
-    // LISTENERS EM TEMPO REAL DO FIREBASE
-    // =========================================================================
     onAuthStateChanged(auth, async (user) => {
         window.currentClient = user;
         const tabPed = document.getElementById('tab-pedidos');
@@ -2201,28 +2639,32 @@
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            const snap = await getDoc(doc(db, "clientes", user.uid));
-            if (snap.exists()) {
-                window.clientProfileData = { enderecos: [], ...snap.data() };
-            } else {
-                window.clientProfileData = { nome: user.email.split('@')[0], email: user.email, telefone: '', enderecos: [] };
+            // 1º: Atualiza imediatamente a interface com os dados disponíveis (sem travar esperando rede)
+            const quickName =
+                (window.pendingRegistrationData && window.pendingRegistrationData.nome) ||
+                user.displayName ||
+                (user.email ? user.email.split('@')[0] : 'Cliente');
+            window.clientProfileData.nome = quickName;
+            window.updateClientHeaderUI();
+
+            // 2º: Carrega dados completos (LocalStorage + Firestore com proteção try/catch)
+            const fullProfile = await window.loadClientProfileEverywhere(user);
+            window.clientProfileData = fullProfile;
+            await window.saveClientProfileEverywhere(user.uid, fullProfile);
+            window.updateClientHeaderUI();
+
+            if (!window.clientProfileData.telefone) {
+                window.openCompleteProfileModal();
             }
-            const firstName = (window.clientProfileData.nome || user.email.split('@')[0]).split(' ')[0];
-            mobBtn.innerText = `👤 ${firstName}`;
-            deskBtn.innerText = `👤 ${firstName}`;
-            document.getElementById('prof-header-name').innerText = window.clientProfileData.nome || firstName;
-            document.getElementById('prof-header-email').innerText = user.email;
-            if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
-                document.getElementById('desktop-addr-label').innerText = window.clientProfileData.enderecos[0].rua.substring(0, 18) + '...';
-            }
+
             window.filterMyOrders();
         } else {
             if (tabPed) tabPed.style.display = 'none';
             if (dnavPed) dnavPed.style.display = 'none';
             document.getElementById('profile-logged-out').style.display = 'block';
             document.getElementById('profile-logged-in').style.display = 'none';
-            mobBtn.innerText = '👤 Entrar';
-            deskBtn.innerText = '👤 Entrar';
+            if (mobBtn) mobBtn.innerText = '👤 Entrar';
+            if (deskBtn) deskBtn.innerText = '👤 Entrar';
             window.myOrders = [];
             window.renderClientOrders();
         }
@@ -2300,7 +2742,6 @@
         window.filterMyOrders();
     });
 
-    // Atualiza vitrine a cada 30s para refletir abertura/fechamento automático por horário
     setInterval(() => {
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
