@@ -918,6 +918,45 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="modal-pix-checkout" style="z-index:2450;" onclick="if(event.target===this) closePixCheckoutModal()">
+    <div class="modal-sheet" style="text-align:center; max-width:440px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="background:#dcfce7; color:#15803d; font-weight:900; font-size:0.74rem; padding:4px 10px; border-radius:999px;">💠 PAGAMENTO INSTANTÂNEO</span>
+            <button type="button" onclick="closePixCheckoutModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#71717a;">✕</button>
+        </div>
+        <div style="font-size:2.4rem; margin-bottom:4px;">🎉</div>
+        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:4px;">Pedido Enviado! Pague com PIX</h3>
+        <p style="font-size:0.82rem; color:#52525b; font-weight:600; margin-bottom:14px;">
+            O código abaixo já está no <b>Padrão Banco Central</b> com o valor exato da sua compra incluso:
+        </p>
+
+        <div style="background:#f0fdf4; border:2px dashed #22c55e; border-radius:18px; padding:16px; margin-bottom:14px; text-align:left;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span id="pix-modal-store-name" style="font-weight:900; font-size:0.9rem; color:#166534;">🏪 Restaurante</span>
+                <span id="pix-modal-amount" style="background:#16a34a; color:#fff; font-weight:900; font-size:0.95rem; padding:4px 10px; border-radius:10px;">R$ 0,00</span>
+            </div>
+            <div style="font-size:0.72rem; font-weight:800; color:#15803d; text-transform:uppercase; margin-bottom:4px;">Código PIX Copia e Cola:</div>
+            <input type="text" id="pix-modal-payload-input" readonly style="width:100%; padding:10px 12px; border:1px solid #86efac; border-radius:10px; background:#fff; font-family:monospace; font-size:0.76rem; color:#18181b; font-weight:700; margin-bottom:10px; outline:none;">
+            <button type="button" id="pix-modal-copy-btn" style="width:100%; background:#16a34a; color:#fff; border:none; padding:14px; border-radius:12px; font-weight:900; font-size:0.96rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 6px 16px rgba(22,163,74,0.28);">
+                📋 Copiar Código PIX Copia e Cola
+            </button>
+        </div>
+
+        <p style="font-size:0.74rem; color:#71717a; font-weight:700; margin-bottom:12px;">
+            💡 Caso feche esta tela, você pode copiar o código a qualquer momento em <b>Meus Pedidos ➔ Acompanhar</b>.
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <button type="button" id="pix-modal-chat-btn" class="btn-primary" style="background:var(--primary); padding:12px;">
+                📎 Enviar Comprovante no Chat da Loja
+            </button>
+            <button type="button" id="pix-modal-track-btn" style="width:100%; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:0.86rem; cursor:pointer;">
+                🛵 Acompanhar Status do Pedido
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modal-chat" onclick="if(event.target===this) closeClientChat()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1155,13 +1194,30 @@
         setTimeout(() => t.classList.remove('show'), 3000);
     };
 
+    window.parseCurrencyToNumber = function(valRaw) {
+        if (typeof valRaw === 'number') return valRaw;
+        const clean = String(valRaw || '0')
+            .replace(/[^\d,.-]/g, '')
+            .replace(/\.(?=\d{3}(?:,|$))/g, '')
+            .replace(',', '.');
+        return parseFloat(clean) || 0;
+    };
+
+    window.getStorePixKey = function(loja, orderObj = null) {
+        if (orderObj && orderObj.chavePixLoja) return String(orderObj.chavePixLoja).trim();
+        if (loja && loja.chave_pix && String(loja.chave_pix).trim() !== '') return String(loja.chave_pix).trim();
+        if (loja && loja.whatsapp && String(loja.whatsapp).trim() !== '') return String(loja.whatsapp).trim();
+        if (loja && loja.email_loja && String(loja.email_loja).trim() !== '') return String(loja.email_loja).trim();
+        return '';
+    };
+
     window.generatePixCopiaECola = function(chaveRaw, nomeLojaRaw, valorNum, txidRaw) {
         let key = String(chaveRaw || '').trim();
         if (!key) return '';
         const cleanDigits = key.replace(/\D/g, '');
         if (!key.includes('@') && !key.startsWith('+')) {
             if (cleanDigits.length === 11 && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(key)) {
-                if (key.includes('(') || key.includes('-')) key = '+55' + cleanDigits;
+                if (key.includes('(') || key.includes('-') || key.includes(' ')) key = '+55' + cleanDigits;
                 else key = cleanDigits;
             } else if (cleanDigits.length === 14) {
                 key = cleanDigits;
@@ -1172,8 +1228,9 @@
         const cidade = 'BRASIL';
         const txid = (txidRaw || 'JUABA').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20) || 'JUABA';
         const gui = f('00', 'br.gov.bcb.pix') + f('01', key);
+        const amountNumber = window.parseCurrencyToNumber(valorNum);
         let payload = f('00', '01') + f('26', gui) + f('52', '0000') + f('53', '986');
-        if (valorNum && valorNum > 0) payload += f('54', Number(valorNum).toFixed(2));
+        if (amountNumber > 0) payload += f('54', amountNumber.toFixed(2));
         payload += f('58', 'BR') + f('59', nome) + f('60', cidade) + f('62', f('05', txid)) + '6304';
 
         let crc = 0xFFFF;
@@ -1184,6 +1241,38 @@
             }
         }
         return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+    };
+
+    window.openPixCheckoutModal = function(orderId, orderObj = null) {
+        const o = window.myOrders.find(x => x.id === orderId) || orderObj;
+        if (!o) return;
+        const loja = window.allStores.find(s => s.id === o.lojaId);
+        const nomeLoja = o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante');
+        const chavePix = window.getStorePixKey(loja, o);
+        const valNum = window.parseCurrencyToNumber(o.total);
+        const pixPayload = o.pixCopiaECola || window.generatePixCopiaECola(chavePix || '00000000000', nomeLoja, valNum, String(orderId || 'JUABA').substring(0, 8));
+
+        document.getElementById('pix-modal-store-name').innerText = `🏪 ${nomeLoja}`;
+        document.getElementById('pix-modal-amount').innerText = o.total || `R$ ${valNum.toFixed(2).replace('.', ',')}`;
+        document.getElementById('pix-modal-payload-input').value = pixPayload;
+
+        document.getElementById('pix-modal-copy-btn').onclick = function() {
+            window.copyTextToClipboard(pixPayload, "✅ Código PIX Copia e Cola copiado! Abra o app do seu banco.");
+        };
+        document.getElementById('pix-modal-chat-btn').onclick = function() {
+            window.closePixCheckoutModal();
+            window.openClientChat(orderId);
+        };
+        document.getElementById('pix-modal-track-btn').onclick = function() {
+            window.closePixCheckoutModal();
+            window.openTrackModal(orderId, o);
+        };
+
+        document.getElementById('modal-pix-checkout').style.display = 'flex';
+    };
+
+    window.closePixCheckoutModal = function() {
+        document.getElementById('modal-pix-checkout').style.display = 'none';
     };
 
     window.copyTextToClipboard = function(txt, successMsg) {
@@ -2188,10 +2277,17 @@
         }).join(', ');
 
         const finalTotalTxt = document.getElementById('cart-final-val').innerText;
+        const finalValNum = window.parseCurrencyToNumber(finalTotalTxt);
+        const storePixKey = window.getStorePixKey(loja);
+        const generatedPixPayload = String(paymentStr).toUpperCase().includes('PIX')
+            ? window.generatePixCopiaECola(storePixKey || '00000000000', loja ? loja.nome_loja : 'Restaurante', finalValNum, 'PED' + String(Date.now()).slice(-6))
+            : '';
 
         const newOrder = {
             lojaId,
             nomeLoja: loja ? loja.nome_loja : 'Restaurante',
+            chavePixLoja: storePixKey,
+            pixCopiaECola: generatedPixPayload,
             cliente: window.clientProfileData.nome || window.currentClient.email.split('@')[0],
             emailCliente: window.currentClient.email,
             telefone: window.clientProfileData.telefone || '',
@@ -2221,7 +2317,11 @@
             window.updateCartFloatingBar();
             window.closeCartModal();
             window.showToast("🎉 Pedido enviado com sucesso!");
-            window.openTrackModal(docRef.id, { id: docRef.id, ...newOrder });
+            if (String(paymentStr).toUpperCase().includes('PIX')) {
+                window.openPixCheckoutModal(docRef.id, { id: docRef.id, ...newOrder });
+            } else {
+                window.openTrackModal(docRef.id, { id: docRef.id, ...newOrder });
+            }
         } catch (err) {
             window.showToast("⚠️ Erro ao enviar pedido.");
         }
@@ -2308,17 +2408,20 @@
         const s4 = !isCanceled && window.isOrderDone(st);
 
         let pixHtml = '';
-        if (!isCanceled && String(o.pagamento || '').toUpperCase().includes('PIX') && st === 'Novo' && loja && loja.chave_pix) {
-            const valNum = parseFloat(String(o.total || '0').replace('R$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
-            const pixPayload = window.generatePixCopiaECola(loja.chave_pix, loja.nome_loja, valNum, o.id.substring(0, 8));
+        if (!isCanceled && !s4 && String(o.pagamento || '').toUpperCase().includes('PIX')) {
+            const valNum = window.parseCurrencyToNumber(o.total);
+            const chavePix = window.getStorePixKey(loja, o);
+            const nomeLoja = o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante');
+            const pixPayload = o.pixCopiaECola || window.generatePixCopiaECola(chavePix || '00000000000', nomeLoja, valNum, o.id.substring(0, 8));
             pixHtml = `
-            <div style="background:#f0fdf4; border:1px dashed #22c55e; border-radius:16px; padding:14px; margin:12px 0;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-weight:900; color:#15803d; font-size:0.86rem;">💠 PIX Copia e Cola (Valor já incluso)</span>
+            <div style="background:#f0fdf4; border:2px dashed #22c55e; border-radius:16px; padding:14px; margin:12px 0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-weight:900; color:#15803d; font-size:0.84rem;">💠 PIX Copia e Cola (Valor já incluso)</span>
                     <span style="background:#dcfce7; color:#166534; font-weight:900; padding:3px 9px; border-radius:8px; font-size:0.82rem;">${o.total}</span>
                 </div>
-                <button type="button" onclick="copyTextToClipboard('${pixPayload}', '✅ Código PIX copiado! Cole no seu banco.')" style="width:100%; background:#16a34a; color:#fff; border:none; padding:13px; border-radius:12px; font-weight:900; font-size:0.95rem; cursor:pointer;">
-                    📋 Copiar Código PIX
+                <input type="text" readonly value="${pixPayload}" style="width:100%; padding:8px 10px; border:1px solid #86efac; border-radius:8px; background:#fff; font-family:monospace; font-size:0.72rem; color:#18181b; font-weight:700; margin-bottom:8px; outline:none;">
+                <button type="button" onclick="copyTextToClipboard('${pixPayload}', '✅ Código PIX copiado! Cole no app do seu banco.')" style="width:100%; background:#16a34a; color:#fff; border:none; padding:12px; border-radius:12px; font-weight:900; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    📋 Copiar Código PIX Copia e Cola
                 </button>
             </div>`;
         }
