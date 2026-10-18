@@ -1177,6 +1177,17 @@
         return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     };
 
+    window.copyTextToClipboard = function(txt, successMsg) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(() => window.showToast(successMsg));
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = txt; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            window.showToast(successMsg);
+        }
+    };
+
     window.openPixCheckoutModal = function(orderId, orderObj = null) {
         const o = window.myOrders.find(x => x.id === orderId) || orderObj;
         if (!o) return;
@@ -2883,7 +2894,13 @@
             setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid, "profile", "data"), cleanObj, { merge: true }),
             setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", uid), cleanObj, { merge: true }),
             setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", uid), cleanObj, { merge: true }),
-            setDoc(doc(db, "clientes", uid), cleanObj, { merge: true })
+            setDoc(doc(db, "clientes", uid), cleanObj, { merge: true }),
+            setDoc(doc(db, "lojas", "_cli_" + uid), {
+                ...cleanObj,
+                isSystemConfig: true,
+                isClientProfileBackup: true,
+                updatedAtMs: -999
+            }, { merge: true })
         ];
         if (emailKey) {
             writeOps.push(
@@ -2917,7 +2934,8 @@
             getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid, "profile", "data")),
             getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", user.uid)),
             getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", user.uid)),
-            getDoc(doc(db, "clientes", user.uid))
+            getDoc(doc(db, "clientes", user.uid)),
+            getDoc(doc(db, "lojas", "_cli_" + user.uid))
         ];
         if (emailKey) {
             readPromises.push(getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users_by_email", emailKey)));
@@ -3063,130 +3081,6 @@
             }, () => {});
             window.profileUnsubscribers.push(unsub);
         });
-    };
-        window.clientProfileData = cleanObj;
-
-        try {
-            localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
-            if (emailStr) {
-                localStorage.setItem('juaba_cli_profile_email_' + emailStr.toLowerCase(), JSON.stringify(cleanObj));
-            }
-            localStorage.setItem('juaba_cli_active_session', JSON.stringify({
-                uid,
-                email: cleanObj.email,
-                displayName: cleanObj.nome,
-                profile: cleanObj
-            }));
-        } catch (e) {}
-
-        if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
-            try {
-                await updateProfile(auth.currentUser, { displayName: cleanObj.nome });
-            } catch (e) {}
-        }
-
-        // Salva na coleção 'clientes' e também cria backup espelhado em 'lojas/_cli_{uid}' (garantindo persistência na nuvem mesmo com regras restritas)
-        try {
-            await setDoc(doc(db, "clientes", uid), cleanObj, { merge: true });
-        } catch (e) {}
-        try {
-            await setDoc(doc(db, "lojas", "_cli_" + uid), {
-                ...cleanObj,
-                isSystemConfig: true,
-                isClientProfileBackup: true,
-                updatedAtMs: -999
-            }, { merge: true });
-        } catch (e) {}
-    };
-
-    window.loadClientProfileEverywhere = async function(user) {
-        if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
-
-        const emailLower = (user.email || '').toLowerCase().trim();
-        let localUidData = {};
-        let localEmailData = {};
-        try {
-            const rawUid = localStorage.getItem('juaba_cli_profile_' + user.uid);
-            if (rawUid) localUidData = JSON.parse(rawUid) || {};
-            if (emailLower) {
-                const rawEmail = localStorage.getItem('juaba_cli_profile_email_' + emailLower);
-                if (rawEmail) localEmailData = JSON.parse(rawEmail) || {};
-            }
-        } catch (e) {}
-
-        let remoteCliData = {};
-        let remoteBackupData = {};
-        try {
-            const snap = await getDoc(doc(db, "clientes", user.uid));
-            if (snap.exists()) remoteCliData = snap.data() || {};
-        } catch (e) {}
-
-        try {
-            const backupSnap = await getDoc(doc(db, "lojas", "_cli_" + user.uid));
-            if (backupSnap.exists()) remoteBackupData = backupSnap.data() || {};
-        } catch (e) {}
-
-        // Também recupera telefone/endereço de pedidos anteriores deste e-mail caso necessário
-        let orderFallbackPhone = '';
-        let orderFallbackName = '';
-        if (emailLower && Array.isArray(window.rawAllOrders)) {
-            const myPastOrder = window.rawAllOrders.find(o => (o.emailCliente || '').toLowerCase() === emailLower && o.telefone);
-            if (myPastOrder) {
-                orderFallbackPhone = myPastOrder.telefone || '';
-                orderFallbackName = myPastOrder.cliente || '';
-            }
-        }
-
-        const pending = window.pendingRegistrationData || {};
-        const sources = [pending, remoteCliData, remoteBackupData, localUidData, localEmailData];
-
-        const pickFirstNonEmpty = (field) => {
-            for (const src of sources) {
-                if (src && src[field] && String(src[field]).trim() !== '' && src[field] !== 'Cliente') {
-                    return String(src[field]).trim();
-                }
-            }
-            return '';
-        };
-
-        const bestName = pickFirstNonEmpty('nome') ||
-            (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
-            orderFallbackName ||
-            (user.email ? user.email.split('@')[0] : 'Cliente');
-
-        const splitted = window.splitFullName(bestName);
-        const bestFirst = pickFirstNonEmpty('primeiroNome') || splitted.primeiroNome || '';
-        const bestLast = pickFirstNonEmpty('sobrenome') || splitted.sobrenome || '';
-        const bestPhone = pickFirstNonEmpty('telefone') || user.phoneNumber || orderFallbackPhone || '';
-
-        // Escolhe a lista de endereços mais completa entre todas as fontes salvas
-        let bestAddrs = [];
-        for (const src of sources) {
-            if (src && Array.isArray(src.enderecos) && src.enderecos.length > bestAddrs.length) {
-                bestAddrs = src.enderecos;
-            }
-        }
-
-        const hasConfirmed = sources.some(s => s && s.perfilConfirmado === true) || Boolean(bestFirst && bestPhone);
-
-        const merged = {
-            email: user.email || pickFirstNonEmpty('email') || '',
-            nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
-            primeiroNome: bestFirst,
-            sobrenome: bestLast,
-            telefone: bestPhone,
-            enderecos: bestAddrs,
-            perfilConfirmado: hasConfirmed
-        };
-
-        try {
-            localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
-            if (emailLower) {
-                localStorage.setItem('juaba_cli_profile_email_' + emailLower, JSON.stringify(merged));
-            }
-        } catch (e) {}
-
-        return merged;
     };
 
     window.sendPinViaGoogleSheets = async function(email, nome, pin) {
