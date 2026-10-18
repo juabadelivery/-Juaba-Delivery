@@ -11,32 +11,7 @@
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-    <script>
-        // Gera o Manifest internamente na memória do navegador sem precisar do arquivo manifest.json externo
-        (function() {
-            try {
-                const inlineManifest = {
-                    name: "JuabaDelivery | Peça Online",
-                    short_name: "JuabaDelivery",
-                    description: "Peça os seus pratos favoritos das melhores lojas da região.",
-                    start_url: window.location.href,
-                    display: "standalone",
-                    background_color: "#ffffff",
-                    theme_color: "#ea1d2c",
-                    orientation: "portrait-primary",
-                    icons: [
-                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-                    ]
-                };
-                const blob = new Blob([JSON.stringify(inlineManifest)], { type: 'application/manifest+json' });
-                const link = document.createElement('link');
-                link.rel = 'manifest';
-                link.href = URL.createObjectURL(blob);
-                document.head.appendChild(link);
-            } catch (e) {}
-        })();
-    </script>
+    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -70,51 +45,30 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
         .banners-carousel-wrapper {
-            position: relative; width: 100%; margin-bottom: 18px; border-radius: 20px;
-            overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.08); background: #18181b;
+            position: relative; width: 100%; margin-bottom: 16px;
         }
         .banners-row {
-            display: flex; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory;
-            scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+            display: flex; gap: 12px; width: 100%; overflow-x: auto; padding-bottom: 6px;
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
         .banners-row::-webkit-scrollbar { display: none; }
         .banner-card {
-            min-width: 100%; width: 100%; height: 190px; position: relative;
+            min-width: 88%; height: 160px; border-radius: 18px; position: relative;
             scroll-snap-align: center; flex-shrink: 0; overflow: hidden;
-            display: flex; align-items: center; justify-content: center; background: #18181b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #f4f4f5;
         }
-        .banner-card .banner-bg-blur {
-            position: absolute; inset: -15px; width: calc(100% + 30px); height: calc(100% + 30px);
-            object-fit: cover; filter: blur(18px) brightness(0.55); z-index: 1; pointer-events: none;
-        }
-        .banner-card .banner-main-img {
-            position: relative; z-index: 2; width: 100%; height: 100%;
-            object-fit: contain; pointer-events: none;
+        .banner-card img {
+            width: 100%; height: 100%; object-fit: fill; display: block; pointer-events: none;
         }
         .banner-card .banner-title {
-            position: absolute; bottom: 0; inset-inline: 0; padding: 26px 16px 22px;
-            background: linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.35), transparent);
-            color: #fff; font-weight: 900; font-size: 1.05rem; z-index: 3; text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            position: absolute; bottom: 0; inset-inline: 0; padding: 24px 14px 12px;
+            background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0.25), transparent);
+            color: #fff; font-weight: 900; font-size: 1.02rem; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
         .carousel-nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-            width: 34px; height: 34px; border-radius: 50%; border: none;
-            background: rgba(255,255,255,0.85); color: #18181b; font-weight: 900;
-            font-size: 0.9rem; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.25); transition: 0.15s;
+            display: none !important;
         }
-        .carousel-nav-btn:active { transform: translateY(-50%) scale(0.92); }
-        .carousel-nav-btn.prev { left: 10px; }
-        .carousel-nav-btn.next { right: 10px; }
-        .carousel-dots {
-            position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
-            z-index: 5; display: flex; gap: 6px; align-items: center;
-        }
-        .carousel-dot {
-            width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.45);
-            border: none; cursor: pointer; transition: all 0.25s ease; padding: 0;
-        }
-        .carousel-dot.active { width: 20px; background: var(--primary); }
 
         .categories-row {
             display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 10px; margin-bottom: 12px;
@@ -311,39 +265,6 @@
         .step-row.done { color: var(--success); font-weight: 900; }
         .step-row.done .step-dot { background: var(--success); color: #fff; }
 
-        /* Botões Elegantes dos Cards de Pedido */
-        .order-card-actions {
-            display: flex; align-items: center; justify-content: flex-end; gap: 8px;
-            padding-top: 10px; border-top: 1px solid #f1f5f9; flex-wrap: wrap;
-        }
-        .btn-order-sleek {
-            padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 0.78rem;
-            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-            gap: 5px; border: 1px solid transparent; transition: all 0.15s ease;
-        }
-        .btn-order-sleek:active { transform: scale(0.96); }
-        .btn-order-sleek.chat { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
-        .btn-order-sleek.track { background: #18181b; color: #ffffff; box-shadow: 0 2px 6px rgba(24,24,27,0.12); }
-        .btn-order-sleek.track.active-green { background: var(--success); color: #ffffff; box-shadow: 0 2px 8px rgba(22,163,74,0.2); }
-        .btn-order-sleek.reorder { background: var(--primary-light); color: var(--primary); border-color: #fecdd3; font-weight: 900; }
-        .btn-order-sleek.rate { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-
-        /* Seletor Customizado de Endereço na Sacola */
-        .delivery-picker-trigger {
-            width: 100%; padding: 12px 14px; border: 1px solid #d4d4d8; border-radius: 14px;
-            background: #f8fafc; display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; cursor: pointer; text-align: left; transition: 0.15s;
-        }
-        .delivery-picker-trigger:active { transform: scale(0.99); border-color: var(--primary); }
-        .delivery-option-card {
-            border: 2px solid var(--border); border-radius: 14px; padding: 12px 14px;
-            margin-bottom: 10px; cursor: pointer; display: flex; align-items: center;
-            justify-content: space-between; gap: 10px; background: #fff; transition: 0.15s;
-        }
-        .delivery-option-card.selected {
-            border-color: var(--primary); background: var(--primary-light);
-        }
-
         .toast {
             position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-150%);
             background: #18181b; color: #fff; padding: 12px 22px; border-radius: 999px;
@@ -386,8 +307,19 @@
 
             .view-section { max-width: 1320px; padding: 24px 28px; }
             .banners-carousel-wrapper { max-width: 100%; margin-bottom: 24px; }
-            .banner-card { height: 290px; }
-            .carousel-nav-btn { width: 42px; height: 42px; font-size: 1.05rem; }
+            .banners-row { gap: 18px; }
+            .banner-card { min-width: calc(50% - 9px); height: 220px; scroll-snap-align: start; }
+            .carousel-nav-btn {
+                display: flex !important; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+                width: 42px; height: 42px; border-radius: 50%; border: none;
+                background: rgba(255,255,255,0.92); color: #18181b; font-weight: 900;
+                font-size: 1.05rem; cursor: pointer; align-items: center;
+                justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); transition: 0.15s;
+            }
+            .carousel-nav-btn:hover { background: #ffffff; transform: translateY(-50%) scale(1.06); }
+            .carousel-nav-btn:active { transform: translateY(-50%) scale(0.94); }
+            .carousel-nav-btn.prev { left: 12px; }
+            .carousel-nav-btn.next { right: 12px; }
             .categories-row { justify-content: flex-start; gap: 16px; }
             .cat-item { width: 96px; }
             .cat-icon-box { width: 80px; height: 80px; font-size: 2rem; }
@@ -450,9 +382,14 @@
 
 <header class="mobile-header">
     <div class="brand-logo" onclick="switchTab('home')">Juaba<span>Delivery</span></div>
-    <button onclick="switchTab('perfil')" id="mobile-user-btn" style="background:#f4f4f5; border:none; padding:8px 14px; border-radius:999px; font-weight:800; font-size:0.8rem; cursor:pointer;">
-        👤 Entrar
-    </button>
+    <div style="display:flex; align-items:center; gap:6px;">
+        <button onclick="triggerNativePwaInstall()" id="btn-pwa-install-mob" style="display:none; background:var(--primary); color:#fff; border:none; padding:7px 11px; border-radius:999px; font-weight:800; font-size:0.74rem; cursor:pointer;">
+            📲 Instalar App
+        </button>
+        <button onclick="switchTab('perfil')" id="mobile-user-btn" style="background:#f4f4f5; border:none; padding:8px 14px; border-radius:999px; font-weight:800; font-size:0.8rem; cursor:pointer;">
+            👤 Entrar
+        </button>
+    </div>
 </header>
 
 <!-- ABA 1: INÍCIO (VITRINE) -->
@@ -461,7 +398,6 @@
         <button type="button" class="carousel-nav-btn prev" id="banner-prev-btn" onclick="stepBannerCarousel(-1)" aria-label="Banner anterior">❮</button>
         <div class="banners-row" id="home-banners" onscroll="onBannerCarouselScroll()"></div>
         <button type="button" class="carousel-nav-btn next" id="banner-next-btn" onclick="stepBannerCarousel(1)" aria-label="Próximo banner">❯</button>
-        <div class="carousel-dots" id="home-banners-dots"></div>
     </div>
 
     <div class="categories-row" id="home-categories">
@@ -638,13 +574,13 @@
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
         <div id="auth-name-group" style="display:none; gap:10px; flex-wrap:wrap;">
-            <div class="input-group" style="flex:1; min-width:140px;">
+            <div class="input-group" style="flex:1; min-width:130px;">
                 <label>Nome *</label>
-                <input type="text" id="cli-auth-first-name" placeholder="Ex: João">
+                <input type="text" id="cli-auth-first-name" placeholder="Ex: Eder">
             </div>
-            <div class="input-group" style="flex:1; min-width:140px;">
+            <div class="input-group" style="flex:1; min-width:130px;">
                 <label>Sobrenome *</label>
-                <input type="text" id="cli-auth-last-name" placeholder="Ex: Silva">
+                <input type="text" id="cli-auth-last-name" placeholder="Ex: Garcia">
             </div>
         </div>
         <div class="input-group" id="auth-phone-group" style="display:none;">
@@ -710,7 +646,7 @@
                         <div style="width:44px; height:44px; border-radius:12px; background:#f4f4f5; color:#18181b; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">⚙️</div>
                         <div>
                             <div style="font-weight:900; font-size:1rem;">Conta</div>
-                            <div style="font-size:0.78rem; color:#71717a; font-weight:600;">Alterar nome de usuário e telefone</div>
+                            <div style="font-size:0.78rem; color:#71717a; font-weight:600;">Alterar nome, sobrenome e telefone</div>
                         </div>
                     </div>
                     <span style="font-weight:900; color:#a1a1aa;">➔</span>
@@ -740,11 +676,11 @@
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
                 <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:14px;">⚙️ Dados da Minha Conta</h3>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <div class="input-group" style="flex:1; min-width:140px;">
+                    <div class="input-group" style="flex:1; min-width:130px;">
                         <label>Nome *</label>
                         <input type="text" id="acc-edit-first-name" placeholder="Seu Nome">
                     </div>
-                    <div class="input-group" style="flex:1; min-width:140px;">
+                    <div class="input-group" style="flex:1; min-width:130px;">
                         <label>Sobrenome *</label>
                         <input type="text" id="acc-edit-last-name" placeholder="Seu Sobrenome">
                     </div>
@@ -1131,9 +1067,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
-    // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec') || "";
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
 
     window.allStores = [];
     window.allProducts = [];
@@ -1142,7 +1076,7 @@
     window.cart = [];
     window.globalBillingEnabled = true;
     window.currentClient = null;
-    window.clientProfileData = { nome: '', telefone: '', enderecos: [] };
+    window.clientProfileData = { nome: '', primeiroNome: '', sobrenome: '', telefone: '', enderecos: [] };
     window.pendingRegistrationData = null;
     window.generatedEmailPin = null;
     window.editingAddressIndex = -1;
@@ -1275,17 +1209,6 @@
         document.getElementById('modal-pix-checkout').style.display = 'none';
     };
 
-    window.copyTextToClipboard = function(txt, successMsg) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(txt).then(() => window.showToast(successMsg));
-        } else {
-            const ta = document.createElement('textarea');
-            ta.value = txt; document.body.appendChild(ta); ta.select();
-            document.execCommand('copy'); document.body.removeChild(ta);
-            window.showToast(successMsg);
-        }
-    };
-
     window.isStoreOpenBySchedule = function(loja) {
         if (!loja) return false;
         const cobrancaAtiva = (window.globalBillingEnabled !== false) && !(loja.cobrancaAtiva === false || String(loja.cobrancaAtiva).toLowerCase() === 'false');
@@ -1402,7 +1325,6 @@
 
     window.renderBanners = function(bannersArr) {
         const box = document.getElementById('home-banners');
-        const dotsBox = document.getElementById('home-banners-dots');
         const prevBtn = document.getElementById('banner-prev-btn');
         const nextBtn = document.getElementById('banner-next-btn');
         if (!box) return;
@@ -1416,19 +1338,13 @@
             const imgUrl = b.img || fallbackImg;
             return `
             <div class="banner-card">
-                <img class="banner-bg-blur" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="">
-                <img class="banner-main-img" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="${(b.text || 'Banner').replace(/"/g, '&quot;')}">
+                <img src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="${(b.text || 'Banner').replace(/"/g, '&quot;')}">
                 ${b.text ? `<div class="banner-title">${b.text}</div>` : ''}
             </div>`;
         }).join('');
 
-        if (dotsBox) {
-            dotsBox.innerHTML = list.length > 1
-                ? list.map((_, idx) => `<button type="button" class="carousel-dot ${idx === window.currentBannerIdx ? 'active' : ''}" onclick="goToBannerSlide(${idx})"></button>`).join('')
-                : '';
-        }
-        if (prevBtn) prevBtn.style.display = list.length > 1 ? 'flex' : 'none';
-        if (nextBtn) nextBtn.style.display = list.length > 1 ? 'flex' : 'none';
+        if (prevBtn) prevBtn.style.visibility = list.length > 1 ? 'visible' : 'hidden';
+        if (nextBtn) nextBtn.style.visibility = list.length > 1 ? 'visible' : 'hidden';
 
         window.startBannerAutoplay();
     };
@@ -1437,9 +1353,10 @@
         const box = document.getElementById('home-banners');
         if (!box || window.totalBannersCount <= 0) return;
         window.currentBannerIdx = (idx + window.totalBannersCount) % window.totalBannersCount;
-        const slideWidth = box.clientWidth;
-        box.scrollTo({ left: slideWidth * window.currentBannerIdx, behavior: 'smooth' });
-        window.updateBannerDotsUI();
+        const targetCard = box.children[window.currentBannerIdx];
+        if (targetCard) {
+            box.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
+        }
     };
 
     window.stepBannerCarousel = function(delta) {
@@ -1448,17 +1365,12 @@
 
     window.onBannerCarouselScroll = function() {
         const box = document.getElementById('home-banners');
-        if (!box || !box.clientWidth) return;
-        const newIdx = Math.round(box.scrollLeft / box.clientWidth);
+        if (!box || !box.children.length) return;
+        const cardWidth = box.children[0].offsetWidth + 12;
+        const newIdx = Math.round(box.scrollLeft / cardWidth);
         if (newIdx !== window.currentBannerIdx && newIdx >= 0 && newIdx < window.totalBannersCount) {
             window.currentBannerIdx = newIdx;
-            window.updateBannerDotsUI();
         }
-    };
-
-    window.updateBannerDotsUI = function() {
-        const dots = document.querySelectorAll('#home-banners-dots .carousel-dot');
-        dots.forEach((d, i) => d.classList.toggle('active', i === window.currentBannerIdx));
     };
 
     window.startBannerAutoplay = function() {
@@ -2010,7 +1922,7 @@
                         <span style="min-width:16px; text-align:center;">${item.qty}</span>
                         <button type="button" onclick="changeCartItemQty(${idx}, 1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--success); cursor:pointer; width:22px;">+</button>
                     </div>
-                    <button type="button" onclick="removeCartItem(${idx})" title="Excluir produto da sacola" style="width:34px; height:34px; border-radius:10px; border:1px solid #fecaca; background:#fee2e2; color:#dc2626; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <button type="button" onclick="removeCartItem(${idx})" title="Excluir" style="width:34px; height:34px; border-radius:10px; border:1px solid #fecaca; background:#fee2e2; color:#dc2626; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                         🗑️
                     </button>
                 </div>
@@ -2021,7 +1933,7 @@
         window.updateCartTotals();
     };
 
-    window.selectedDeliveryIdx = 0; // -1 = Retirar na Loja, 0..N = índice do endereço salvo
+    window.selectedDeliveryIdx = 0;
     window.reopenDeliveryModalAfterSave = false;
 
     window.syncCartDeliveryDisplay = function() {
@@ -2442,7 +2354,7 @@
 
         const canClientCancel = (!isCanceled && st === 'Novo');
         const cancelBtnHtml = canClientCancel
-            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">✕ Solicitar Cancelamento do Pedido</button>`
+            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">✕ Cancelar Pedido</button>`
             : '';
 
         document.getElementById('track-order-body').innerHTML = `
@@ -2826,20 +2738,20 @@
 
             return `
             <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
-                        <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
-                        <div style="font-weight:900; font-size:0.98rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
+                        <div style="font-weight:900; font-size:0.95rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             ${nomeLoja}
                         </div>
                     </div>
-                    ${isDone && !isCanceled ? `<span style="font-size:0.72rem; font-weight:700; color:#71717a; white-space:nowrap;">✔️ Pedido finalizado</span>` : ''}
+                    ${isDone && !isCanceled ? `<span style="font-size:0.72rem; font-weight:700; color:#71717a; white-space:nowrap;">Pedido finalizado</span>` : ''}
                     ${isCanceled ? `<span style="font-size:0.72rem; font-weight:800; color:#dc2626; white-space:nowrap;">❌ Cancelado</span>` : ''}
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:0.8rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
-                    <span style="font-size:1.02rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:0.78rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
+                    <span style="font-size:0.98rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">${o.total || 'R$ 0,00'}</span>
                 </div>
 
                 <div class="order-card-actions">
@@ -2857,7 +2769,7 @@
                     <button type="button" class="btn-order-sleek rate" onclick="openRateOrderModal('${o.id}')">
                         ⭐ Avaliar
                     </button>` : ''}
-                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
+                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.74rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -2882,27 +2794,69 @@
         return { primeiroNome, sobrenome };
     };
 
-    // Salva e sincroniza os dados do cliente tanto no navegador quanto no Firebase
+    // Registro do Service Worker e Captura do Instalador Nativo (WebAPK na Prateleira de Apps)
+    window.deferredPwaPrompt = null;
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+    }
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredPwaPrompt = e;
+        const btnMob = document.getElementById('btn-pwa-install-mob');
+        if (btnMob) btnMob.style.display = 'inline-flex';
+    });
+    window.addEventListener('appinstalled', () => {
+        window.deferredPwaPrompt = null;
+        const btnMob = document.getElementById('btn-pwa-install-mob');
+        if (btnMob) btnMob.style.display = 'none';
+        window.showToast("🎉 Aplicativo instalado na sua gaveta de apps!");
+    });
+    window.triggerNativePwaInstall = async function() {
+        if (!window.deferredPwaPrompt) {
+            window.showToast("💡 No menu do navegador (⋮), toque em 'Instalar aplicativo'.");
+            return;
+        }
+        window.deferredPwaPrompt.prompt();
+        const { outcome } = await window.deferredPwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+            document.getElementById('btn-pwa-install-mob').style.display = 'none';
+        }
+        window.deferredPwaPrompt = null;
+    };
+
     window.saveClientProfileEverywhere = async function(uid, profileObj) {
         if (!uid) return;
-        const splitted = window.splitFullName(profileObj.nome);
-        const primeiroNome = (profileObj.primeiroNome || splitted.primeiroNome || '').trim();
-        const sobrenome = (profileObj.sobrenome || splitted.sobrenome || '').trim();
+        const existingMem = window.clientProfileData || {};
+        const splitted = window.splitFullName(profileObj.nome || existingMem.nome);
+        const primeiroNome = (profileObj.primeiroNome || existingMem.primeiroNome || splitted.primeiroNome || '').trim();
+        const sobrenome = (profileObj.sobrenome || existingMem.sobrenome || splitted.sobrenome || '').trim();
         const fullNome = [primeiroNome, sobrenome].filter(Boolean).join(' ').trim() ||
-            ((profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : 'Cliente');
+            ((profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : (existingMem.nome || 'Cliente'));
+        const telefone = (profileObj.telefone || existingMem.telefone || '').trim();
+        const enderecos = (Array.isArray(profileObj.enderecos) && profileObj.enderecos.length > 0)
+            ? profileObj.enderecos
+            : (Array.isArray(profileObj.enderecos) ? profileObj.enderecos : (existingMem.enderecos || []));
+        const emailStr = (profileObj.email || (window.currentClient ? window.currentClient.email : '') || existingMem.email || '').trim();
 
         const cleanObj = {
-            email: profileObj.email || (window.currentClient ? window.currentClient.email : ''),
+            email: emailStr,
             nome: fullNome,
             primeiroNome: primeiroNome,
             sobrenome: sobrenome,
-            telefone: (profileObj.telefone || '').trim(),
-            enderecos: Array.isArray(profileObj.enderecos) ? profileObj.enderecos : [],
-            perfilConfirmado: Boolean(profileObj.perfilConfirmado || (primeiroNome && sobrenome && profileObj.telefone))
+            telefone: telefone,
+            enderecos: enderecos,
+            perfilConfirmado: Boolean(profileObj.perfilConfirmado || existingMem.perfilConfirmado || (primeiroNome && telefone)),
+            updatedAtMs: Date.now()
         };
         window.clientProfileData = cleanObj;
+
         try {
             localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
+            if (emailStr) {
+                localStorage.setItem('juaba_cli_profile_email_' + emailStr.toLowerCase(), JSON.stringify(cleanObj));
+            }
             localStorage.setItem('juaba_cli_active_session', JSON.stringify({
                 uid,
                 email: cleanObj.email,
@@ -2917,69 +2871,113 @@
             } catch (e) {}
         }
 
+        // Salva na coleção 'clientes' e também cria backup espelhado em 'lojas/_cli_{uid}' (garantindo persistência na nuvem mesmo com regras restritas)
         try {
             await setDoc(doc(db, "clientes", uid), cleanObj, { merge: true });
-        } catch (e) {
-            console.warn("Perfil salvo localmente (coleção clientes restrita nas regras):", e);
-        }
+        } catch (e) {}
+        try {
+            await setDoc(doc(db, "lojas", "_cli_" + uid), {
+                ...cleanObj,
+                isSystemConfig: true,
+                isClientProfileBackup: true,
+                updatedAtMs: -999
+            }, { merge: true });
+        } catch (e) {}
     };
 
     window.loadClientProfileEverywhere = async function(user) {
         if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
 
-        let localData = {};
+        const emailLower = (user.email || '').toLowerCase().trim();
+        let localUidData = {};
+        let localEmailData = {};
         try {
-            const raw = localStorage.getItem('juaba_cli_profile_' + user.uid);
-            if (raw) localData = JSON.parse(raw);
+            const rawUid = localStorage.getItem('juaba_cli_profile_' + user.uid);
+            if (rawUid) localUidData = JSON.parse(rawUid) || {};
+            if (emailLower) {
+                const rawEmail = localStorage.getItem('juaba_cli_profile_email_' + emailLower);
+                if (rawEmail) localEmailData = JSON.parse(rawEmail) || {};
+            }
         } catch (e) {}
 
-        let remoteData = {};
+        let remoteCliData = {};
+        let remoteBackupData = {};
         try {
             const snap = await getDoc(doc(db, "clientes", user.uid));
-            if (snap.exists()) remoteData = snap.data() || {};
-        } catch (e) {
-            console.warn("Usando perfil local/Auth para o cliente:", e);
+            if (snap.exists()) remoteCliData = snap.data() || {};
+        } catch (e) {}
+
+        try {
+            const backupSnap = await getDoc(doc(db, "lojas", "_cli_" + user.uid));
+            if (backupSnap.exists()) remoteBackupData = backupSnap.data() || {};
+        } catch (e) {}
+
+        // Também recupera telefone/endereço de pedidos anteriores deste e-mail caso necessário
+        let orderFallbackPhone = '';
+        let orderFallbackName = '';
+        if (emailLower && Array.isArray(window.rawAllOrders)) {
+            const myPastOrder = window.rawAllOrders.find(o => (o.emailCliente || '').toLowerCase() === emailLower && o.telefone);
+            if (myPastOrder) {
+                orderFallbackPhone = myPastOrder.telefone || '';
+                orderFallbackName = myPastOrder.cliente || '';
+            }
         }
 
         const pending = window.pendingRegistrationData || {};
-        const bestName =
-            (pending.nome && pending.nome !== 'Cliente' ? pending.nome : '') ||
-            (remoteData.nome && remoteData.nome !== 'Cliente' ? remoteData.nome : '') ||
-            (localData.nome && localData.nome !== 'Cliente' ? localData.nome : '') ||
+        const sources = [pending, remoteCliData, remoteBackupData, localUidData, localEmailData];
+
+        const pickFirstNonEmpty = (field) => {
+            for (const src of sources) {
+                if (src && src[field] && String(src[field]).trim() !== '' && src[field] !== 'Cliente') {
+                    return String(src[field]).trim();
+                }
+            }
+            return '';
+        };
+
+        const bestName = pickFirstNonEmpty('nome') ||
             (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
+            orderFallbackName ||
             (user.email ? user.email.split('@')[0] : 'Cliente');
 
         const splitted = window.splitFullName(bestName);
-        const bestFirst = pending.primeiroNome || remoteData.primeiroNome || localData.primeiroNome || splitted.primeiroNome || '';
-        const bestLast = pending.sobrenome || remoteData.sobrenome || localData.sobrenome || splitted.sobrenome || '';
-        const bestPhone = pending.telefone || remoteData.telefone || localData.telefone || user.phoneNumber || '';
-        const bestAddrs = (Array.isArray(remoteData.enderecos) && remoteData.enderecos.length > 0)
-            ? remoteData.enderecos
-            : (Array.isArray(localData.enderecos) ? localData.enderecos : []);
-        const confirmed = Boolean(pending.perfilConfirmado || remoteData.perfilConfirmado || localData.perfilConfirmado);
+        const bestFirst = pickFirstNonEmpty('primeiroNome') || splitted.primeiroNome || '';
+        const bestLast = pickFirstNonEmpty('sobrenome') || splitted.sobrenome || '';
+        const bestPhone = pickFirstNonEmpty('telefone') || user.phoneNumber || orderFallbackPhone || '';
+
+        // Escolhe a lista de endereços mais completa entre todas as fontes salvas
+        let bestAddrs = [];
+        for (const src of sources) {
+            if (src && Array.isArray(src.enderecos) && src.enderecos.length > bestAddrs.length) {
+                bestAddrs = src.enderecos;
+            }
+        }
+
+        const hasConfirmed = sources.some(s => s && s.perfilConfirmado === true) || Boolean(bestFirst && bestPhone);
 
         const merged = {
-            email: user.email || remoteData.email || localData.email || '',
+            email: user.email || pickFirstNonEmpty('email') || '',
             nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
             primeiroNome: bestFirst,
             sobrenome: bestLast,
             telefone: bestPhone,
             enderecos: bestAddrs,
-            perfilConfirmado: confirmed
+            perfilConfirmado: hasConfirmed
         };
 
         try {
             localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
+            if (emailLower) {
+                localStorage.setItem('juaba_cli_profile_email_' + emailLower, JSON.stringify(merged));
+            }
         } catch (e) {}
 
         return merged;
     };
 
-    // Envia o PIN de 4 dígitos para o e-mail do usuário usando o Google Sheets (Apps Script)
     window.sendPinViaGoogleSheets = async function(email, nome, pin) {
         const scriptUrl = (window.GOOGLE_SCRIPT_URL || localStorage.getItem('juaba_google_script_url') || '').trim();
         if (!scriptUrl) {
-            console.warn("URL do Google Apps Script ainda não configurada.");
             document.getElementById('pin-script-config-hint').style.display = 'block';
             window.showToast(`⚠️ Configure a URL da Planilha ou use o PIN de teste: ${pin}`);
             return;
@@ -3000,7 +2998,6 @@
         try {
             const query = new URLSearchParams(payload).toString();
             const sep = scriptUrl.includes('?') ? '&' : '?';
-            // Dispara via POST (JSON/Form) e fallback GET para máxima compatibilidade com qualquer Apps Script
             fetch(scriptUrl, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -3008,24 +3005,18 @@
                 body: JSON.stringify(payload)
             }).catch(() => {});
 
-            fetch(scriptUrl + sep + query, {
-                method: 'GET',
-                mode: 'no-cors'
-            }).catch(() => {});
-
+            fetch(scriptUrl + sep + query, { method: 'GET', mode: 'no-cors' }).catch(() => {});
             window.showToast(`📩 PIN de 4 dígitos enviado para ${email}!`);
-        } catch (err) {
-            console.error("Erro ao acionar Google Sheets:", err);
-        }
+        } catch (err) {}
     };
 
     window.saveCustomGoogleScriptUrl = function() {
         const val = document.getElementById('custom-gsheet-url-input').value.trim();
-        if (!val) { window.showToast("Cole a URL do seu Google Apps Script!"); return; }
+        if (!val) { window.showToast("Cole a URL do Google Apps Script!"); return; }
         window.GOOGLE_SCRIPT_URL = val;
         localStorage.setItem('juaba_google_script_url', val);
         document.getElementById('pin-script-config-hint').style.display = 'none';
-        window.showToast("✅ URL da Planilha salva! Reenviando PIN...");
+        window.showToast("✅ URL salva! Reenviando PIN...");
         window.resendEmailPinCode();
     };
 
@@ -3045,14 +3036,8 @@
 
     window.confirmEmailPinCode = async function() {
         const typed = document.getElementById('pin-code-input').value.trim();
-        if (!typed || typed.length < 4) {
-            window.showToast("⚠️ Digite os 4 dígitos do PIN!");
-            return;
-        }
-        if (typed !== String(window.generatedEmailPin)) {
-            window.showToast("❌ Código PIN incorreto! Verifique seu e-mail.");
-            return;
-        }
+        if (!typed || typed.length < 4) { window.showToast("⚠️ Digite os 4 dígitos do PIN!"); return; }
+        if (typed !== String(window.generatedEmailPin)) { window.showToast("❌ PIN incorreto!"); return; }
         if (!window.pendingRegistrationData) return;
 
         const { email, pass, nome, primeiroNome, sobrenome, telefone } = window.pendingRegistrationData;
@@ -3065,7 +3050,7 @@
             const lojaCheck = await getDoc(doc(db, "lojas", cred.user.uid));
             if (lojaCheck.exists() && !lojaCheck.data().isSystemConfig) {
                 await signOut(auth);
-                window.showToast("⚠️ Este e-mail pertence a uma Loja! Use o Painel do Lojista.");
+                window.showToast("⚠️ Este e-mail pertence a uma Loja!");
                 return;
             }
             await window.saveClientProfileEverywhere(cred.user.uid, {
@@ -3081,13 +3066,9 @@
             window.generatedEmailPin = null;
             window.closeVerifyPinModal();
             window.updateClientHeaderUI();
-            window.showToast(`🎉 Bem-vindo(a), ${primeiroNome || nome.split(' ')[0]}! Conta verificada!`);
+            window.showToast(`🎉 Bem-vindo(a), ${primeiroNome}! Conta verificada!`);
         } catch (err) {
-            console.error("Erro ao criar conta após PIN:", err);
-            const msg = (err.code === 'auth/email-already-in-use')
-                ? "⚠️ Este e-mail já possui cadastro! Faça login."
-                : "⚠️ Erro ao criar conta. Verifique os dados.";
-            window.showToast(msg);
+            window.showToast("⚠️ Erro ao criar conta.");
         } finally {
             btn.disabled = false;
             btn.innerText = "✅ Confirmar PIN e Criar Conta";
@@ -3106,18 +3087,10 @@
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
                 if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
                 if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
-                if (!telefone || telefone.replace(/\D/g, '').length < 8) {
-                    window.showToast("⚠️ Informe seu WhatsApp com DDD!");
-                    return;
-                }
-                if (pass.length < 6) {
-                    window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!");
-                    return;
-                }
+                if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
+                if (pass.length < 6) { window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!"); return; }
 
                 const nome = `${primeiroNome} ${sobrenome}`.trim();
-
-                // Gera o PIN de 4 dígitos e abre o modal de confirmação antes de concluir o cadastro
                 window.pendingRegistrationData = { email, pass, nome, primeiroNome, sobrenome, telefone, perfilConfirmado: true };
                 window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
                 document.getElementById('pin-target-email').innerText = email;
@@ -3131,7 +3104,7 @@
                 const lojaSnap = await getDoc(doc(db, "lojas", cred.user.uid));
                 if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
                     await signOut(auth);
-                    window.showToast("🏪 Esta conta é de um Lojista! Acesse pelo Painel do Gestor.");
+                    window.showToast("🏪 Esta conta é de um Lojista!");
                     return;
                 }
                 window.showToast("👋 Bem-vindo de volta!");
@@ -3141,7 +3114,6 @@
         }
     };
 
-    // Recuperação de Senha do Cliente
     window.openForgotPasswordModal = function() {
         const currentEmail = document.getElementById('cli-auth-email').value.trim();
         document.getElementById('forgot-pass-email').value = currentEmail;
@@ -3154,34 +3126,23 @@
 
     window.sendClientPasswordReset = async function() {
         const email = document.getElementById('forgot-pass-email').value.trim();
-        if (!email) {
-            window.showToast("⚠️ Digite seu e-mail cadastrado!");
-            return;
-        }
-        const btn = document.getElementById('btn-send-reset');
-        btn.disabled = true;
-        btn.innerText = "Enviando...";
+        if (!email) { window.showToast("⚠️ Digite seu e-mail!"); return; }
         try {
             await sendPasswordResetEmail(auth, email);
             window.closeForgotPasswordModal();
             window.showToast("✅ Link de recuperação enviado para seu e-mail!");
         } catch (err) {
-            console.error("Erro ao recuperar senha:", err);
-            window.showToast("⚠️ Não foi possível enviar. Verifique se o e-mail está correto.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "📩 Enviar E-mail de Recuperação";
+            window.showToast("⚠️ Não foi possível enviar. Verifique o e-mail.");
         }
     };
 
     window.updateClientHeaderUI = function() {
         if (!window.currentClient) return;
         const user = window.currentClient;
-        const googleName = user.displayName || '';
         const savedName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
             ? window.clientProfileData.nome
             : '';
-        const finalName = savedName || googleName || (user.email ? user.email.split('@')[0] : 'Cliente');
+        const finalName = savedName || user.displayName || (user.email ? user.email.split('@')[0] : 'Cliente');
         window.clientProfileData.nome = finalName;
 
         const firstName = finalName.split(' ')[0];
@@ -3198,12 +3159,12 @@
         if (profPhone) {
             profPhone.innerText = window.clientProfileData.telefone
                 ? `📱 WhatsApp: ${window.clientProfileData.telefone}`
-                : `⚠️ WhatsApp não informado (Toque em Conta para adicionar)`;
+                : `⚠️ WhatsApp não informado`;
             profPhone.style.color = window.clientProfileData.telefone ? 'var(--success)' : '#d97706';
         }
         if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
             const addrLbl = document.getElementById('desktop-addr-label');
-            if (addrLbl) addrLbl.innerText = window.clientProfileData.enderecos[0].rua.substring(0, 18) + '...';
+            if (addrLbl) addrLbl.innerText = (window.clientProfileData.enderecos[0].logradouro || window.clientProfileData.enderecos[0].rua || '').substring(0, 18) + '...';
         }
     };
 
@@ -3229,21 +3190,9 @@
         const sobrenome = document.getElementById('google-complete-last-name').value.trim();
         const telefone = document.getElementById('google-complete-phone').value.trim();
 
-        if (!primeiroNome) {
-            window.showToast("⚠️ Digite seu Nome!");
-            document.getElementById('google-complete-first-name').focus();
-            return;
-        }
-        if (!sobrenome) {
-            window.showToast("⚠️ Digite seu Sobrenome!");
-            document.getElementById('google-complete-last-name').focus();
-            return;
-        }
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
-            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
-            document.getElementById('google-complete-phone').focus();
-            return;
-        }
+        if (!primeiroNome) { window.showToast("⚠️ Digite seu Nome!"); return; }
+        if (!sobrenome) { window.showToast("⚠️ Digite seu Sobrenome!"); return; }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Digite seu WhatsApp com DDD!"); return; }
 
         const nome = `${primeiroNome} ${sobrenome}`.trim();
 
@@ -3264,53 +3213,48 @@
 
     window.loginWithGoogle = async function() {
         try {
+            window.isGoogleAuthInProgress = true;
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             const cred = await signInWithPopup(auth, provider);
             const user = cred.user;
             if (user) {
                 const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig && !lojaSnap.data().isClientProfileBackup) {
+                    window.isGoogleAuthInProgress = false;
                     await signOut(auth);
-                    window.showToast("🏪 Esta conta Google pertence a um Lojista! Use o Painel Gestor.");
+                    window.showToast("🏪 Esta conta Google é de um Lojista!");
                     return;
                 }
 
                 const loaded = await window.loadClientProfileEverywhere(user);
-                const realName = (loaded.nome && loaded.nome !== 'Cliente')
-                    ? loaded.nome
-                    : ((user.displayName && user.displayName !== 'Cliente') ? user.displayName : 'Cliente');
-                const realPhone = loaded.telefone || user.phoneNumber || '';
+                window.clientProfileData = loaded;
 
-                await window.saveClientProfileEverywhere(user.uid, {
-                    email: user.email || '',
-                    nome: realName,
-                    primeiroNome: loaded.primeiroNome || '',
-                    sobrenome: loaded.sobrenome || '',
-                    telefone: realPhone,
-                    enderecos: loaded.enderecos || [],
-                    perfilConfirmado: loaded.perfilConfirmado
-                });
-
-                window.updateClientHeaderUI();
-
-                // Sempre abre para confirmar Nome, Sobrenome e Telefone caso ainda não tenha confirmado os 3 campos
-                if (!loaded.perfilConfirmado || !loaded.primeiroNome || !loaded.sobrenome || !realPhone) {
-                    window.openCompleteProfileModal();
+                if (loaded.perfilConfirmado || (loaded.primeiroNome && loaded.telefone)) {
+                    await window.saveClientProfileEverywhere(user.uid, {
+                        ...loaded,
+                        perfilConfirmado: true
+                    });
+                    window.isGoogleAuthInProgress = false;
+                    document.getElementById('modal-complete-profile').style.display = 'none';
+                    window.updateClientHeaderUI();
+                    window.renderSavedAddresses();
+                    window.syncCartDeliveryDisplay();
+                    window.showToast(`👋 Bem-vindo(a) de volta, ${loaded.primeiroNome || loaded.nome.split(' ')[0]}!`);
                 } else {
-                    window.showToast(`👋 Bem-vindo(a), ${loaded.primeiroNome}!`);
+                    window.isGoogleAuthInProgress = false;
+                    window.updateClientHeaderUI();
+                    window.openCompleteProfileModal();
                 }
             }
         } catch (err) {
-            console.error("Erro Login Google:", err);
+            window.isGoogleAuthInProgress = false;
             window.showToast("⚠️ Não foi possível entrar com o Google.");
         }
     };
 
     window.logoutClient = async function() {
-        try {
-            localStorage.removeItem('juaba_cli_active_session');
-        } catch (e) {}
+        try { localStorage.removeItem('juaba_cli_active_session'); } catch (e) {}
         await signOut(auth);
         window.showToast("Você saiu da conta.");
         window.switchTab('home');
@@ -3471,13 +3415,7 @@
         if (!numero) { window.showToast("⚠️ Informe o Número (ou S/N)!"); document.getElementById('addr-numero').focus(); return; }
         if (!bairro) { window.showToast("⚠️ Informe o Bairro!"); document.getElementById('addr-bairro').focus(); return; }
 
-        const addrObj = {
-            logradouro,
-            numero,
-            bairro,
-            complemento,
-            referencia
-        };
+        const addrObj = { logradouro, numero, bairro, complemento, referencia };
         addrObj.rua = window.formatAddressDisplay(addrObj);
 
         if (!Array.isArray(window.clientProfileData.enderecos)) window.clientProfileData.enderecos = [];
@@ -3528,28 +3466,16 @@
     window.restoreInstantSessionUI = function() {
         try {
             const cachedStores = localStorage.getItem('juaba_cache_stores');
-            if (cachedStores) {
-                window.allStores = JSON.parse(cachedStores) || [];
-                window.renderHomeView();
-            }
+            if (cachedStores) { window.allStores = JSON.parse(cachedStores) || []; window.renderHomeView(); }
             const cachedProds = localStorage.getItem('juaba_cache_products');
-            if (cachedProds) {
-                window.allProducts = JSON.parse(cachedProds) || [];
-                window.renderHomeView();
-            }
+            if (cachedProds) { window.allProducts = JSON.parse(cachedProds) || []; window.renderHomeView(); }
             const rawSession = localStorage.getItem('juaba_cli_active_session');
             if (!rawSession) return;
             const sess = JSON.parse(rawSession);
             if (!sess || !sess.uid) return;
 
-            window.currentClient = {
-                uid: sess.uid,
-                email: sess.email || '',
-                displayName: sess.displayName || (sess.profile && sess.profile.nome) || 'Cliente'
-            };
-            if (sess.profile) {
-                window.clientProfileData = sess.profile;
-            }
+            window.currentClient = { uid: sess.uid, email: sess.email || '', displayName: sess.displayName || 'Cliente' };
+            if (sess.profile) { window.clientProfileData = sess.profile; }
             const tabPed = document.getElementById('tab-pedidos');
             const dnavPed = document.getElementById('dnav-pedidos');
             if (tabPed) tabPed.style.display = 'flex';
@@ -3559,21 +3485,17 @@
             window.updateClientHeaderUI();
 
             const cachedOrders = localStorage.getItem('juaba_cache_orders_' + sess.uid);
-            if (cachedOrders) {
-                window.myOrders = JSON.parse(cachedOrders) || [];
-                window.renderClientOrders();
-            }
+            if (cachedOrders) { window.myOrders = JSON.parse(cachedOrders) || []; window.renderClientOrders(); }
         } catch (e) {}
     };
 
-    // Executa imediatamente antes mesmo do Firebase responder para não piscar "Entrar"
     window.restoreInstantSessionUI();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
                 const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig && !lojaSnap.data().isClientProfileBackup) {
                     localStorage.removeItem('juaba_cli_active_session');
                     await signOut(auth);
                     window.showToast("🏪 Conta de Lojista detectada! Use o Painel do Gestor.");
@@ -3594,20 +3516,19 @@
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            const quickName =
-                (window.pendingRegistrationData && window.pendingRegistrationData.nome) ||
-                (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente' ? window.clientProfileData.nome : '') ||
-                user.displayName ||
-                (user.email ? user.email.split('@')[0] : 'Cliente');
-            window.clientProfileData.nome = quickName;
-            window.updateClientHeaderUI();
-
             const fullProfile = await window.loadClientProfileEverywhere(user);
             window.clientProfileData = fullProfile;
-            await window.saveClientProfileEverywhere(user.uid, fullProfile);
-            window.updateClientHeaderUI();
 
-            if (!window.clientProfileData.perfilConfirmado || !window.clientProfileData.primeiroNome || !window.clientProfileData.sobrenome || !window.clientProfileData.telefone) {
+            // Só grava de volta no login se já houver dados confirmados para nunca sobrescrever dados existentes com vazio
+            if (fullProfile.perfilConfirmado || (fullProfile.primeiroNome && fullProfile.telefone) || (fullProfile.enderecos && fullProfile.enderecos.length > 0)) {
+                await window.saveClientProfileEverywhere(user.uid, fullProfile);
+            }
+
+            window.updateClientHeaderUI();
+            window.renderSavedAddresses();
+            window.syncCartDeliveryDisplay();
+
+            if (!window.isGoogleAuthInProgress && !fullProfile.perfilConfirmado && (!fullProfile.primeiroNome || !fullProfile.telefone)) {
                 window.openCompleteProfileModal();
             }
 
@@ -3635,6 +3556,7 @@
 
         snap.forEach(d => {
             const data = d.data();
+            if (data.isClientProfileBackup === true) return;
             if (d.id === '_marketplace_config_' || data.isSystemConfig === true) {
                 const ms = data.updatedAtMs || 0;
                 if (ms >= latestMs) {
@@ -3652,7 +3574,7 @@
 
         snap.forEach(d => {
             const data = d.data();
-            if (d.id !== '_marketplace_config_' && !data.isSystemConfig) {
+            if (d.id !== '_marketplace_config_' && !data.isSystemConfig && !data.isClientProfileBackup) {
                 const over = sysOverrides[d.id] || {};
                 const blocked = (sysBlocked[d.id] !== undefined) ? sysBlocked[d.id] : Boolean(data.bloqueada);
                 window.allStores.push({ id: d.id, ...data, ...over, bloqueada: blocked });
@@ -3660,7 +3582,6 @@
         });
 
         try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
-
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
     });
