@@ -2839,8 +2839,10 @@
             ? profileObj.enderecos
             : (Array.isArray(profileObj.enderecos) ? profileObj.enderecos : (existingMem.enderecos || []));
         const emailStr = (profileObj.email || (window.currentClient ? window.currentClient.email : '') || existingMem.email || '').trim();
+        const emailKey = emailStr.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
 
         const cleanObj = {
+            uid: uid,
             email: emailStr,
             nome: fullNome,
             primeiroNome: primeiroNome,
@@ -2850,6 +2852,218 @@
             perfilConfirmado: Boolean(profileObj.perfilConfirmado || existingMem.perfilConfirmado || (primeiroNome && telefone)),
             updatedAtMs: Date.now()
         };
+        window.clientProfileData = cleanObj;
+
+        try {
+            localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
+            if (emailStr) {
+                localStorage.setItem('juaba_cli_profile_email_' + emailStr.toLowerCase(), JSON.stringify(cleanObj));
+            }
+            localStorage.setItem('juaba_cli_active_session', JSON.stringify({
+                uid,
+                email: cleanObj.email,
+                displayName: cleanObj.nome,
+                profile: cleanObj
+            }));
+        } catch (e) {}
+
+        if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
+            try {
+                await updateProfile(auth.currentUser, { displayName: cleanObj.nome });
+            } catch (e) {}
+        }
+
+        if (auth.currentUser) {
+            try { await auth.currentUser.getIdToken(); } catch (e) {}
+        }
+
+        const writeOps = [
+            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid), cleanObj, { merge: true }),
+            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid, "perfil", "dados"), cleanObj, { merge: true }),
+            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid, "profile", "data"), cleanObj, { merge: true }),
+            setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", uid), cleanObj, { merge: true }),
+            setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", uid), cleanObj, { merge: true }),
+            setDoc(doc(db, "clientes", uid), cleanObj, { merge: true })
+        ];
+        if (emailKey) {
+            writeOps.push(
+                setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users_by_email", emailKey), cleanObj, { merge: true })
+            );
+        }
+        await Promise.allSettled(writeOps);
+    };
+
+    window.loadClientProfileEverywhere = async function(user) {
+        if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
+
+        try { await user.getIdToken(); } catch (e) {}
+
+        const emailLower = (user.email || '').toLowerCase().trim();
+        const emailKey = emailLower.replace(/[^a-z0-9@._-]/g, '_');
+        let localUidData = {};
+        let localEmailData = {};
+        try {
+            const rawUid = localStorage.getItem('juaba_cli_profile_' + user.uid);
+            if (rawUid) localUidData = JSON.parse(rawUid) || {};
+            if (emailLower) {
+                const rawEmail = localStorage.getItem('juaba_cli_profile_email_' + emailLower);
+                if (rawEmail) localEmailData = JSON.parse(rawEmail) || {};
+            }
+        } catch (e) {}
+
+        const readPromises = [
+            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid)),
+            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid, "perfil", "dados")),
+            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid, "profile", "data")),
+            getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", user.uid)),
+            getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", user.uid)),
+            getDoc(doc(db, "clientes", user.uid))
+        ];
+        if (emailKey) {
+            readPromises.push(getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users_by_email", emailKey)));
+        }
+
+        const results = await Promise.allSettled(readPromises);
+        const cloudDocs = [];
+        results.forEach(res => {
+            if (res.status === 'fulfilled' && res.value && res.value.exists()) {
+                cloudDocs.push(res.value.data() || {});
+            }
+        });
+
+        // Também recupera telefone/endereço de pedidos anteriores deste e-mail caso necessário
+        let orderFallbackPhone = '';
+        let orderFallbackName = '';
+        let orderFallbackAddr = null;
+        if (emailLower && Array.isArray(window.rawAllOrders)) {
+            const myPastOrder = window.rawAllOrders.find(o => (o.emailCliente || '').toLowerCase() === emailLower && (o.telefone || o.endereco));
+            if (myPastOrder) {
+                orderFallbackPhone = myPastOrder.telefone || '';
+                orderFallbackName = myPastOrder.cliente || '';
+                if (myPastOrder.endereco && myPastOrder.endereco !== 'Retirar na Loja') {
+                    orderFallbackAddr = { rua: myPastOrder.endereco };
+                }
+            }
+        }
+
+        const pending = window.pendingRegistrationData || {};
+        // Prioriza os dados vindos da nuvem (Firestore) sobre cache local vazio
+        const sources = [pending, ...cloudDocs, localUidData, localEmailData];
+
+        const pickFirstNonEmpty = (field) => {
+            for (const src of sources) {
+                if (src && src[field] && String(src[field]).trim() !== '' && src[field] !== 'Cliente') {
+                    return String(src[field]).trim();
+                }
+            }
+            return '';
+        };
+
+        const bestName = pickFirstNonEmpty('nome') ||
+            (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
+            orderFallbackName ||
+            (user.email ? user.email.split('@')[0] : 'Cliente');
+
+        const splitted = window.splitFullName(bestName);
+        const bestFirst = pickFirstNonEmpty('primeiroNome') || splitted.primeiroNome || '';
+        const bestLast = pickFirstNonEmpty('sobrenome') || splitted.sobrenome || '';
+        const bestPhone = pickFirstNonEmpty('telefone') || user.phoneNumber || orderFallbackPhone || '';
+
+        let bestAddrs = [];
+        for (const src of sources) {
+            if (src && Array.isArray(src.enderecos) && src.enderecos.length > bestAddrs.length) {
+                bestAddrs = src.enderecos;
+            }
+        }
+        if (bestAddrs.length === 0 && orderFallbackAddr) {
+            bestAddrs = [orderFallbackAddr];
+        }
+
+        const hasConfirmed = sources.some(s => s && (s.perfilConfirmado === true || (s.telefone && String(s.telefone).trim().length >= 8))) ||
+            Boolean(bestPhone && bestPhone.replace(/\D/g, '').length >= 8);
+
+        const merged = {
+            uid: user.uid,
+            email: user.email || pickFirstNonEmpty('email') || '',
+            nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
+            primeiroNome: bestFirst,
+            sobrenome: bestLast,
+            telefone: bestPhone,
+            enderecos: bestAddrs,
+            perfilConfirmado: hasConfirmed
+        };
+
+        try {
+            localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
+            if (emailLower) {
+                localStorage.setItem('juaba_cli_profile_email_' + emailLower, JSON.stringify(merged));
+            }
+            localStorage.setItem('juaba_cli_active_session', JSON.stringify({
+                uid: user.uid,
+                email: merged.email,
+                displayName: merged.nome,
+                profile: merged
+            }));
+        } catch (e) {}
+
+        return merged;
+    };
+
+    window.profileUnsubscribers = [];
+    window.startUserProfileRealtimeSync = function(user) {
+        if (window.profileUnsubscribers && window.profileUnsubscribers.length) {
+            window.profileUnsubscribers.forEach(unsub => { try { unsub(); } catch (e) {} });
+        }
+        window.profileUnsubscribers = [];
+        if (!user) return;
+
+        const paths = [
+            doc(db, "artifacts", "juaba-delivery", "users", user.uid),
+            doc(db, "artifacts", "juaba-delivery", "users", user.uid, "perfil", "dados"),
+            doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", user.uid)
+        ];
+
+        paths.forEach(ref => {
+            const unsub = onSnapshot(ref, (snap) => {
+                if (!snap.exists()) return;
+                const d = snap.data() || {};
+                const cur = window.clientProfileData || {};
+                const mergedAddrs = (Array.isArray(d.enderecos) && d.enderecos.length > 0)
+                    ? d.enderecos
+                    : (cur.enderecos || []);
+                const mergedPhone = d.telefone || cur.telefone || '';
+                const mergedFirst = d.primeiroNome || cur.primeiroNome || '';
+                const mergedLast = d.sobrenome || cur.sobrenome || '';
+                const mergedName = d.nome || [mergedFirst, mergedLast].filter(Boolean).join(' ') || cur.nome || 'Cliente';
+
+                if (mergedPhone || mergedAddrs.length > 0 || d.perfilConfirmado) {
+                    window.clientProfileData = {
+                        ...cur,
+                        ...d,
+                        nome: mergedName,
+                        primeiroNome: mergedFirst,
+                        sobrenome: mergedLast,
+                        telefone: mergedPhone,
+                        enderecos: mergedAddrs,
+                        perfilConfirmado: Boolean(d.perfilConfirmado || mergedPhone)
+                    };
+                    try {
+                        localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(window.clientProfileData));
+                        if (user.email) {
+                            localStorage.setItem('juaba_cli_profile_email_' + user.email.toLowerCase(), JSON.stringify(window.clientProfileData));
+                        }
+                    } catch (e) {}
+                    window.updateClientHeaderUI();
+                    window.renderSavedAddresses();
+                    window.syncCartDeliveryDisplay();
+                    if (window.clientProfileData.perfilConfirmado || window.clientProfileData.telefone) {
+                        document.getElementById('modal-complete-profile').style.display = 'none';
+                    }
+                }
+            }, () => {});
+            window.profileUnsubscribers.push(unsub);
+        });
+    };
         window.clientProfileData = cleanObj;
 
         try {
@@ -3196,18 +3410,26 @@
 
         const nome = `${primeiroNome} ${sobrenome}`.trim();
 
+        // Preserva quaisquer endereços que já existam no banco para este usuário
+        const existingCloud = await window.loadClientProfileEverywhere(window.currentClient);
+        const preservedAddrs = (Array.isArray(window.clientProfileData.enderecos) && window.clientProfileData.enderecos.length > 0)
+            ? window.clientProfileData.enderecos
+            : (existingCloud.enderecos || []);
+
         await window.saveClientProfileEverywhere(window.currentClient.uid, {
             email: window.currentClient.email || '',
             nome,
             primeiroNome,
             sobrenome,
             telefone,
-            enderecos: window.clientProfileData.enderecos || [],
+            enderecos: preservedAddrs,
             perfilConfirmado: true
         });
 
         document.getElementById('modal-complete-profile').style.display = 'none';
         window.updateClientHeaderUI();
+        window.renderSavedAddresses();
+        window.syncCartDeliveryDisplay();
         window.showToast(`✅ Cadastro concluído! Bem-vindo(a), ${primeiroNome}!`);
     };
 
@@ -3229,12 +3451,9 @@
 
                 const loaded = await window.loadClientProfileEverywhere(user);
                 window.clientProfileData = loaded;
+                window.startUserProfileRealtimeSync(user);
 
-                if (loaded.perfilConfirmado || (loaded.primeiroNome && loaded.telefone)) {
-                    await window.saveClientProfileEverywhere(user.uid, {
-                        ...loaded,
-                        perfilConfirmado: true
-                    });
+                if (loaded.perfilConfirmado || (loaded.telefone && String(loaded.telefone).replace(/\D/g, '').length >= 8) || (Array.isArray(loaded.enderecos) && loaded.enderecos.length > 0)) {
                     window.isGoogleAuthInProgress = false;
                     document.getElementById('modal-complete-profile').style.display = 'none';
                     window.updateClientHeaderUI();
@@ -3518,22 +3737,30 @@
 
             const fullProfile = await window.loadClientProfileEverywhere(user);
             window.clientProfileData = fullProfile;
-
-            // Só grava de volta no login se já houver dados confirmados para nunca sobrescrever dados existentes com vazio
-            if (fullProfile.perfilConfirmado || (fullProfile.primeiroNome && fullProfile.telefone) || (fullProfile.enderecos && fullProfile.enderecos.length > 0)) {
-                await window.saveClientProfileEverywhere(user.uid, fullProfile);
-            }
+            window.startUserProfileRealtimeSync(user);
 
             window.updateClientHeaderUI();
             window.renderSavedAddresses();
             window.syncCartDeliveryDisplay();
 
-            if (!window.isGoogleAuthInProgress && !fullProfile.perfilConfirmado && (!fullProfile.primeiroNome || !fullProfile.telefone)) {
+            const alreadyRegistered = Boolean(
+                fullProfile.perfilConfirmado ||
+                (fullProfile.telefone && String(fullProfile.telefone).replace(/\D/g, '').length >= 8) ||
+                (Array.isArray(fullProfile.enderecos) && fullProfile.enderecos.length > 0)
+            );
+
+            if (!window.isGoogleAuthInProgress && !alreadyRegistered) {
                 window.openCompleteProfileModal();
+            } else if (alreadyRegistered) {
+                document.getElementById('modal-complete-profile').style.display = 'none';
             }
 
             window.filterMyOrders();
         } else {
+            if (window.profileUnsubscribers && window.profileUnsubscribers.length) {
+                window.profileUnsubscribers.forEach(unsub => { try { unsub(); } catch (e) {} });
+                window.profileUnsubscribers = [];
+            }
             localStorage.removeItem('juaba_cli_active_session');
             if (tabPed) tabPed.style.display = 'none';
             if (dnavPed) dnavPed.style.display = 'none';
