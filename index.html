@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<selection-tag><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -11,32 +11,6 @@
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-    <script>
-        // Gera o Manifest internamente na memória do navegador sem precisar do arquivo manifest.json externo
-        (function() {
-            try {
-                const inlineManifest = {
-                    name: "JuabaDelivery | Peça Online",
-                    short_name: "JuabaDelivery",
-                    description: "Peça os seus pratos favoritos das melhores lojas da região.",
-                    start_url: window.location.href,
-                    display: "standalone",
-                    background_color: "#ffffff",
-                    theme_color: "#ea1d2c",
-                    orientation: "portrait-primary",
-                    icons: [
-                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-                        { src: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-                    ]
-                };
-                const blob = new Blob([JSON.stringify(inlineManifest)], { type: 'application/manifest+json' });
-                const link = document.createElement('link');
-                link.rel = 'manifest';
-                link.href = URL.createObjectURL(blob);
-                document.head.appendChild(link);
-            } catch (e) {}
-        })();
-    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -62,6 +36,66 @@
         .brand-logo { font-weight: 900; font-size: 1.25rem; letter-spacing: -0.5px; color: var(--dark); cursor: pointer; }
         .brand-logo span { color: var(--primary); }
 
+        /* Botão de Carrinho Criativo no Topo Direito */
+        .header-cart-creative {
+            position: relative;
+            background: #f4f4f5;
+            color: var(--dark);
+            border: 1.5px solid var(--border);
+            height: 42px;
+            min-width: 44px;
+            padding: 0 13px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 900;
+            font-size: 0.8rem;
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .header-cart-creative:active {
+            transform: scale(0.93);
+        }
+        .header-cart-creative.has-items {
+            background: linear-gradient(135deg, var(--primary) 0%, #c81421 100%);
+            color: #ffffff;
+            border-color: var(--primary);
+            padding: 0 15px;
+            box-shadow: 0 6px 18px rgba(234, 29, 44, 0.32);
+        }
+        .header-cart-creative .cart-icon-svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+        .header-cart-creative .cart-count-pill {
+            display: none;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            font-weight: 900;
+            font-size: 0.8rem;
+            letter-spacing: -0.2px;
+        }
+        .header-cart-creative.has-items .cart-count-pill {
+            display: inline-flex;
+        }
+        @keyframes cartBounce {
+            0%, 100% { transform: scale(1); }
+            45% { transform: scale(1.12); }
+        }
+        .header-cart-creative.bump {
+            animation: cartBounce 0.35s ease;
+        }
+
         .desktop-header { display: none; }
         .desktop-footer { display: none; }
 
@@ -69,52 +103,43 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .banners-carousel-wrapper {
-            position: relative; width: 100%; margin-bottom: 18px; border-radius: 20px;
-            overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.08); background: #18181b;
-        }
+        /* ==========================================================================
+           ESTILOS DOS CARDS DE BANNERS (CARROSSEL DA TELA INICIAL - MOBILE)
+           ========================================================================== */
+        /* Container principal que envolve a fileira de cards dos banners */
+        .banners-carousel-wrapper { position: relative; width: 100%; margin-bottom: 16px; }
+
+        /* Fileira horizontal deslizável onde ficam os vários cards de banner */
         .banners-row {
-            display: flex; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory;
-            scroll-behavior: smooth; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+            display: flex; gap: 12px; width: 100%; overflow-x: auto; padding: 2px 2px 6px;
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
         .banners-row::-webkit-scrollbar { display: none; }
+
+        /* Card individual de cada banner (Largura reduzida para caber mais na tela) */
         .banner-card {
-            min-width: 100%; width: 100%; height: 190px; position: relative;
-            scroll-snap-align: center; flex-shrink: 0; overflow: hidden;
-            display: flex; align-items: center; justify-content: center; background: #18181b;
+            width: 245px; min-width: 245px; height: 135px; border-radius: 16px; position: relative;
+            scroll-snap-align: start; flex-shrink: 0; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #ffffff;
         }
-        .banner-card .banner-bg-blur {
-            position: absolute; inset: -15px; width: calc(100% + 30px); height: calc(100% + 30px);
-            object-fit: cover; filter: blur(18px) brightness(0.55); z-index: 1; pointer-events: none;
+
+        /* Imagem de fundo do card do banner ajustada para preencher sem cortar */
+        .banner-card img {
+            width: 100%; height: 100%; object-fit: fill; display: block; pointer-events: none;
         }
-        .banner-card .banner-main-img {
-            position: relative; z-index: 2; width: 100%; height: 100%;
-            object-fit: contain; pointer-events: none;
-        }
+
+        /* Texto/Título exibido na parte inferior do card do banner */
         .banner-card .banner-title {
-            position: absolute; bottom: 0; inset-inline: 0; padding: 26px 16px 22px;
-            background: linear-gradient(to top, rgba(0,0,0,0.88), rgba(0,0,0,0.35), transparent);
-            color: #fff; font-weight: 900; font-size: 1.05rem; z-index: 3; text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            position: absolute; bottom: 0; inset-inline: 0; padding: 18px 12px 8px;
+            background: linear-gradient(to top, rgba(0,0,0,0.82), transparent);
+            color: #fff; font-weight: 900; font-size: 0.92rem; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
+
+        /* Esconde as setas no celular (no celular o cliente desliza com o dedo) */
         .carousel-nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-            width: 34px; height: 34px; border-radius: 50%; border: none;
-            background: rgba(255,255,255,0.85); color: #18181b; font-weight: 900;
-            font-size: 0.9rem; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.25); transition: 0.15s;
+            display: none !important;
         }
-        .carousel-nav-btn:active { transform: translateY(-50%) scale(0.92); }
-        .carousel-nav-btn.prev { left: 10px; }
-        .carousel-nav-btn.next { right: 10px; }
-        .carousel-dots {
-            position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
-            z-index: 5; display: flex; gap: 6px; align-items: center;
-        }
-        .carousel-dot {
-            width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.45);
-            border: none; cursor: pointer; transition: all 0.25s ease; padding: 0;
-        }
-        .carousel-dot.active { width: 20px; background: var(--primary); }
 
         .categories-row {
             display: flex; gap: 10px; overflow-x: auto; padding: 6px 4px 10px; margin-bottom: 12px;
@@ -235,11 +260,63 @@
         .addon-option-row:last-child { border-bottom: none; }
 
         .cart-float-bar {
-            position: fixed; bottom: calc(60px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
-            width: calc(100% - 24px); max-width: 560px; background: var(--primary); color: #fff;
-            padding: 13px 18px; border-radius: 16px; display: none; justify-content: space-between;
-            align-items: center; z-index: 850; cursor: pointer;
-            box-shadow: 0 8px 25px rgba(234, 29, 44, 0.35);
+            display: none !important;
+        }
+
+        /* Botões de Quantidade e Adicionar Produto com Altura Idêntica e Sem Quebra */
+        .detail-actions-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            margin-top: 14px;
+        }
+        .detail-qty-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #f4f4f5;
+            border: 1px solid var(--border);
+            height: 50px;
+            padding: 0 12px;
+            border-radius: 14px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .detail-qty-box button {
+            border: none;
+            background: none;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            width: 26px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+        }
+        .detail-add-btn-fixed {
+            flex: 1;
+            height: 50px;
+            padding: 0 16px;
+            border-radius: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(234, 29, 44, 0.25);
+        }
+        .detail-add-btn-fixed:active {
+            transform: scale(0.98);
         }
 
         .bottom-nav {
@@ -311,39 +388,6 @@
         .step-row.done { color: var(--success); font-weight: 900; }
         .step-row.done .step-dot { background: var(--success); color: #fff; }
 
-        /* Botões Elegantes dos Cards de Pedido */
-        .order-card-actions {
-            display: flex; align-items: center; justify-content: flex-end; gap: 8px;
-            padding-top: 10px; border-top: 1px solid #f1f5f9; flex-wrap: wrap;
-        }
-        .btn-order-sleek {
-            padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 0.78rem;
-            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-            gap: 5px; border: 1px solid transparent; transition: all 0.15s ease;
-        }
-        .btn-order-sleek:active { transform: scale(0.96); }
-        .btn-order-sleek.chat { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
-        .btn-order-sleek.track { background: #18181b; color: #ffffff; box-shadow: 0 2px 6px rgba(24,24,27,0.12); }
-        .btn-order-sleek.track.active-green { background: var(--success); color: #ffffff; box-shadow: 0 2px 8px rgba(22,163,74,0.2); }
-        .btn-order-sleek.reorder { background: var(--primary-light); color: var(--primary); border-color: #fecdd3; font-weight: 900; }
-        .btn-order-sleek.rate { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-
-        /* Seletor Customizado de Endereço na Sacola */
-        .delivery-picker-trigger {
-            width: 100%; padding: 12px 14px; border: 1px solid #d4d4d8; border-radius: 14px;
-            background: #f8fafc; display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; cursor: pointer; text-align: left; transition: 0.15s;
-        }
-        .delivery-picker-trigger:active { transform: scale(0.99); border-color: var(--primary); }
-        .delivery-option-card {
-            border: 2px solid var(--border); border-radius: 14px; padding: 12px 14px;
-            margin-bottom: 10px; cursor: pointer; display: flex; align-items: center;
-            justify-content: space-between; gap: 10px; background: #fff; transition: 0.15s;
-        }
-        .delivery-option-card.selected {
-            border-color: var(--primary); background: var(--primary-light);
-        }
-
         .toast {
             position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-150%);
             background: #18181b; color: #fff; padding: 12px 22px; border-radius: 999px;
@@ -385,9 +429,26 @@
             }
 
             .view-section { max-width: 1320px; padding: 24px 28px; }
+
+            /* ==========================================================================
+               ESTILOS DOS CARDS DE BANNERS NA VERSÃO DESKTOP (COMPUTADOR)
+               ========================================================================== */
             .banners-carousel-wrapper { max-width: 100%; margin-bottom: 24px; }
-            .banner-card { height: 290px; }
-            .carousel-nav-btn { width: 42px; height: 42px; font-size: 1.05rem; }
+            .banners-row { gap: 16px; }
+            /* Largura mais compacta no PC (300px) para exibir vários cards lado a lado */
+            .banner-card { width: 300px; min-width: 300px; height: 165px; scroll-snap-align: start; }
+            /* Botões de seta (< e >) visíveis apenas no computador */
+            .carousel-nav-btn {
+                display: flex !important; position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+                width: 42px; height: 42px; border-radius: 50%; border: none;
+                background: rgba(255,255,255,0.92); color: #18181b; font-weight: 900;
+                font-size: 1.05rem; cursor: pointer; align-items: center;
+                justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); transition: 0.15s;
+            }
+            .carousel-nav-btn:hover { background: #ffffff; transform: translateY(-50%) scale(1.06); }
+            .carousel-nav-btn:active { transform: translateY(-50%) scale(0.94); }
+            .carousel-nav-btn.prev { left: 12px; }
+            .carousel-nav-btn.next { right: 12px; }
             .categories-row { justify-content: flex-start; gap: 16px; }
             .cat-item { width: 96px; }
             .cat-icon-box { width: 80px; height: 80px; font-size: 2rem; }
@@ -437,12 +498,13 @@
             <button onclick="switchTab('perfil')" id="desktop-user-btn" style="background:#f4f4f5; border:none; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; color:#18181b;">
                 👤 Entrar
             </button>
-            <button class="desktop-cart-btn" onclick="openCartModal()">
-                <span>🛍️</span>
-                <div style="text-align:left; line-height:1.1;">
-                    <div id="desktop-cart-total" style="font-size:0.84rem;">R$ 0,00</div>
-                    <div id="desktop-cart-count" style="font-size:0.68rem; opacity:0.85;">0 itens</div>
-                </div>
+            <button class="header-cart-creative" id="desktop-cart-btn" onclick="openCartModal()" title="Abrir Minha Sacola">
+                <svg class="cart-icon-svg" viewBox="0 0 24 24">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span class="cart-count-pill" id="desktop-cart-count"></span>
             </button>
         </div>
     </div>
@@ -450,18 +512,33 @@
 
 <header class="mobile-header">
     <div class="brand-logo" onclick="switchTab('home')">Juaba<span>Delivery</span></div>
-    <button onclick="switchTab('perfil')" id="mobile-user-btn" style="background:#f4f4f5; border:none; padding:8px 14px; border-radius:999px; font-weight:800; font-size:0.8rem; cursor:pointer;">
-        👤 Entrar
-    </button>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <button onclick="triggerNativePwaInstall()" id="btn-pwa-install-mob" style="display:none; background:var(--primary); color:#fff; border:none; padding:7px 11px; border-radius:999px; font-weight:800; font-size:0.74rem; cursor:pointer;">
+            📲 Instalar App
+        </button>
+        <!-- Novo Botão Criativo de Carrinho no lugar do Nome do Usuário -->
+        <button type="button" class="header-cart-creative" id="mobile-header-cart-btn" onclick="openCartModal()" aria-label="Minha Sacola">
+            <svg class="cart-icon-svg" viewBox="0 0 24 24">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="cart-count-pill" id="mobile-header-cart-count"></span>
+        </button>
+    </div>
 </header>
 
 <!-- ABA 1: INÍCIO (VITRINE) -->
 <main id="sec-home" class="view-section active">
-    <div class="banners-carousel-wrapper" id="home-banners-wrapper" onmouseenter="pauseBannerAutoplay()" onmouseleave="resumeBannerAutoplay()" ontouchstart="pauseBannerAutoplay()" ontouchend="resumeBannerAutoplay()">
+    <!-- ==========================================================================
+         ESTRUTURA HTML DOS CARDS DE BANNERS (CARROSSEL DESLIZÁVEL)
+         - No celular: vários cards lado a lado que passam deslizando com o dedo.
+         - No computador: exibe os botões laterais (❮ e ❯) para avançar/voltar.
+         ========================================================================== -->
+    <div class="banners-carousel-wrapper" id="home-banners-wrapper">
         <button type="button" class="carousel-nav-btn prev" id="banner-prev-btn" onclick="stepBannerCarousel(-1)" aria-label="Banner anterior">❮</button>
-        <div class="banners-row" id="home-banners" onscroll="onBannerCarouselScroll()"></div>
+        <div class="banners-row" id="home-banners"></div>
         <button type="button" class="carousel-nav-btn next" id="banner-next-btn" onclick="stepBannerCarousel(1)" aria-label="Próximo banner">❯</button>
-        <div class="carousel-dots" id="home-banners-dots"></div>
     </div>
 
     <div class="categories-row" id="home-categories">
@@ -590,14 +667,16 @@
                     <input type="text" id="detail-prod-obs" placeholder="Ex: Sem cebola, bem gelada, ponto da carne...">
                 </div>
 
-                <div style="display:flex; gap:10px; align-items:center; margin-top:14px;">
-                    <div style="display:flex; align-items:center; gap:12px; background:#f4f4f5; padding:10px 14px; border-radius:14px; font-weight:900;">
-                        <button type="button" onclick="changeDetailQty(-1)" style="border:none; background:none; font-size:1.2rem; font-weight:900; cursor:pointer; width:24px;">−</button>
-                        <span id="detail-prod-qty" style="font-size:1rem; min-width:18px; text-align:center;">1</span>
-                        <button type="button" onclick="changeDetailQty(1)" style="border:none; background:none; font-size:1.2rem; font-weight:900; cursor:pointer; width:24px;">+</button>
+                <div class="detail-actions-row">
+                    <div class="detail-qty-box">
+                        <button type="button" onclick="changeDetailQty(-1)">−</button>
+                        <span id="detail-prod-qty" style="font-size:1rem; min-width:20px; text-align:center;">1</span>
+                        <button type="button" onclick="changeDetailQty(1)">+</button>
                     </div>
-                    <button type="button" class="btn-primary" id="detail-add-btn" onclick="confirmAddToCart()" style="flex:1; display:flex; justify-content:center; align-items:center; gap:8px;">
-                        <span>Adicionar</span> • <span id="detail-total-btn-price">R$ 0,00</span>
+                    <button type="button" class="detail-add-btn-fixed" id="detail-add-btn" onclick="confirmAddToCart()">
+                        <span>Adicionar</span>
+                        <span>•</span>
+                        <span id="detail-total-btn-price">R$ 0,00</span>
                     </button>
                 </div>
             </div>
@@ -626,31 +705,27 @@
     </div>
 </section>
 
-<!-- ABA 3: MEUS PEDIDOS (Visível apenas logado) -->
+<!-- ABA 3: MEUS PEDIDOS -->
 <section id="sec-pedidos" class="view-section">
     <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:14px;">🧾 Meus Pedidos</h2>
     <div id="client-orders-list"></div>
 </section>
 
-<!-- ABA 4: PERFIL (Com sub-abas) -->
+<!-- ABA 4: PERFIL -->
 <section id="sec-perfil" class="view-section">
     <div id="profile-logged-out" style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:22px;">
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
-        <div id="auth-name-group" style="display:none; gap:10px; flex-wrap:wrap;">
-            <div class="input-group" style="flex:1; min-width:140px;">
-                <label>Nome *</label>
-                <input type="text" id="cli-auth-first-name" placeholder="Ex: João">
-            </div>
-            <div class="input-group" style="flex:1; min-width:140px;">
-                <label>Sobrenome *</label>
-                <input type="text" id="cli-auth-last-name" placeholder="Ex: Silva">
-            </div>
+        
+        <div class="input-group" id="auth-name-group" style="display:none;">
+            <label>Seu Nome Completo *</label>
+            <input type="text" id="cli-auth-name" placeholder="Ex: Eder Garcia Gomes">
         </div>
         <div class="input-group" id="auth-phone-group" style="display:none;">
             <label>Seu WhatsApp (com DDD) *</label>
-            <input type="text" id="cli-auth-phone" placeholder="Ex: 91988887777">
+            <input type="tel" id="cli-auth-phone" placeholder="Ex: 91988887777">
         </div>
+
         <div class="input-group">
             <label>E-mail</label>
             <input type="email" id="cli-auth-email" placeholder="seuemail@gmail.com">
@@ -659,20 +734,14 @@
             <label>Senha</label>
             <input type="password" id="cli-auth-pass" placeholder="Sua senha...">
         </div>
+
         <div id="forgot-pass-link-box" style="text-align:right; margin-top:-6px; margin-bottom:12px;">
             <button type="button" onclick="openForgotPasswordModal()" style="background:none; border:none; color:#71717a; font-weight:800; font-size:0.78rem; cursor:pointer; text-decoration:underline;">
                 Esqueci minha senha
             </button>
         </div>
+
         <button class="btn-primary" id="cli-auth-submit-btn" onclick="submitClientAuth()">Entrar na Conta</button>
-
-        <div style="display:flex; align-items:center; gap:10px; margin:14px 0;">
-            <div style="flex:1; height:1px; background:var(--border);"></div>
-            <span style="font-size:0.74rem; font-weight:800; color:#a1a1aa; text-transform:uppercase;">ou</span>
-            <div style="flex:1; height:1px; background:var(--border);"></div>
-        </div>
-
-       
 
         <button type="button" onclick="toggleClientAuthMode()" id="cli-auth-toggle-btn" style="width:100%; background:none; border:none; color:var(--primary); font-weight:800; margin-top:14px; cursor:pointer;">
             Ainda não tem conta? Cadastre-se grátis
@@ -707,7 +776,7 @@
                         <div style="width:44px; height:44px; border-radius:12px; background:#f4f4f5; color:#18181b; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">⚙️</div>
                         <div>
                             <div style="font-weight:900; font-size:1rem;">Conta</div>
-                            <div style="font-size:0.78rem; color:#71717a; font-weight:600;">Alterar nome de usuário e telefone</div>
+                            <div style="font-size:0.78rem; color:#71717a; font-weight:600;">Alterar nome, sobrenome e telefone</div>
                         </div>
                     </div>
                     <span style="font-weight:900; color:#a1a1aa;">➔</span>
@@ -727,7 +796,6 @@
                         + Adicionar Endereço
                     </button>
                 </div>
-
                 <div id="saved-addresses-list"></div>
             </div>
         </div>
@@ -736,19 +804,13 @@
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
                 <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:14px;">⚙️ Dados da Minha Conta</h3>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <div class="input-group" style="flex:1; min-width:140px;">
-                        <label>Nome *</label>
-                        <input type="text" id="acc-edit-first-name" placeholder="Seu Nome">
-                    </div>
-                    <div class="input-group" style="flex:1; min-width:140px;">
-                        <label>Sobrenome *</label>
-                        <input type="text" id="acc-edit-last-name" placeholder="Seu Sobrenome">
-                    </div>
+                <div class="input-group">
+                    <label>Seu Nome Completo *</label>
+                    <input type="text" id="acc-edit-name" placeholder="Ex: Eder Garcia Gomes">
                 </div>
                 <div class="input-group">
                     <label>Telefone / WhatsApp *</label>
-                    <input type="text" id="acc-edit-phone" placeholder="Ex: 91988887777">
+                    <input type="tel" id="acc-edit-phone" placeholder="Ex: 91988887777">
                 </div>
                 <button class="btn-primary" onclick="saveAccountDetails()" style="background:var(--success);">💾 Salvar Alterações</button>
             </div>
@@ -797,7 +859,7 @@
         <div class="input-group">
             <label>📍 Como deseja receber?</label>
             <input type="hidden" id="cart-delivery-select" value="">
-            <div class="delivery-picker-trigger" onclick="openCartDeliveryModal()">
+            <div class="delivery-picker-trigger" onclick="openCartDeliveryModal()" style="background:#fff; border:1px solid #d4d4d8; border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                 <div style="min-width:0; flex:1;">
                     <div id="cart-delivery-title" style="font-weight:900; font-size:0.88rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         🛵 Selecionar endereço de entrega
@@ -806,7 +868,7 @@
                         Toque para escolher ou retirar na loja
                     </div>
                 </div>
-                <span style="background:#fff; border:1px solid #e4e4e7; padding:5px 10px; border-radius:8px; font-weight:800; font-size:0.74rem; color:var(--primary); flex-shrink:0;">
+                <span style="background:#f4f4f5; border:1px solid #e4e4e7; padding:5px 10px; border-radius:8px; font-weight:800; font-size:0.74rem; color:var(--primary); flex-shrink:0;">
                     Trocar ▾
                 </span>
             </div>
@@ -850,7 +912,6 @@
     </div>
 </div>
 
-<!-- Modal para Escolher Endereço de Entrega na Sacola -->
 <div class="modal-overlay" id="modal-select-delivery-address" style="z-index:2400;" onclick="if(event.target===this) closeCartDeliveryModal()">
     <div class="modal-sheet" style="max-width:460px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -867,7 +928,6 @@
     </div>
 </div>
 
-<!-- Modal com o Formulário para Cadastrar / Editar Endereço -->
 <div class="modal-overlay" id="modal-address-form" style="z-index:2600;" onclick="if(event.target===this) closeAddressFormModal()">
     <div class="modal-sheet" style="max-width:460px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -899,7 +959,7 @@
             <input type="text" id="addr-ref" placeholder="Ex: Próximo à praça / Portão branco">
         </div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-            <button type="button" onclick="closeAddressFormModal()" id="btn-cancel-addr" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">Cancelar</button>
+            <button type="button" onclick="closeAddressFormModal()" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">Cancelar</button>
             <button type="button" onclick="saveAddressFromProfile()" class="btn-primary" style="background:var(--primary); flex:1.5; padding:12px;" id="btn-save-addr">💾 Salvar Endereço</button>
         </div>
     </div>
@@ -939,10 +999,6 @@
             </button>
         </div>
 
-        <p style="font-size:0.74rem; color:#71717a; font-weight:700; margin-bottom:12px;">
-            💡 Caso feche esta tela, você pode copiar o código a qualquer momento em <b>Meus Pedidos ➔ Acompanhar</b>.
-        </p>
-
         <div style="display:flex; flex-direction:column; gap:8px;">
             <button type="button" id="pix-modal-chat-btn" class="btn-primary" style="background:var(--primary); padding:12px;">
                 📎 Enviar Comprovante no Chat da Loja
@@ -957,8 +1013,8 @@
 <div class="modal-overlay" id="modal-chat" onclick="if(event.target===this) closeClientChat()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">💬 Chat com a Loja</h3>
-            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0;">✕</button>
+            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.05rem;">💬 Chat com a Loja</h3>
+            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
         </div>
         <div class="chat-msgs-box" id="client-chat-msgs"></div>
         <div style="display:flex; gap:6px; align-items:center; width:100%;">
@@ -972,29 +1028,24 @@
     </div>
 </div>
 
-<!-- Modal para o Cliente Cancelar o Pedido informando o Motivo -->
 <div class="modal-overlay" id="modal-client-cancel-order" style="z-index:2500;" onclick="if(event.target===this) closeClientCancelModal()">
     <div class="modal-sheet" style="max-width:440px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 style="font-weight:900; font-size:1.15rem; color:#dc2626;">❌ Cancelar Pedido</h3>
             <button type="button" onclick="closeClientCancelModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
         </div>
-        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:12px;">
-            Selecione ou digite o motivo pelo qual deseja cancelar este pedido:
-        </p>
         <div class="input-group">
             <label>Motivo do Cancelamento</label>
             <select id="client-cancel-reason-select" onchange="document.getElementById('client-cancel-custom-box').style.display = this.value === 'OUTRO' ? 'block' : 'none'">
                 <option value="Pedi por engano">Pedi por engano</option>
-                <option value="Quero alterar os itens ou forma de pagamento">Quero alterar os itens ou forma de pagamento</option>
-                <option value="Tempo de espera muito longo">Tempo de espera muito longo</option>
-                <option value="Desisti da compra">Desisti da compra</option>
+                <option value="Quero alterar os itens">Quero alterar os itens</option>
+                <option value="Demora na entrega">Demora na entrega</option>
                 <option value="OUTRO">Outro motivo...</option>
             </select>
         </div>
         <div class="input-group" id="client-cancel-custom-box" style="display:none;">
             <label>Qual o motivo?</label>
-            <input type="text" id="client-cancel-custom-input" placeholder="Digite o motivo do cancelamento...">
+            <input type="text" id="client-cancel-custom-input" placeholder="Digite o motivo...">
         </div>
         <div style="display:flex; gap:8px; margin-top:14px;">
             <button type="button" onclick="closeClientCancelModal()" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:13px; border-radius:12px; font-weight:800; cursor:pointer;">Voltar</button>
@@ -1022,44 +1073,33 @@
     </div>
 </div>
 
-<!-- Modal de Verificação de PIN de 4 Dígitos por E-mail (Google Sheets) -->
-<div class="modal-overlay" id="modal-verify-pin">
+<!-- Modal de Verificação de PIN de 4 Dígitos no Cadastro do Cliente -->
+<div class="modal-overlay" id="modal-client-verify-pin" style="z-index: 6500;">
     <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="font-size:0.75rem; font-weight:900; color:var(--primary); text-transform:uppercase;">Verificação de Segurança</span>
-            <button type="button" onclick="closeVerifyPinModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
+            <span style="font-size:0.74rem; font-weight:900; color:var(--primary); text-transform:uppercase;">Verificação de Segurança</span>
+            <button type="button" onclick="document.getElementById('modal-client-verify-pin').style.display='none'" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
         </div>
         <div style="font-size:2.4rem; margin-bottom:6px;">📩</div>
-        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Confirme seu E-mail</h3>
+        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:6px;">Confirme seu E-mail</h3>
         <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
             Enviamos um código PIN de <b>4 dígitos</b> para:<br>
-            <b id="pin-target-email" style="color:var(--primary);">email@exemplo.com</b>
+            <b id="client-pin-target-email" style="color:var(--primary);">seuemail@gmail.com</b>
         </p>
 
         <div class="input-group" style="text-align:center;">
             <label style="text-align:center;">Digite o PIN de 4 dígitos</label>
-            <input type="text" id="pin-code-input" maxlength="4" inputmode="numeric" placeholder="0000" style="text-align:center; font-size:1.6rem; font-weight:900; letter-spacing:10px; padding:12px;" onkeypress="if(event.key==='Enter') confirmEmailPinCode()">
+            <input type="text" id="client-pin-code-input" maxlength="4" inputmode="numeric" placeholder="0000" style="text-align:center; font-size:1.6rem; font-weight:900; letter-spacing:10px; padding:12px;" onkeypress="if(event.key==='Enter') confirmClientEmailPin()">
         </div>
 
-        <div id="pin-script-config-hint" style="display:none; background:#fffbeb; border:1px dashed #f59e0b; padding:10px; border-radius:12px; margin-bottom:12px; text-align:left; font-size:0.75rem; color:#92400e;">
-            <div style="font-weight:900; margin-bottom:4px;">⚙️ Link do Google Sheets (Apps Script):</div>
-            <div style="display:flex; gap:6px;">
-                <input type="text" id="custom-gsheet-url-input" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1; padding:7px 9px; border:1px solid #fcd34d; border-radius:8px; font-size:0.75rem;">
-                <button type="button" onclick="saveCustomGoogleScriptUrl()" style="background:#d97706; color:#fff; border:none; padding:0 10px; border-radius:8px; font-weight:800; cursor:pointer;">Salvar</button>
-            </div>
-        </div>
+        <div id="client-pin-dev-alert" style="display:none; background:#fffbeb; border:1px dashed #f59e0b; color:#92400e; padding:10px; border-radius:12px; font-size:0.76rem; font-weight:700; margin-bottom:10px; line-height:1.35;"></div>
 
-        <button type="button" class="btn-primary" id="btn-confirm-pin" onclick="confirmEmailPinCode()" style="background:var(--success); margin-bottom:10px;">
-            ✅ Confirmar PIN e Criar Conta
+        <button type="button" class="btn-primary" id="btn-client-confirm-pin" onclick="confirmClientEmailPin()" style="background:var(--success); margin-bottom:10px;">
+            ✅ Validar PIN e Concluir Cadastro
         </button>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-            <button type="button" onclick="resendEmailPinCode()" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.8rem; cursor:pointer;">
-                🔄 Reenviar PIN
-            </button>
-            <button type="button" onclick="document.getElementById('pin-script-config-hint').style.display = document.getElementById('pin-script-config-hint').style.display === 'none' ? 'block' : 'none'" style="background:none; border:none; color:#71717a; font-weight:700; font-size:0.75rem; cursor:pointer;">
-                ⚙️ Configurar Planilha
-            </button>
+        <div style="display:flex; justify-content:center; align-items:center;">
+            <button type="button" onclick="resendClientPin()" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.82rem; cursor:pointer;">🔄 Reenviar PIN para meu e-mail</button>
         </div>
     </div>
 </div>
@@ -1072,48 +1112,21 @@
         </div>
         <div style="font-size:2.4rem; margin-bottom:6px;">🔑</div>
         <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Recuperar Minha Senha</h3>
-        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
-            Informe seu e-mail cadastrado. Enviaremos um link oficial para você criar uma nova senha:
+        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px;">
+            Informe seu e-mail cadastrado. Enviaremos um link para redefinir sua senha:
         </p>
         <div class="input-group">
             <label>Seu E-mail Cadastrado</label>
             <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
         </div>
-        <button type="button" class="btn-primary" id="btn-send-reset" onclick="sendClientPasswordReset()">📩 Enviar E-mail de Recuperação</button>
-    </div>
-</div>
-
-<!-- Modal para completar Nome, Sobrenome e Telefone/WhatsApp após entrar com Google -->
-<div class="modal-overlay" id="modal-complete-profile" style="z-index: 6500;">
-    <div class="modal-sheet" style="text-align:center; max-width:430px; border-radius:24px; margin:auto;">
-        <div style="font-size:2.4rem; margin-bottom:6px;">👤</div>
-        <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Complete seu Cadastro</h3>
-        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">Informe seu Nome, Sobrenome e WhatsApp para identificação nos seus pedidos e entregas:</p>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <div class="input-group" style="flex:1; min-width:135px;">
-                <label>Nome *</label>
-                <input type="text" id="google-complete-first-name" placeholder="Ex: Eder">
-            </div>
-            <div class="input-group" style="flex:1; min-width:135px;">
-                <label>Sobrenome *</label>
-                <input type="text" id="google-complete-last-name" placeholder="Ex: Garcia">
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Seu WhatsApp (com DDD) *</label>
-            <input type="tel" id="google-complete-phone" placeholder="Ex: 91988887777" onkeypress="if(event.key==='Enter') saveGoogleCompleteProfile()">
-        </div>
-        <button type="button" class="btn-primary" onclick="saveGoogleCompleteProfile()" style="background:var(--success); margin-top:8px;">
-            ✅ Salvar e Continuar
-        </button>
+        <button type="button" class="btn-primary" onclick="sendClientPasswordReset()">📩 Enviar E-mail de Recuperação</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, doc, getDoc, setDoc, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { 
         apiKey: "AIzaSyBYRRtW1_lmoEMd89f7kQ-L6IzkhTkofR4", 
@@ -1128,9 +1141,14 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 🔗 URL DO GOOGLE SHEETS (APPS SCRIPT) PARA ENVIO DO PIN DE 4 DÍGITOS POR E-MAIL
-    // Cole abaixo a URL do seu Google Apps Script (ou configure clicando em "⚙️ Configurar Planilha" no modal do PIN)
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('https://script.google.com/macros/s/AKfycbzQE1PZ3ssBG8JJM-5xoXn37_w_uYoWIg6w3iyMEyg6ARPSwSEHwHz86_RZEiUOI6qayQ/exec') || "";
+    // =========================================================================
+    // CONFIGURAÇÃO BACK-END DO PIN DE 4 DÍGITOS POR E-MAIL (GOOGLE SHEETS)
+    // IMPORTANTE: Substitua o texto abaixo pela URL real do seu Google Apps Script
+    // Exemplo: "https://script.google.com/macros/s/AKfycbx.../exec"
+    // =========================================================================
+    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_gscript_url') || "https://script.google.com/macros/s/AKfycbzPwVthaJMg8GifsEy09DapU84EJzVrpuJeyD6EB4dGyIdv3VR6yCzW_1LR_Zdg1GYb/exec";
+    window.pendingClientReg = null;
+    window.generatedClientPin = null;
 
     window.allStores = [];
     window.allProducts = [];
@@ -1139,11 +1157,9 @@
     window.cart = [];
     window.globalBillingEnabled = true;
     window.currentClient = null;
-    window.clientProfileData = { nome: '', telefone: '', enderecos: [] };
-    window.pendingRegistrationData = null;
-    window.generatedEmailPin = null;
-    window.editingAddressIndex = -1;
+    window.clientProfileData = { nome: '', primeiroNome: '', sobrenome: '', telefone: '', enderecos: [] };
     window.isRegisterMode = false;
+    window.editingAddressIndex = -1;
 
     window.selectedCategory = 'TODOS';
     window.quickFilterMode = 'ALL';
@@ -1180,10 +1196,6 @@
         { img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80", text: "Festival de Pizzas" },
         { img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80", text: "Artesanais Suculentos" }
     ];
-    window.currentBannerIdx = 0;
-    window.totalBannersCount = 0;
-    window.bannerAutoplayTimer = null;
-    window.bannerAutoplayPaused = false;
 
     window.showToast = function(msg) {
         const t = document.getElementById('toast');
@@ -1240,6 +1252,17 @@
         return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     };
 
+    window.copyTextToClipboard = function(txt, successMsg) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(() => window.showToast(successMsg));
+        } else {
+            const ta = document.createElement('textarea');
+            ta.value = txt; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            window.showToast(successMsg);
+        }
+    };
+
     window.openPixCheckoutModal = function(orderId, orderObj = null) {
         const o = window.myOrders.find(x => x.id === orderId) || orderObj;
         if (!o) return;
@@ -1270,17 +1293,6 @@
 
     window.closePixCheckoutModal = function() {
         document.getElementById('modal-pix-checkout').style.display = 'none';
-    };
-
-    window.copyTextToClipboard = function(txt, successMsg) {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(txt).then(() => window.showToast(successMsg));
-        } else {
-            const ta = document.createElement('textarea');
-            ta.value = txt; document.body.appendChild(ta); ta.select();
-            document.execCommand('copy'); document.body.removeChild(ta);
-            window.showToast(successMsg);
-        }
     };
 
     window.isStoreOpenBySchedule = function(loja) {
@@ -1388,92 +1400,50 @@
     window.setStoresViewMode = function(mode) {
         window.applyUnifiedViewMode(mode);
     };
-
     window.setCategoryProductsViewMode = function(mode) {
         window.applyUnifiedViewMode(mode);
     };
-
     window.setSuggestedViewMode = function(mode) {
         window.applyUnifiedViewMode(mode);
     };
 
+    // =========================================================================
+    // FUNÇÕES JAVASCRIPT DOS CARDS DE BANNERS (CARROSSEL)
+    // =========================================================================
+    // Função acionada pelas setas laterais (❮ e ❯) na versão de computador (Desktop)
+    // Desliza a fileira de cards para a esquerda (-1) ou para a direita (1)
+    window.stepBannerCarousel = function(dir) {
+        const row = document.getElementById('home-banners');
+        if (!row) return;
+        // Calcula a largura de um card de banner + o espaçamento (gap) entre eles
+        const firstCard = row.querySelector('.banner-card');
+        const stepWidth = firstCard ? (firstCard.offsetWidth + 16) : 260;
+        const maxScroll = row.scrollWidth - row.clientWidth;
+
+        // Se chegou no último card e clicou em avançar, volta suavemente para o primeiro
+        if (dir > 0 && row.scrollLeft >= maxScroll - 10) {
+            row.scrollTo({ left: 0, behavior: 'smooth' });
+        } else if (dir < 0 && row.scrollLeft <= 10) {
+            // Se está no primeiro card e clicou em voltar, vai para o final
+            row.scrollTo({ left: maxScroll, behavior: 'smooth' });
+        } else {
+            row.scrollBy({ left: dir * stepWidth, behavior: 'smooth' });
+        }
+    };
+
+    // Função que desenha todos os cards de banner na tela inicial (vindos do Super Admin)
     window.renderBanners = function(bannersArr) {
         const box = document.getElementById('home-banners');
-        const dotsBox = document.getElementById('home-banners-dots');
-        const prevBtn = document.getElementById('banner-prev-btn');
-        const nextBtn = document.getElementById('banner-next-btn');
         if (!box) return;
-
+        // Usa os banners cadastrados no Super Admin ou os banners padrão caso esteja vazio
         const list = (Array.isArray(bannersArr) && bannersArr.length > 0) ? bannersArr : window.defaultBanners;
-        window.totalBannersCount = list.length;
-        if (window.currentBannerIdx >= list.length) window.currentBannerIdx = 0;
-
-        const fallbackImg = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80";
-        box.innerHTML = list.map(b => {
-            const imgUrl = b.img || fallbackImg;
-            return `
+        box.innerHTML = list.map(b => `
+            <!-- Card Individual do Banner -->
             <div class="banner-card">
-                <img class="banner-bg-blur" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="">
-                <img class="banner-main-img" src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="${(b.text || 'Banner').replace(/"/g, '&quot;')}">
+                <img src="${b.img}" onerror="this.src='https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80'">
                 ${b.text ? `<div class="banner-title">${b.text}</div>` : ''}
-            </div>`;
-        }).join('');
-
-        if (dotsBox) {
-            dotsBox.innerHTML = list.length > 1
-                ? list.map((_, idx) => `<button type="button" class="carousel-dot ${idx === window.currentBannerIdx ? 'active' : ''}" onclick="goToBannerSlide(${idx})"></button>`).join('')
-                : '';
-        }
-        if (prevBtn) prevBtn.style.display = list.length > 1 ? 'flex' : 'none';
-        if (nextBtn) nextBtn.style.display = list.length > 1 ? 'flex' : 'none';
-
-        window.startBannerAutoplay();
-    };
-
-    window.goToBannerSlide = function(idx) {
-        const box = document.getElementById('home-banners');
-        if (!box || window.totalBannersCount <= 0) return;
-        window.currentBannerIdx = (idx + window.totalBannersCount) % window.totalBannersCount;
-        const slideWidth = box.clientWidth;
-        box.scrollTo({ left: slideWidth * window.currentBannerIdx, behavior: 'smooth' });
-        window.updateBannerDotsUI();
-    };
-
-    window.stepBannerCarousel = function(delta) {
-        window.goToBannerSlide((window.currentBannerIdx || 0) + delta);
-    };
-
-    window.onBannerCarouselScroll = function() {
-        const box = document.getElementById('home-banners');
-        if (!box || !box.clientWidth) return;
-        const newIdx = Math.round(box.scrollLeft / box.clientWidth);
-        if (newIdx !== window.currentBannerIdx && newIdx >= 0 && newIdx < window.totalBannersCount) {
-            window.currentBannerIdx = newIdx;
-            window.updateBannerDotsUI();
-        }
-    };
-
-    window.updateBannerDotsUI = function() {
-        const dots = document.querySelectorAll('#home-banners-dots .carousel-dot');
-        dots.forEach((d, i) => d.classList.toggle('active', i === window.currentBannerIdx));
-    };
-
-    window.startBannerAutoplay = function() {
-        if (window.bannerAutoplayTimer) clearInterval(window.bannerAutoplayTimer);
-        if (window.totalBannersCount <= 1) return;
-        window.bannerAutoplayTimer = setInterval(() => {
-            if (!window.bannerAutoplayPaused && document.getElementById('sec-home').classList.contains('active')) {
-                window.stepBannerCarousel(1);
-            }
-        }, 4000);
-    };
-
-    window.pauseBannerAutoplay = function() {
-        window.bannerAutoplayPaused = true;
-    };
-
-    window.resumeBannerAutoplay = function() {
-        window.bannerAutoplayPaused = false;
+            </div>
+        `).join('');
     };
 
     window.openCategoryFullScreen = function(cat) {
@@ -2007,7 +1977,7 @@
                         <span style="min-width:16px; text-align:center;">${item.qty}</span>
                         <button type="button" onclick="changeCartItemQty(${idx}, 1)" style="border:none; background:none; font-size:1.1rem; font-weight:900; color:var(--success); cursor:pointer; width:22px;">+</button>
                     </div>
-                    <button type="button" onclick="removeCartItem(${idx})" title="Excluir produto da sacola" style="width:34px; height:34px; border-radius:10px; border:1px solid #fecaca; background:#fee2e2; color:#dc2626; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                    <button type="button" onclick="removeCartItem(${idx})" title="Excluir" style="width:34px; height:34px; border-radius:10px; border:1px solid #fecaca; background:#fee2e2; color:#dc2626; font-size:0.92rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                         🗑️
                     </button>
                 </div>
@@ -2018,7 +1988,7 @@
         window.updateCartTotals();
     };
 
-    window.selectedDeliveryIdx = 0; // -1 = Retirar na Loja, 0..N = índice do endereço salvo
+    window.selectedDeliveryIdx = 0;
     window.reopenDeliveryModalAfterSave = false;
 
     window.syncCartDeliveryDisplay = function() {
@@ -2084,7 +2054,7 @@
                 ].filter(Boolean).join(' • ');
 
                 return `
-                <div class="delivery-option-card ${isSel ? 'selected' : ''}" onclick="selectCartDeliveryOption(${idx})">
+                <div style="background:#fff; border:1px solid ${isSel ? 'var(--primary)' : 'var(--border)'}; background:${isSel ? 'var(--primary-light)' : '#fff'}; border-radius:14px; padding:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="selectCartDeliveryOption(${idx})">
                     <div style="min-width:0; flex:1;">
                         <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🛵 ${mainLine}</div>
                         ${subDetails ? `<div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">${subDetails}</div>` : ''}
@@ -2096,7 +2066,7 @@
 
         const isPickup = window.selectedDeliveryIdx === -1;
         html += `
-        <div class="delivery-option-card ${isPickup ? 'selected' : ''}" onclick="selectCartDeliveryOption(-1)">
+        <div style="background:#fff; border:1px solid ${isPickup ? 'var(--primary)' : 'var(--border)'}; background:${isPickup ? 'var(--primary-light)' : '#fff'}; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="selectCartDeliveryOption(-1)">
             <div style="min-width:0; flex:1;">
                 <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🏪 Vou Retirar na Loja</div>
                 <div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">Sem taxa de entrega • Buscar no estabelecimento</div>
@@ -2160,18 +2130,33 @@
 
     window.updateCartFloatingBar = function() {
         const totalItems = window.cart.reduce((acc, i) => acc + i.qty, 0);
-        const totalPrice = window.cart.reduce((acc, i) => acc + (i.unitPrice * i.qty), 0);
-        const bar = document.getElementById('cart-float-bar');
+        const mobCartBtn = document.getElementById('mobile-header-cart-btn');
+        const mobCartCount = document.getElementById('mobile-header-cart-count');
+        const deskCartBtn = document.getElementById('desktop-cart-btn');
+        const deskCartCount = document.getElementById('desktop-cart-count');
+
+        const labelTxt = totalItems === 1 ? '1 item' : `${totalItems} itens`;
+
         if (totalItems > 0) {
-            document.getElementById('float-cart-count').innerText = `${totalItems} item(ns) na sacola`;
-            document.getElementById('float-cart-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
-            document.getElementById('desktop-cart-count').innerText = `${totalItems} itens`;
-            document.getElementById('desktop-cart-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
-            bar.style.display = 'flex';
+            if (mobCartBtn && mobCartCount) {
+                mobCartCount.innerText = labelTxt;
+                mobCartBtn.classList.add('has-items', 'bump');
+                setTimeout(() => mobCartBtn.classList.remove('bump'), 380);
+            }
+            if (deskCartBtn && deskCartCount) {
+                deskCartCount.innerText = labelTxt;
+                deskCartBtn.classList.add('has-items', 'bump');
+                setTimeout(() => deskCartBtn.classList.remove('bump'), 380);
+            }
         } else {
-            document.getElementById('desktop-cart-count').innerText = `0 itens`;
-            document.getElementById('desktop-cart-total').innerText = `R$ 0,00`;
-            bar.style.display = 'none';
+            if (mobCartBtn && mobCartCount) {
+                mobCartCount.innerText = '';
+                mobCartBtn.classList.remove('has-items');
+            }
+            if (deskCartBtn && deskCartCount) {
+                deskCartCount.innerText = '';
+                deskCartBtn.classList.remove('has-items');
+            }
         }
     };
 
@@ -2249,8 +2234,8 @@
 
         if (!window.clientProfileData.telefone || String(window.clientProfileData.telefone).trim().length < 8) {
             window.closeCartModal();
-            window.openCompleteProfileModal();
-            window.showToast("📱 Informe seu WhatsApp para finalizar o pedido!");
+            window.openProfileSubView('conta');
+            window.showToast("📱 Informe seu WhatsApp nos dados da conta para finalizar o pedido!");
             return;
         }
 
@@ -2413,7 +2398,7 @@
             pixHtml = `
             <div style="background:#f0fdf4; border:2px dashed #22c55e; border-radius:16px; padding:14px; margin:12px 0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-weight:900; color:#15803d; font-size:0.84rem;">💠 PIX Copia e Cola (Valor já incluso)</span>
+                    <span style="font-weight:900; color:#15803d; font-size:0.84rem;">💠 PIX Copia e Cola (Se ja pagou desconsidere essa menssagem)</span>
                     <span style="background:#dcfce7; color:#166534; font-weight:900; padding:3px 9px; border-radius:8px; font-size:0.82rem;">${o.total}</span>
                 </div>
                 <input type="text" readonly value="${pixPayload}" style="width:100%; padding:8px 10px; border:1px solid #86efac; border-radius:8px; background:#fff; font-family:monospace; font-size:0.72rem; color:#18181b; font-weight:700; margin-bottom:8px; outline:none;">
@@ -2439,7 +2424,7 @@
 
         const canClientCancel = (!isCanceled && st === 'Novo');
         const cancelBtnHtml = canClientCancel
-            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">✕ Solicitar Cancelamento do Pedido</button>`
+            ? `<button type="button" onclick="openClientCancelModal('${o.id}')" style="width:100%; background:#fff1f2; color:#e11d48; border:1px solid #fecdd3; padding:10px 14px; border-radius:12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">✕ Cancelar Pedido</button>`
             : '';
 
         document.getElementById('track-order-body').innerHTML = `
@@ -2752,42 +2737,6 @@
                 }
                 addedCount++;
             });
-        } else if (o.itens) {
-            const parts = String(o.itens).split(',');
-            parts.forEach(part => {
-                const clean = part.trim();
-                const match = clean.match(/^(\d+)x\s+(.+)$/i);
-                const qty = match ? (parseInt(match[1]) || 1) : 1;
-                let rawName = match ? match[2].trim() : clean;
-                rawName = rawName.replace(/\[.*?\]/g, '').replace(/\(Obs:.*?\)/gi, '').trim();
-
-                const foundProd = window.allProducts.find(p =>
-                    p.lojaId === o.lojaId &&
-                    String(p.nome || '').toLowerCase().trim() === rawName.toLowerCase()
-                ) || window.allProducts.find(p =>
-                    p.lojaId === o.lojaId &&
-                    String(p.nome || '').toLowerCase().includes(rawName.toLowerCase())
-                );
-
-                if (foundProd) {
-                    const existingIdx = window.cart.findIndex(item => item.prodId === foundProd.id && !item.addonsKey && !item.obs);
-                    if (existingIdx > -1) {
-                        window.cart[existingIdx].qty += qty;
-                    } else {
-                        window.cart.push({
-                            prodId: foundProd.id,
-                            lojaId: o.lojaId,
-                            nome: foundProd.nome,
-                            unitPrice: parseFloat(foundProd.preco) || 0,
-                            qty: qty,
-                            addonsNames: [],
-                            addonsKey: '',
-                            obs: ''
-                        });
-                    }
-                    addedCount++;
-                }
-            });
         }
 
         if (addedCount > 0) {
@@ -2823,38 +2772,41 @@
 
             return `
             <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
-                        <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
-                        <div style="font-weight:900; font-size:0.98rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                            ${nomeLoja}
+                        <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
+                        <div style="min-width:0;">
+                            <div style="font-weight:900; font-size:0.95rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${nomeLoja}
+                            </div>
+                            <div style="font-size:0.72rem; color:#71717a; font-weight:700;">
+                                ${isDone ? '<span style="color:#16a34a; font-weight:800;">Pedido finalizado</span>' : (isCanceled ? '<span style="color:#dc2626; font-weight:800;">Cancelado</span>' : 'Pedido em andamento')}
+                            </div>
                         </div>
                     </div>
-                    ${isDone && !isCanceled ? `<span style="font-size:0.72rem; font-weight:700; color:#71717a; white-space:nowrap;">✔️ Pedido finalizado</span>` : ''}
-                    ${isCanceled ? `<span style="font-size:0.72rem; font-weight:800; color:#dc2626; white-space:nowrap;">❌ Cancelado</span>` : ''}
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:0.8rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
-                    <span style="font-size:1.02rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">Total: ${o.total || 'R$ 0,00'}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:0.78rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
+                    <span style="font-size:0.98rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">${o.total || 'R$ 0,00'}</span>
                 </div>
 
-                <div class="order-card-actions">
-                    <button type="button" class="btn-order-sleek chat" onclick="openClientChat('${o.id}')">
+                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+                    <button type="button" class="btn-order-sleek" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer;">
                         💬 Chat
                     </button>
                     ${isDone && !isCanceled ? `
-                    <button type="button" class="btn-order-sleek reorder" onclick="reorderToCart('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="reorderToCart('${o.id}')" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         🛍️ Adicionar na sacola
                     </button>` : `
-                    <button type="button" class="btn-order-sleek track ${!isCanceled ? 'active-green' : ''}" onclick="openTrackModal('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="openTrackModal('${o.id}')" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         ${isCanceled ? '🔍 Ver Detalhes' : '🛵 Acompanhar'}
                     </button>`}
                     ${isDone && !isCanceled && !hasEvaluated ? `
-                    <button type="button" class="btn-order-sleek rate" onclick="openRateOrderModal('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="openRateOrderModal('${o.id}')" style="background:#fef3c7; color:#b45309; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         ⭐ Avaliar
                     </button>` : ''}
-                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
+                    ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.74rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -2862,7 +2814,7 @@
 
     window.toggleClientAuthMode = function() {
         window.isRegisterMode = !window.isRegisterMode;
-        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'flex' : 'none';
+        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'block' : 'none';
         document.getElementById('auth-phone-group').style.display = window.isRegisterMode ? 'block' : 'none';
         const forgotBox = document.getElementById('forgot-pass-link-box');
         if (forgotBox) forgotBox.style.display = window.isRegisterMode ? 'none' : 'block';
@@ -2870,36 +2822,75 @@
         document.getElementById('cli-auth-toggle-btn').innerText = window.isRegisterMode ? 'Já tem conta? Faça Login' : 'Ainda não tem conta? Cadastre-se grátis';
     };
 
-    window.splitFullName = function(fullNameStr) {
-        const clean = String(fullNameStr || '').trim();
-        if (!clean || clean === 'Cliente') return { primeiroNome: '', sobrenome: '' };
-        const parts = clean.split(/\s+/);
-        const primeiroNome = parts[0] || '';
-        const sobrenome = parts.slice(1).join(' ') || '';
-        return { primeiroNome, sobrenome };
+    window.encodeAuthProfileBackup = function(profileObj) {
+        try {
+            const compact = {
+                n: String(profileObj.nome || '').trim(),
+                t: String(profileObj.telefone || '').trim(),
+                e: (Array.isArray(profileObj.enderecos) ? profileObj.enderecos : []).map(a => ({
+                    l: a.logradouro || '',
+                    nu: a.numero || '',
+                    b: a.bairro || '',
+                    c: a.complemento || '',
+                    rf: a.referencia || '',
+                    r: a.rua || ''
+                }))
+            };
+            const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
+            return "https://juabadelivery.local/p?d=" + encodeURIComponent(b64);
+        } catch (err) {
+            return "";
+        }
     };
 
-    // Salva e sincroniza os dados do cliente tanto no navegador quanto no Firebase
+    window.decodeAuthProfileBackup = function(photoURL) {
+        try {
+            if (!photoURL || !String(photoURL).includes("juabadelivery.local/p?d=")) return null;
+            const b64 = decodeURIComponent(String(photoURL).split("juabadelivery.local/p?d=")[1] || "");
+            if (!b64) return null;
+            const jsonStr = decodeURIComponent(escape(atob(b64)));
+            const compact = JSON.parse(jsonStr);
+            return {
+                nome: compact.n || '',
+                telefone: compact.t || '',
+                enderecos: Array.isArray(compact.e) ? compact.e.map(x => ({
+                    logradouro: x.l || '',
+                    numero: x.nu || '',
+                    bairro: x.b || '',
+                    complemento: x.c || '',
+                    referencia: x.rf || '',
+                    rua: x.r || ''
+                })) : []
+            };
+        } catch (err) {
+            return null;
+        }
+    };
+
     window.saveClientProfileEverywhere = async function(uid, profileObj) {
         if (!uid) return;
-        const splitted = window.splitFullName(profileObj.nome);
-        const primeiroNome = (profileObj.primeiroNome || splitted.primeiroNome || '').trim();
-        const sobrenome = (profileObj.sobrenome || splitted.sobrenome || '').trim();
-        const fullNome = [primeiroNome, sobrenome].filter(Boolean).join(' ').trim() ||
-            ((profileObj.nome && profileObj.nome !== 'Cliente') ? profileObj.nome.trim() : 'Cliente');
+        const existingMem = window.clientProfileData || {};
+        const fullNome = String(profileObj.nome || existingMem.nome || '').trim() || 'Cliente';
+        const telefone = String(profileObj.telefone !== undefined ? profileObj.telefone : (existingMem.telefone || '')).trim();
+        const enderecos = Array.isArray(profileObj.enderecos)
+            ? profileObj.enderecos
+            : (Array.isArray(existingMem.enderecos) ? existingMem.enderecos : []);
+        const emailStr = String(profileObj.email || (window.currentClient ? window.currentClient.email : '') || existingMem.email || '').trim().toLowerCase();
 
         const cleanObj = {
-            email: profileObj.email || (window.currentClient ? window.currentClient.email : ''),
+            uid: uid,
+            email: emailStr,
             nome: fullNome,
-            primeiroNome: primeiroNome,
-            sobrenome: sobrenome,
-            telefone: (profileObj.telefone || '').trim(),
-            enderecos: Array.isArray(profileObj.enderecos) ? profileObj.enderecos : [],
-            perfilConfirmado: Boolean(profileObj.perfilConfirmado || (primeiroNome && sobrenome && profileObj.telefone))
+            telefone: telefone,
+            enderecos: enderecos,
+            dataCadastro: existingMem.dataCadastro || new Date().toLocaleDateString('pt-BR'),
+            updatedAtMs: Date.now()
         };
         window.clientProfileData = cleanObj;
+
         try {
             localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
+            if (emailStr) localStorage.setItem('juaba_cli_email_' + emailStr, JSON.stringify(cleanObj));
             localStorage.setItem('juaba_cli_active_session', JSON.stringify({
                 uid,
                 email: cleanObj.email,
@@ -2908,189 +2899,241 @@
             }));
         } catch (e) {}
 
-        if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
+        // 1. Salva Nome, Telefone e Endereços diretamente na nuvem do Firebase Auth (nunca falha por regra de Firestore)
+        if (auth.currentUser) {
+            const backupUrl = window.encodeAuthProfileBackup(cleanObj);
             try {
-                await updateProfile(auth.currentUser, { displayName: cleanObj.nome });
+                await updateProfile(auth.currentUser, {
+                    displayName: cleanObj.nome,
+                    ...(backupUrl ? { photoURL: backupUrl } : {})
+                });
             } catch (e) {}
         }
 
-        try {
-            await setDoc(doc(db, "clientes", uid), cleanObj, { merge: true });
-        } catch (e) {
-            console.warn("Perfil salvo localmente (coleção clientes restrita nas regras):", e);
-        }
+        // 2. Grava diretamente na coleção raiz "usuario" (onde todos os usuários cadastrados ficam organizados)
+        await Promise.allSettled([
+            setDoc(doc(db, "usuario", uid), cleanObj, { merge: true }),
+            deleteDoc(doc(db, "pedidos", "user_profile_" + uid))
+        ]);
     };
 
     window.loadClientProfileEverywhere = async function(user) {
-        if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
+        if (!user) return { nome: 'Cliente', email: '', telefone: '', enderecos: [] };
 
-        let localData = {};
+        try { await user.reload(); } catch (e) {}
+
+        const uid = user.uid;
+        const emailKey = String(user.email || '').trim().toLowerCase();
+
+        // 1. Decodifica backup salvo na nuvem do Firebase Authentication (photoURL)
+        const authCloudBackup = window.decodeAuthProfileBackup(user.photoURL);
+
+        // 2. Verifica dados salvos localmente
+        let localData = null;
         try {
-            const raw = localStorage.getItem('juaba_cli_profile_' + user.uid);
-            if (raw) localData = JSON.parse(raw);
+            const byUid = localStorage.getItem('juaba_cli_profile_' + uid);
+            const byEmail = emailKey ? localStorage.getItem('juaba_cli_email_' + emailKey) : null;
+            if (byUid) localData = JSON.parse(byUid);
+            else if (byEmail) localData = JSON.parse(byEmail);
         } catch (e) {}
 
-        let remoteData = {};
-        try {
-            const snap = await getDoc(doc(db, "clientes", user.uid));
-            if (snap.exists()) remoteData = snap.data() || {};
-        } catch (e) {
-            console.warn("Usando perfil local/Auth para o cliente:", e);
+        // 3. Busca no Firestore na coleção principal "usuario"
+        let cloudData = null;
+        const results = await Promise.allSettled([
+            getDoc(doc(db, "usuario", uid)),
+            getDoc(doc(db, "usuarios", uid)),
+            getDoc(doc(db, "clientes", uid))
+        ]);
+
+        for (const res of results) {
+            if (res.status === 'fulfilled' && res.value && res.value.exists()) {
+                const d = res.value.data();
+                if (!cloudData || (Array.isArray(d.enderecos) && d.enderecos.length > (cloudData.enderecos?.length || 0)) || (d.updatedAtMs || 0) > (cloudData.updatedAtMs || 0)) {
+                    cloudData = d;
+                }
+            }
         }
 
-        const pending = window.pendingRegistrationData || {};
-        const bestName =
-            (pending.nome && pending.nome !== 'Cliente' ? pending.nome : '') ||
-            (remoteData.nome && remoteData.nome !== 'Cliente' ? remoteData.nome : '') ||
-            (localData.nome && localData.nome !== 'Cliente' ? localData.nome : '') ||
-            (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
-            (user.email ? user.email.split('@')[0] : 'Cliente');
+        // 4. Também verifica pedidos anteriores desse cliente caso tenha telefone/endereço salvo neles
+        let orderFallbackPhone = '';
+        let orderFallbackName = '';
+        if (Array.isArray(window.rawAllOrders) && emailKey) {
+            const myPastOrder = window.rawAllOrders.find(o => !o.isUserProfileDoc && String(o.emailCliente || '').toLowerCase() === emailKey && (o.telefone || o.cliente));
+            if (myPastOrder) {
+                orderFallbackPhone = myPastOrder.telefone || '';
+                orderFallbackName = myPastOrder.cliente || '';
+            }
+        }
 
-        const splitted = window.splitFullName(bestName);
-        const bestFirst = pending.primeiroNome || remoteData.primeiroNome || localData.primeiroNome || splitted.primeiroNome || '';
-        const bestLast = pending.sobrenome || remoteData.sobrenome || localData.sobrenome || splitted.sobrenome || '';
-        const bestPhone = pending.telefone || remoteData.telefone || localData.telefone || user.phoneNumber || '';
-        const bestAddrs = (Array.isArray(remoteData.enderecos) && remoteData.enderecos.length > 0)
-            ? remoteData.enderecos
-            : (Array.isArray(localData.enderecos) ? localData.enderecos : []);
-        const confirmed = Boolean(pending.perfilConfirmado || remoteData.perfilConfirmado || localData.perfilConfirmado);
+        const bestName = (cloudData?.nome && cloudData.nome !== 'Cliente')
+            ? cloudData.nome
+            : ((authCloudBackup?.nome && authCloudBackup.nome !== 'Cliente')
+                ? authCloudBackup.nome
+                : ((localData?.nome && localData.nome !== 'Cliente')
+                    ? localData.nome
+                    : (user.displayName || orderFallbackName || (emailKey ? emailKey.split('@')[0] : 'Cliente'))));
+
+        const bestPhone = cloudData?.telefone || authCloudBackup?.telefone || localData?.telefone || user.phoneNumber || orderFallbackPhone || '';
+
+        const cloudAddrs = Array.isArray(cloudData?.enderecos) ? cloudData.enderecos : [];
+        const authAddrs = Array.isArray(authCloudBackup?.enderecos) ? authCloudBackup.enderecos : [];
+        const localAddrs = Array.isArray(localData?.enderecos) ? localData.enderecos : [];
+
+        let bestAddrs = cloudAddrs;
+        if (authAddrs.length > bestAddrs.length) bestAddrs = authAddrs;
+        if (localAddrs.length > bestAddrs.length) bestAddrs = localAddrs;
 
         const merged = {
-            email: user.email || remoteData.email || localData.email || '',
-            nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
-            primeiroNome: bestFirst,
-            sobrenome: bestLast,
+            uid: uid,
+            email: emailKey,
+            nome: bestName,
             telefone: bestPhone,
             enderecos: bestAddrs,
-            perfilConfirmado: confirmed
+            dataCadastro: cloudData?.dataCadastro || localData?.dataCadastro || new Date().toLocaleDateString('pt-BR'),
+            updatedAtMs: Date.now()
         };
 
+        window.clientProfileData = merged;
+
+        // Sincroniza de volta na coleção raiz "usuario" e limpa qualquer rastro antigo dentro de "pedidos"
         try {
-            localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
+            localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(merged));
+            if (emailKey) localStorage.setItem('juaba_cli_email_' + emailKey, JSON.stringify(merged));
+            Promise.allSettled([
+                setDoc(doc(db, "usuario", uid), merged, { merge: true }),
+                deleteDoc(doc(db, "pedidos", "user_profile_" + uid))
+            ]);
         } catch (e) {}
 
         return merged;
     };
 
-    // Envia o PIN de 4 dígitos para o e-mail do usuário usando o Google Sheets (Apps Script)
-    window.sendPinViaGoogleSheets = async function(email, nome, pin) {
-        const scriptUrl = (window.GOOGLE_SCRIPT_URL || localStorage.getItem('juaba_google_script_url') || '').trim();
-        if (!scriptUrl) {
-            console.warn("URL do Google Apps Script ainda não configurada.");
-            document.getElementById('pin-script-config-hint').style.display = 'block';
-            window.showToast(`⚠️ Configure a URL da Planilha ou use o PIN de teste: ${pin}`);
+    // =========================================================================
+    // FUNÇÃO QUE ENVIA O PIN DE 4 DÍGITOS PARA O E-MAIL (USANDO GOOGLE SHEETS)
+    // =========================================================================
+    window.sendClientPinViaGoogleSheets = async function(email, nomeCliente, pin) {
+        const scriptUrl = String(window.GOOGLE_SCRIPT_URL || '').trim();
+        const devAlert = document.getElementById('client-pin-dev-alert');
+
+        // Verifica se a URL do Google Apps Script ainda não foi colada no código
+        if (!scriptUrl || scriptUrl === "COLE_AQUI_A_URL_DO_SEU_GOOGLE_SHEETS" || !scriptUrl.startsWith("https://script.google.com")) {
+            console.warn("Coloque a URL do seu Google Apps Script na variável window.GOOGLE_SCRIPT_URL no código.");
+            if (devAlert) {
+                devAlert.style.display = 'block';
+                devAlert.innerHTML = `⚠️ <b>Falta colar a URL do Google Script no código!</b><br>Abra o <code>index.html</code>, procure por <code>window.GOOGLE_SCRIPT_URL</code> e cole seu link <code>https://script.google.com/.../exec</code>.<br><span style="color:#15803d; font-weight:900;">🔑 PIN liberado p/ teste agora: ${pin}</span>`;
+            }
+            window.showToast(`🔑 PIN de teste: ${pin}`);
             return;
         }
 
+        if (devAlert) devAlert.style.display = 'none';
+
+        // Envia todos os nomes de campos possíveis para funcionar com qualquer script do Google Sheets
         const payload = {
             acao: 'enviar_pin',
-            tipo: 'verificacao',
+            action: 'send_pin',
+            tipo: 'verificacao_cliente',
             email: email,
+            to: email,
             destinatario: email,
-            nome: nome,
+            nome: nomeCliente,
+            name: nomeCliente,
             pin: String(pin),
             codigo: String(pin),
+            code: String(pin),
             assunto: `Código de Verificação: ${pin} - JuabaDelivery`,
-            mensagem: `Olá ${nome}, seu código PIN de verificação no JuabaDelivery é: ${pin}`
+            subject: `Código de Verificação: ${pin} - JuabaDelivery`,
+            mensagem: `Olá ${nomeCliente}, seu código PIN de 4 dígitos para validar seu cadastro no JuabaDelivery é: ${pin}`,
+            message: `Olá ${nomeCliente}, seu código PIN de 4 dígitos para validar seu cadastro no JuabaDelivery é: ${pin}`,
+            body: `Olá ${nomeCliente}, seu código PIN de 4 dígitos para validar seu cadastro no JuabaDelivery é: ${pin}`
         };
 
         try {
             const query = new URLSearchParams(payload).toString();
             const sep = scriptUrl.includes('?') ? '&' : '?';
-            // Dispara via POST (JSON/Form) e fallback GET para máxima compatibilidade com qualquer Apps Script
-            fetch(scriptUrl, {
+            // Envia os parâmetros tanto na URL (para e.parameter) quanto no corpo JSON (para e.postData.contents)
+            await fetch(scriptUrl + sep + query, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
-            }).catch(() => {});
-
-            fetch(scriptUrl + sep + query, {
-                method: 'GET',
-                mode: 'no-cors'
-            }).catch(() => {});
-
+            });
             window.showToast(`📩 PIN de 4 dígitos enviado para ${email}!`);
         } catch (err) {
-            console.error("Erro ao acionar Google Sheets:", err);
+            console.error("Erro ao enviar PIN pelo Google Sheets:", err);
+            window.showToast("⚠️ Falha de conexão ao enviar o PIN.");
         }
     };
 
-    window.saveCustomGoogleScriptUrl = function() {
-        const val = document.getElementById('custom-gsheet-url-input').value.trim();
-        if (!val) { window.showToast("Cole a URL do seu Google Apps Script!"); return; }
-        window.GOOGLE_SCRIPT_URL = val;
-        localStorage.setItem('juaba_google_script_url', val);
-        document.getElementById('pin-script-config-hint').style.display = 'none';
-        window.showToast("✅ URL da Planilha salva! Reenviando PIN...");
-        window.resendEmailPinCode();
-    };
-
-    window.closeVerifyPinModal = function() {
-        document.getElementById('modal-verify-pin').style.display = 'none';
-    };
-
-    window.resendEmailPinCode = function() {
-        if (!window.pendingRegistrationData) return;
-        window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
-        window.sendPinViaGoogleSheets(
-            window.pendingRegistrationData.email,
-            window.pendingRegistrationData.nome,
-            window.generatedEmailPin
+    // Gera um novo PIN de 4 dígitos e reenvia para o e-mail do usuário
+    window.resendClientPin = function() {
+        if (!window.pendingClientReg) return;
+        window.generatedClientPin = String(Math.floor(1000 + Math.random() * 9000));
+        window.sendClientPinViaGoogleSheets(
+            window.pendingClientReg.email,
+            window.pendingClientReg.nome,
+            window.generatedClientPin
         );
     };
 
-    window.confirmEmailPinCode = async function() {
-        const typed = document.getElementById('pin-code-input').value.trim();
-        if (!typed || typed.length < 4) {
-            window.showToast("⚠️ Digite os 4 dígitos do PIN!");
+    // =========================================================================
+    // VALIDAÇÃO DO PIN DE 4 DÍGITOS: SÓ CRIA A CONTA APÓS CONFIRMAR O PIN
+    // =========================================================================
+    window.confirmClientEmailPin = async function() {
+        const typedPin = document.getElementById('client-pin-code-input').value.trim();
+        if (!typedPin || typedPin.length < 4) {
+            window.showToast("⚠️ Digite os 4 dígitos do PIN enviado ao seu e-mail!");
             return;
         }
-        if (typed !== String(window.generatedEmailPin)) {
-            window.showToast("❌ Código PIN incorreto! Verifique seu e-mail.");
+        if (typedPin !== String(window.generatedClientPin)) {
+            window.showToast("❌ PIN incorreto! Confira sua caixa de entrada ou spam.");
             return;
         }
-        if (!window.pendingRegistrationData) return;
+        if (!window.pendingClientReg) return;
 
-        const { email, pass, nome, primeiroNome, sobrenome, telefone } = window.pendingRegistrationData;
-        const btn = document.getElementById('btn-confirm-pin');
+        const { email, pass, nome, telefone } = window.pendingClientReg;
+        const btn = document.getElementById('btn-client-confirm-pin');
         btn.disabled = true;
         btn.innerText = "Criando sua conta...";
 
         try {
+            // Sinaliza que estamos concluindo um cadastro para que o onAuthStateChanged não sobrescreva os dados
+            window.isRegisteringClient = true;
+            window.clientProfileData = {
+                email: email.toLowerCase(),
+                nome: nome,
+                telefone: telefone,
+                enderecos: []
+            };
+
             const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            const lojaCheck = await getDoc(doc(db, "lojas", cred.user.uid));
-            if (lojaCheck.exists() && !lojaCheck.data().isSystemConfig) {
-                await signOut(auth);
-                window.showToast("⚠️ Este e-mail pertence a uma Loja! Use o Painel do Lojista.");
-                return;
-            }
+            await updateProfile(cred.user, { displayName: nome }).catch(() => {});
+
             await window.saveClientProfileEverywhere(cred.user.uid, {
-                email,
-                nome,
-                primeiroNome,
-                sobrenome,
-                telefone,
-                enderecos: [],
-                perfilConfirmado: true
+                email: email.toLowerCase(),
+                nome: nome,
+                telefone: telefone,
+                enderecos: []
             });
-            window.pendingRegistrationData = null;
-            window.generatedEmailPin = null;
-            window.closeVerifyPinModal();
+
+            window.isRegisteringClient = false;
+            window.pendingClientReg = null;
+            window.generatedClientPin = null;
+            document.getElementById('modal-client-verify-pin').style.display = 'none';
             window.updateClientHeaderUI();
-            window.showToast(`🎉 Bem-vindo(a), ${primeiroNome || nome.split(' ')[0]}! Conta verificada!`);
+            window.showToast("🎉 Conta criada e salva com sucesso!");
         } catch (err) {
-            console.error("Erro ao criar conta após PIN:", err);
-            const msg = (err.code === 'auth/email-already-in-use')
-                ? "⚠️ Este e-mail já possui cadastro! Faça login."
-                : "⚠️ Erro ao criar conta. Verifique os dados.";
-            window.showToast(msg);
+            window.isRegisteringClient = false;
+            window.showToast("⚠️ Erro ao criar conta. Verifique se este e-mail já está cadastrado.");
         } finally {
             btn.disabled = false;
-            btn.innerText = "✅ Confirmar PIN e Criar Conta";
+            btn.innerText = "✅ Validar PIN e Concluir Cadastro";
         }
     };
 
+    // =========================================================================
+    // BOTÃO DE LOGIN / CADASTRO DO CLIENTE
+    // =========================================================================
     window.submitClientAuth = async function() {
         const email = document.getElementById('cli-auth-email').value.trim();
         const pass = document.getElementById('cli-auth-pass').value.trim();
@@ -3098,37 +3141,29 @@
 
         try {
             if (window.isRegisterMode) {
-                const primeiroNome = document.getElementById('cli-auth-first-name').value.trim();
-                const sobrenome = document.getElementById('cli-auth-last-name').value.trim();
+                const nome = document.getElementById('cli-auth-name').value.trim();
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
-                if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
-                if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
-                if (!telefone || telefone.replace(/\D/g, '').length < 8) {
-                    window.showToast("⚠️ Informe seu WhatsApp com DDD!");
-                    return;
-                }
-                if (pass.length < 6) {
-                    window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!");
-                    return;
-                }
+                if (!nome || nome.length < 2) { window.showToast("⚠️ Informe seu Nome Completo!"); return; }
+                if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
+                if (pass.length < 6) { window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!"); return; }
 
-                const nome = `${primeiroNome} ${sobrenome}`.trim();
+                // Guarda os dados preenchidos e gera o PIN de 4 dígitos para validar o e-mail
+                window.pendingClientReg = { email, pass, nome, telefone };
+                window.generatedClientPin = String(Math.floor(1000 + Math.random() * 9000));
 
-                // Gera o PIN de 4 dígitos e abre o modal de confirmação antes de concluir o cadastro
-                window.pendingRegistrationData = { email, pass, nome, primeiroNome, sobrenome, telefone, perfilConfirmado: true };
-                window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
-                document.getElementById('pin-target-email').innerText = email;
-                document.getElementById('pin-code-input').value = '';
-                document.getElementById('custom-gsheet-url-input').value = window.GOOGLE_SCRIPT_URL || '';
-                document.getElementById('modal-verify-pin').style.display = 'flex';
+                document.getElementById('client-pin-target-email').innerText = email;
+                document.getElementById('client-pin-code-input').value = '';
+                document.getElementById('modal-client-verify-pin').style.display = 'flex';
 
-                await window.sendPinViaGoogleSheets(email, nome, window.generatedEmailPin);
+                // Dispara o PIN de 4 dígitos para o e-mail do usuário via Google Sheets
+                await window.sendClientPinViaGoogleSheets(email, nome, window.generatedClientPin);
             } else {
                 const cred = await signInWithEmailAndPassword(auth, email, pass);
+                // Impede que uma conta de Lojista faça login no App do Cliente
                 const lojaSnap = await getDoc(doc(db, "lojas", cred.user.uid));
                 if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
                     await signOut(auth);
-                    window.showToast("🏪 Esta conta é de um Lojista! Acesse pelo Painel do Gestor.");
+                    window.showToast("🏪 Este e-mail pertence a uma Loja! Acesse pelo Painel do Lojista.");
                     return;
                 }
                 window.showToast("👋 Bem-vindo de volta!");
@@ -3138,176 +3173,8 @@
         }
     };
 
-    // Recuperação de Senha do Cliente
-    window.openForgotPasswordModal = function() {
-        const currentEmail = document.getElementById('cli-auth-email').value.trim();
-        document.getElementById('forgot-pass-email').value = currentEmail;
-        document.getElementById('modal-forgot-password').style.display = 'flex';
-    };
-
-    window.closeForgotPasswordModal = function() {
-        document.getElementById('modal-forgot-password').style.display = 'none';
-    };
-
-    window.sendClientPasswordReset = async function() {
-        const email = document.getElementById('forgot-pass-email').value.trim();
-        if (!email) {
-            window.showToast("⚠️ Digite seu e-mail cadastrado!");
-            return;
-        }
-        const btn = document.getElementById('btn-send-reset');
-        btn.disabled = true;
-        btn.innerText = "Enviando...";
-        try {
-            await sendPasswordResetEmail(auth, email);
-            window.closeForgotPasswordModal();
-            window.showToast("✅ Link de recuperação enviado para seu e-mail!");
-        } catch (err) {
-            console.error("Erro ao recuperar senha:", err);
-            window.showToast("⚠️ Não foi possível enviar. Verifique se o e-mail está correto.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "📩 Enviar E-mail de Recuperação";
-        }
-    };
-
-    window.updateClientHeaderUI = function() {
-        if (!window.currentClient) return;
-        const user = window.currentClient;
-        const googleName = user.displayName || '';
-        const savedName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
-            ? window.clientProfileData.nome
-            : '';
-        const finalName = savedName || googleName || (user.email ? user.email.split('@')[0] : 'Cliente');
-        window.clientProfileData.nome = finalName;
-
-        const firstName = finalName.split(' ')[0];
-        const mobBtn = document.getElementById('mobile-user-btn');
-        const deskBtn = document.getElementById('desktop-user-btn');
-        const profName = document.getElementById('prof-header-name');
-        const profEmail = document.getElementById('prof-header-email');
-        const profPhone = document.getElementById('prof-header-phone');
-
-        if (mobBtn) mobBtn.innerText = `👤 ${firstName}`;
-        if (deskBtn) deskBtn.innerText = `👤 ${firstName}`;
-        if (profName) profName.innerText = finalName;
-        if (profEmail) profEmail.innerText = user.email || '';
-        if (profPhone) {
-            profPhone.innerText = window.clientProfileData.telefone
-                ? `📱 WhatsApp: ${window.clientProfileData.telefone}`
-                : `⚠️ WhatsApp não informado (Toque em Conta para adicionar)`;
-            profPhone.style.color = window.clientProfileData.telefone ? 'var(--success)' : '#d97706';
-        }
-        if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
-            const addrLbl = document.getElementById('desktop-addr-label');
-            if (addrLbl) addrLbl.innerText = window.clientProfileData.enderecos[0].rua.substring(0, 18) + '...';
-        }
-    };
-
-    window.openCompleteProfileModal = function() {
-        if (!window.currentClient) return;
-        const savedFirst = (window.clientProfileData && window.clientProfileData.primeiroNome) || '';
-        const savedLast = (window.clientProfileData && window.clientProfileData.sobrenome) || '';
-        const fallbackSplit = window.splitFullName(
-            (window.clientProfileData && window.clientProfileData.nome !== 'Cliente')
-                ? window.clientProfileData.nome
-                : (window.currentClient.displayName || '')
-        );
-
-        document.getElementById('google-complete-first-name').value = savedFirst || fallbackSplit.primeiroNome || '';
-        document.getElementById('google-complete-last-name').value = savedLast || fallbackSplit.sobrenome || '';
-        document.getElementById('google-complete-phone').value = (window.clientProfileData && window.clientProfileData.telefone) || '';
-        document.getElementById('modal-complete-profile').style.display = 'flex';
-    };
-
-    window.saveGoogleCompleteProfile = async function() {
-        if (!window.currentClient) return;
-        const primeiroNome = document.getElementById('google-complete-first-name').value.trim();
-        const sobrenome = document.getElementById('google-complete-last-name').value.trim();
-        const telefone = document.getElementById('google-complete-phone').value.trim();
-
-        if (!primeiroNome) {
-            window.showToast("⚠️ Digite seu Nome!");
-            document.getElementById('google-complete-first-name').focus();
-            return;
-        }
-        if (!sobrenome) {
-            window.showToast("⚠️ Digite seu Sobrenome!");
-            document.getElementById('google-complete-last-name').focus();
-            return;
-        }
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) {
-            window.showToast("⚠️ Digite seu número de WhatsApp com DDD!");
-            document.getElementById('google-complete-phone').focus();
-            return;
-        }
-
-        const nome = `${primeiroNome} ${sobrenome}`.trim();
-
-        await window.saveClientProfileEverywhere(window.currentClient.uid, {
-            email: window.currentClient.email || '',
-            nome,
-            primeiroNome,
-            sobrenome,
-            telefone,
-            enderecos: window.clientProfileData.enderecos || [],
-            perfilConfirmado: true
-        });
-
-        document.getElementById('modal-complete-profile').style.display = 'none';
-        window.updateClientHeaderUI();
-        window.showToast(`✅ Cadastro concluído! Bem-vindo(a), ${primeiroNome}!`);
-    };
-
-    window.loginWithGoogle = async function() {
-        try {
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            const cred = await signInWithPopup(auth, provider);
-            const user = cred.user;
-            if (user) {
-                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
-                    await signOut(auth);
-                    window.showToast("🏪 Esta conta Google pertence a um Lojista! Use o Painel Gestor.");
-                    return;
-                }
-
-                const loaded = await window.loadClientProfileEverywhere(user);
-                const realName = (loaded.nome && loaded.nome !== 'Cliente')
-                    ? loaded.nome
-                    : ((user.displayName && user.displayName !== 'Cliente') ? user.displayName : 'Cliente');
-                const realPhone = loaded.telefone || user.phoneNumber || '';
-
-                await window.saveClientProfileEverywhere(user.uid, {
-                    email: user.email || '',
-                    nome: realName,
-                    primeiroNome: loaded.primeiroNome || '',
-                    sobrenome: loaded.sobrenome || '',
-                    telefone: realPhone,
-                    enderecos: loaded.enderecos || [],
-                    perfilConfirmado: loaded.perfilConfirmado
-                });
-
-                window.updateClientHeaderUI();
-
-                // Sempre abre para confirmar Nome, Sobrenome e Telefone caso ainda não tenha confirmado os 3 campos
-                if (!loaded.perfilConfirmado || !loaded.primeiroNome || !loaded.sobrenome || !realPhone) {
-                    window.openCompleteProfileModal();
-                } else {
-                    window.showToast(`👋 Bem-vindo(a), ${loaded.primeiroNome}!`);
-                }
-            }
-        } catch (err) {
-            console.error("Erro Login Google:", err);
-            window.showToast("⚠️ Não foi possível entrar com o Google.");
-        }
-    };
-
     window.logoutClient = async function() {
-        try {
-            localStorage.removeItem('juaba_cli_active_session');
-        } catch (e) {}
+        try { localStorage.removeItem('juaba_cli_active_session'); } catch (e) {}
         await signOut(auth);
         window.showToast("Você saiu da conta.");
         window.switchTab('home');
@@ -3321,24 +3188,17 @@
         }
 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        const secPerfil = document.getElementById('sec-perfil');
-        if (secPerfil) secPerfil.classList.add('active');
+        document.getElementById('sec-perfil').classList.add('active');
         document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-        const tabPerfil = document.getElementById('tab-perfil');
-        if (tabPerfil) tabPerfil.classList.add('active');
+        document.getElementById('tab-perfil').classList.add('active');
 
         document.getElementById('profile-main-menu').style.display = (sub === 'main') ? 'block' : 'none';
         document.getElementById('profile-sub-enderecos').style.display = (sub === 'enderecos') ? 'block' : 'none';
         document.getElementById('profile-sub-conta').style.display = (sub === 'conta') ? 'block' : 'none';
 
-        if (sub === 'enderecos') {
-            window.cancelEditAddress();
-            window.renderSavedAddresses();
-        }
+        if (sub === 'enderecos') window.renderSavedAddresses();
         if (sub === 'conta') {
-            const sp = window.splitFullName(window.clientProfileData.nome || '');
-            document.getElementById('acc-edit-first-name').value = window.clientProfileData.primeiroNome || sp.primeiroNome || '';
-            document.getElementById('acc-edit-last-name').value = window.clientProfileData.sobrenome || sp.sobrenome || '';
+            document.getElementById('acc-edit-name').value = window.clientProfileData.nome || '';
             document.getElementById('acc-edit-phone').value = window.clientProfileData.telefone || '';
         }
     };
@@ -3363,19 +3223,11 @@
             return;
         }
         listEl.innerHTML = addrs.map((a, idx) => {
-            const mainLine = a.logradouro
-                ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}`
-                : (a.rua || '');
-            const subDetails = [
-                a.complemento ? `Compl: ${a.complemento}` : '',
-                a.referencia ? `Ref: ${a.referencia}` : ''
-            ].filter(Boolean).join(' • ');
-
+            const mainLine = a.logradouro ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}` : (a.rua || '');
             return `
             <div class="addr-card">
                 <div style="flex:1;">
                     <div style="font-weight:900; font-size:0.92rem; color:#18181b;">📍 ${mainLine}</div>
-                    ${subDetails ? `<div style="font-size:0.76rem; color:#71717a; font-weight:700; margin-top:3px;">${subDetails}</div>` : ''}
                 </div>
                 <button type="button" class="dots-btn" onclick="toggleAddrMenu(${idx}); event.stopPropagation();">⋮</button>
                 <div class="dots-dropdown" id="addr-menu-${idx}">
@@ -3387,11 +3239,8 @@
     };
 
     window.toggleAddrMenu = function(idx) {
-        document.querySelectorAll('.dots-dropdown').forEach((el, i) => {
-            if (i !== idx) el.classList.remove('show');
-        });
-        const target = document.getElementById(`addr-menu-${idx}`);
-        if (target) target.classList.toggle('show');
+        document.querySelectorAll('.dots-dropdown').forEach((el, i) => { if (i !== idx) el.classList.remove('show'); });
+        document.getElementById(`addr-menu-${idx}`).classList.toggle('show');
     };
 
     document.addEventListener('click', () => {
@@ -3399,43 +3248,8 @@
     });
 
     window.openAddressFormModal = function(fromDeliveryPicker = false) {
-        if (!window.currentClient) {
-            window.closeCartModal();
-            window.switchTab('perfil');
-            window.showToast("👤 Entre na sua conta para cadastrar um endereço!");
-            return;
-        }
+        if (!window.currentClient) { window.switchTab('perfil'); window.showToast("Entre na sua conta!"); return; }
         window.reopenDeliveryModalAfterSave = Boolean(fromDeliveryPicker);
-        window.cancelEditAddress();
-        document.getElementById('modal-address-form').style.display = 'flex';
-        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
-    };
-
-    window.closeAddressFormModal = function() {
-        document.getElementById('modal-address-form').style.display = 'none';
-        window.cancelEditAddress();
-    };
-
-    window.startEditAddress = function(idx) {
-        const addrs = window.clientProfileData.enderecos || [];
-        const a = addrs[idx];
-        if (!a) return;
-        window.editingAddressIndex = idx;
-        window.reopenDeliveryModalAfterSave = false;
-
-        document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
-        document.getElementById('addr-numero').value = a.numero || '';
-        document.getElementById('addr-bairro').value = a.bairro || '';
-        document.getElementById('addr-comp').value = a.complemento || '';
-        document.getElementById('addr-ref').value = a.referencia || '';
-
-        document.getElementById('addr-form-title').innerText = '✏️ Editar Endereço';
-        document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
-        document.getElementById('modal-address-form').style.display = 'flex';
-        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
-    };
-
-    window.cancelEditAddress = function() {
         window.editingAddressIndex = -1;
         document.getElementById('addr-rua').value = '';
         document.getElementById('addr-numero').value = '';
@@ -3444,6 +3258,26 @@
         document.getElementById('addr-ref').value = '';
         document.getElementById('addr-form-title').innerText = '➕ Novo Endereço';
         document.getElementById('btn-save-addr').innerText = '💾 Salvar Endereço';
+        document.getElementById('modal-address-form').style.display = 'flex';
+    };
+
+    window.closeAddressFormModal = function() {
+        document.getElementById('modal-address-form').style.display = 'none';
+    };
+
+    window.startEditAddress = function(idx) {
+        const addrs = window.clientProfileData.enderecos || [];
+        const a = addrs[idx];
+        if (!a) return;
+        window.editingAddressIndex = idx;
+        document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
+        document.getElementById('addr-numero').value = a.numero || '';
+        document.getElementById('addr-bairro').value = a.bairro || '';
+        document.getElementById('addr-comp').value = a.complemento || '';
+        document.getElementById('addr-ref').value = a.referencia || '';
+        document.getElementById('addr-form-title').innerText = '✏️ Editar Endereço';
+        document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
+        document.getElementById('modal-address-form').style.display = 'flex';
     };
 
     window.deleteAddress = async function(idx) {
@@ -3451,8 +3285,8 @@
         window.clientProfileData.enderecos.splice(idx, 1);
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
-        window.updateClientHeaderUI();
         window.syncCartDeliveryDisplay();
+        window.updateClientHeaderUI();
         window.showToast("🗑️ Endereço removido!");
     };
 
@@ -3464,36 +3298,30 @@
         const complemento = document.getElementById('addr-comp').value.trim();
         const referencia = document.getElementById('addr-ref').value.trim();
 
-        if (!logradouro) { window.showToast("⚠️ Informe a Rua / Logradouro!"); document.getElementById('addr-rua').focus(); return; }
-        if (!numero) { window.showToast("⚠️ Informe o Número (ou S/N)!"); document.getElementById('addr-numero').focus(); return; }
-        if (!bairro) { window.showToast("⚠️ Informe o Bairro!"); document.getElementById('addr-bairro').focus(); return; }
+        if (!logradouro) { window.showToast("Informe a Rua!"); return; }
+        if (!numero) { window.showToast("Informe o Número!"); return; }
+        if (!bairro) { window.showToast("Informe o Bairro!"); return; }
 
-        const addrObj = {
-            logradouro,
-            numero,
-            bairro,
-            complemento,
-            referencia
-        };
+        const addrObj = { logradouro, numero, bairro, complemento, referencia };
         addrObj.rua = window.formatAddressDisplay(addrObj);
 
         if (!Array.isArray(window.clientProfileData.enderecos)) window.clientProfileData.enderecos = [];
         if (window.editingAddressIndex > -1) {
             window.clientProfileData.enderecos[window.editingAddressIndex] = addrObj;
+            window.selectedDeliveryIdx = window.editingAddressIndex;
         } else {
             window.clientProfileData.enderecos.push(addrObj);
             window.selectedDeliveryIdx = window.clientProfileData.enderecos.length - 1;
         }
 
-        const shouldReopenPicker = window.reopenDeliveryModalAfterSave;
         window.closeAddressFormModal();
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
-        window.updateClientHeaderUI();
         window.syncCartDeliveryDisplay();
+        window.updateClientHeaderUI();
         window.showToast("✅ Endereço salvo com sucesso!");
 
-        if (shouldReopenPicker) {
+        if (window.reopenDeliveryModalAfterSave) {
             window.reopenDeliveryModalAfterSave = false;
             window.openCartDeliveryModal();
         }
@@ -3501,121 +3329,70 @@
 
     window.saveAccountDetails = async function() {
         if (!window.currentClient) return;
-        const primeiroNome = document.getElementById('acc-edit-first-name').value.trim();
-        const sobrenome = document.getElementById('acc-edit-last-name').value.trim();
+        const nome = document.getElementById('acc-edit-name').value.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
 
-        if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
-        if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
+        if (!nome || nome.length < 2) { window.showToast("Informe seu Nome Completo!"); return; }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("Informe seu WhatsApp!"); return; }
 
-        const nome = `${primeiroNome} ${sobrenome}`.trim();
         window.clientProfileData.nome = nome;
-        window.clientProfileData.primeiroNome = primeiroNome;
-        window.clientProfileData.sobrenome = sobrenome;
         window.clientProfileData.telefone = telefone;
-        window.clientProfileData.perfilConfirmado = true;
 
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.updateClientHeaderUI();
-        window.showToast("✅ Dados da conta atualizados!");
+        window.showToast("✅ Dados atualizados!");
         window.openProfileSubView('main');
     };
 
-    window.restoreInstantSessionUI = function() {
-        try {
-            const cachedStores = localStorage.getItem('juaba_cache_stores');
-            if (cachedStores) {
-                window.allStores = JSON.parse(cachedStores) || [];
-                window.renderHomeView();
-            }
-            const cachedProds = localStorage.getItem('juaba_cache_products');
-            if (cachedProds) {
-                window.allProducts = JSON.parse(cachedProds) || [];
-                window.renderHomeView();
-            }
-            const rawSession = localStorage.getItem('juaba_cli_active_session');
-            if (!rawSession) return;
-            const sess = JSON.parse(rawSession);
-            if (!sess || !sess.uid) return;
+    window.updateClientHeaderUI = function() {
+        if (!window.currentClient) return;
+        const name = window.clientProfileData.nome || window.currentClient.displayName || 'Cliente';
+        const firstName = name.split(' ')[0];
+        const deskBtn = document.getElementById('desktop-user-btn');
+        if (deskBtn) deskBtn.innerText = `👤 ${firstName}`;
+        document.getElementById('prof-header-name').innerText = name;
+        document.getElementById('prof-header-email').innerText = window.currentClient.email || '';
+        document.getElementById('prof-header-phone').innerText = window.clientProfileData.telefone ? `📱 WhatsApp: ${window.clientProfileData.telefone}` : `⚠️ WhatsApp não informado`;
 
-            window.currentClient = {
-                uid: sess.uid,
-                email: sess.email || '',
-                displayName: sess.displayName || (sess.profile && sess.profile.nome) || 'Cliente'
-            };
-            if (sess.profile) {
-                window.clientProfileData = sess.profile;
+        const deskAddrLbl = document.getElementById('desktop-addr-label');
+        if (deskAddrLbl) {
+            const addrs = window.clientProfileData.enderecos || [];
+            if (addrs.length > 0) {
+                const a = addrs[0];
+                const shortAddr = a.logradouro ? `${a.logradouro}, ${a.numero || 'S/N'}` : (a.rua || 'Endereço');
+                deskAddrLbl.innerText = shortAddr.length > 20 ? shortAddr.substring(0, 20) + '...' : shortAddr;
+            } else {
+                deskAddrLbl.innerText = 'Endereço';
             }
-            const tabPed = document.getElementById('tab-pedidos');
-            const dnavPed = document.getElementById('dnav-pedidos');
-            if (tabPed) tabPed.style.display = 'flex';
-            if (dnavPed) dnavPed.style.display = 'inline-block';
-            document.getElementById('profile-logged-out').style.display = 'none';
-            document.getElementById('profile-logged-in').style.display = 'block';
-            window.updateClientHeaderUI();
-
-            const cachedOrders = localStorage.getItem('juaba_cache_orders_' + sess.uid);
-            if (cachedOrders) {
-                window.myOrders = JSON.parse(cachedOrders) || [];
-                window.renderClientOrders();
-            }
-        } catch (e) {}
+        }
     };
-
-    // Executa imediatamente antes mesmo do Firebase responder para não piscar "Entrar"
-    window.restoreInstantSessionUI();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            try {
-                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
-                    localStorage.removeItem('juaba_cli_active_session');
-                    await signOut(auth);
-                    window.showToast("🏪 Conta de Lojista detectada! Use o Painel do Gestor.");
-                    return;
-                }
-            } catch (e) {}
-        }
-
-        window.currentClient = user;
-        const tabPed = document.getElementById('tab-pedidos');
-        const dnavPed = document.getElementById('dnav-pedidos');
-        const mobBtn = document.getElementById('mobile-user-btn');
-        const deskBtn = document.getElementById('desktop-user-btn');
-
-        if (user) {
-            if (tabPed) tabPed.style.display = 'flex';
-            if (dnavPed) dnavPed.style.display = 'inline-block';
+            window.currentClient = user;
+            document.getElementById('tab-pedidos').style.display = 'flex';
+            document.getElementById('dnav-pedidos').style.display = 'inline-block';
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            const quickName =
-                (window.pendingRegistrationData && window.pendingRegistrationData.nome) ||
-                (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente' ? window.clientProfileData.nome : '') ||
-                user.displayName ||
-                (user.email ? user.email.split('@')[0] : 'Cliente');
-            window.clientProfileData.nome = quickName;
-            window.updateClientHeaderUI();
-
-            const fullProfile = await window.loadClientProfileEverywhere(user);
-            window.clientProfileData = fullProfile;
-            await window.saveClientProfileEverywhere(user.uid, fullProfile);
-            window.updateClientHeaderUI();
-
-            if (!window.clientProfileData.perfilConfirmado || !window.clientProfileData.primeiroNome || !window.clientProfileData.sobrenome || !window.clientProfileData.telefone) {
-                window.openCompleteProfileModal();
+            // Se acabou de criar a conta, preserva os dados preenchidos no ato do cadastro sem sobrescrever
+            if (window.isRegisteringClient && window.clientProfileData && window.clientProfileData.nome) {
+                window.updateClientHeaderUI();
+            } else {
+                const profile = await window.loadClientProfileEverywhere(user);
+                window.clientProfileData = profile;
+                window.updateClientHeaderUI();
+                window.renderSavedAddresses();
+                window.syncCartDeliveryDisplay();
             }
-
             window.filterMyOrders();
         } else {
-            localStorage.removeItem('juaba_cli_active_session');
-            if (tabPed) tabPed.style.display = 'none';
-            if (dnavPed) dnavPed.style.display = 'none';
+            window.currentClient = null;
+            document.getElementById('tab-pedidos').style.display = 'none';
+            document.getElementById('dnav-pedidos').style.display = 'none';
             document.getElementById('profile-logged-out').style.display = 'block';
             document.getElementById('profile-logged-in').style.display = 'none';
-            if (mobBtn) mobBtn.innerText = '👤 Entrar';
+            const deskBtn = document.getElementById('desktop-user-btn');
             if (deskBtn) deskBtn.innerText = '👤 Entrar';
             window.myOrders = [];
             window.renderClientOrders();
@@ -3656,8 +3433,6 @@
             }
         });
 
-        try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
-
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
     });
@@ -3665,7 +3440,6 @@
     onSnapshot(collection(db, "produtos"), (snap) => {
         window.allProducts = [];
         snap.forEach(d => window.allProducts.push({ id: d.id, ...d.data() }));
-        try { localStorage.setItem('juaba_cache_products', JSON.stringify(window.allProducts)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
         if (window.detailProduct) window.renderProductSuggestions(window.detailProduct);
@@ -3680,12 +3454,7 @@
     window.filterMyOrders = function() {
         if (!window.currentClient) { window.myOrders = []; return; }
         const myEmail = (window.currentClient.email || '').toLowerCase();
-        window.myOrders = window.rawAllOrders.filter(o => (o.emailCliente || '').toLowerCase() === myEmail);
-        try {
-            if (window.currentClient.uid) {
-                localStorage.setItem('juaba_cache_orders_' + window.currentClient.uid, JSON.stringify(window.myOrders));
-            }
-        } catch (e) {}
+        window.myOrders = window.rawAllOrders.filter(o => !o.isUserProfileDoc && (o.emailCliente || '').toLowerCase() === myEmail);
         window.renderClientOrders();
         if (window.activeTrackOrderId) {
             const found = window.myOrders.find(x => x.id === window.activeTrackOrderId);
@@ -3698,9 +3467,35 @@
 
     onSnapshot(collection(db, "pedidos"), (snap) => {
         window.rawAllOrders = [];
-        snap.forEach(d => window.rawAllOrders.push({ id: d.id, ...d.data() }));
+        snap.forEach(d => {
+            const data = d.data();
+            if (!data.isUserProfileDoc && !d.id.startsWith('user_profile_')) {
+                window.rawAllOrders.push({ id: d.id, ...data });
+            }
+        });
         window.filterMyOrders();
     });
+
+    window.openForgotPasswordModal = function() {
+        document.getElementById('forgot-pass-email').value = document.getElementById('cli-auth-email').value.trim();
+        document.getElementById('modal-forgot-password').style.display = 'flex';
+    };
+
+    window.closeForgotPasswordModal = function() {
+        document.getElementById('modal-forgot-password').style.display = 'none';
+    };
+
+    window.sendClientPasswordReset = async function() {
+        const email = document.getElementById('forgot-pass-email').value.trim();
+        if (!email) { window.showToast("Digite seu e-mail!"); return; }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            window.closeForgotPasswordModal();
+            window.showToast("✅ Link enviado para seu e-mail!");
+        } catch (e) {
+            window.showToast("⚠️ E-mail não encontrado.");
+        }
+    };
 
     setInterval(() => {
         window.renderHomeView();
