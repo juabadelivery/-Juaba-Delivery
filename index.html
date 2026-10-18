@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<selection-tag><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,6 @@
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -44,26 +43,21 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .banners-carousel-wrapper {
-            position: relative; width: 100%; margin-bottom: 16px;
-        }
+        .banners-carousel-wrapper { position: relative; width: 100%; margin-bottom: 16px; overflow: hidden; border-radius: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #f4f4f5; }
         .banners-row {
-            display: flex; gap: 12px; width: 100%; overflow-x: auto; padding-bottom: 6px;
-            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            display: flex; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
             scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
         .banners-row::-webkit-scrollbar { display: none; }
         .banner-card {
-            min-width: 88%; height: 160px; border-radius: 18px; position: relative;
-            scroll-snap-align: center; flex-shrink: 0; overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #f4f4f5;
+            min-width: 100%; height: 160px; position: relative; scroll-snap-align: center; flex-shrink: 0; overflow: hidden; background: #000;
         }
         .banner-card img {
-            width: 100%; height: 100%; object-fit: fill; display: block; pointer-events: none;
+            width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; background: #18181b;
         }
         .banner-card .banner-title {
-            position: absolute; bottom: 0; inset-inline: 0; padding: 24px 14px 12px;
-            background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0.25), transparent);
+            position: absolute; bottom: 0; inset-inline: 0; padding: 20px 14px 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
             color: #fff; font-weight: 900; font-size: 1.02rem; z-index: 2; text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
         .carousel-nav-btn {
@@ -562,17 +556,18 @@
     </div>
 </section>
 
-<!-- ABA 3: MEUS PEDIDOS (Visível apenas logado) -->
+<!-- ABA 3: MEUS PEDIDOS -->
 <section id="sec-pedidos" class="view-section">
     <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:14px;">🧾 Meus Pedidos</h2>
     <div id="client-orders-list"></div>
 </section>
 
-<!-- ABA 4: PERFIL (Com sub-abas) -->
+<!-- ABA 4: PERFIL -->
 <section id="sec-perfil" class="view-section">
     <div id="profile-logged-out" style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:22px;">
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
+        
         <div id="auth-name-group" style="display:none; gap:10px; flex-wrap:wrap;">
             <div class="input-group" style="flex:1; min-width:130px;">
                 <label>Nome *</label>
@@ -587,6 +582,7 @@
             <label>Seu WhatsApp (com DDD) *</label>
             <input type="text" id="cli-auth-phone" placeholder="Ex: 91988887777">
         </div>
+
         <div class="input-group">
             <label>E-mail</label>
             <input type="email" id="cli-auth-email" placeholder="seuemail@gmail.com">
@@ -595,11 +591,13 @@
             <label>Senha</label>
             <input type="password" id="cli-auth-pass" placeholder="Sua senha...">
         </div>
+
         <div id="forgot-pass-link-box" style="text-align:right; margin-top:-6px; margin-bottom:12px;">
             <button type="button" onclick="openForgotPasswordModal()" style="background:none; border:none; color:#71717a; font-weight:800; font-size:0.78rem; cursor:pointer; text-decoration:underline;">
                 Esqueci minha senha
             </button>
         </div>
+
         <button class="btn-primary" id="cli-auth-submit-btn" onclick="submitClientAuth()">Entrar na Conta</button>
 
         <div style="display:flex; align-items:center; gap:10px; margin:14px 0;">
@@ -666,7 +664,6 @@
                         + Adicionar Endereço
                     </button>
                 </div>
-
                 <div id="saved-addresses-list"></div>
             </div>
         </div>
@@ -736,7 +733,7 @@
         <div class="input-group">
             <label>📍 Como deseja receber?</label>
             <input type="hidden" id="cart-delivery-select" value="">
-            <div class="delivery-picker-trigger" onclick="openCartDeliveryModal()">
+            <div class="delivery-picker-trigger" onclick="openCartDeliveryModal()" style="background:#fff; border:1px solid #d4d4d8; border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
                 <div style="min-width:0; flex:1;">
                     <div id="cart-delivery-title" style="font-weight:900; font-size:0.88rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                         🛵 Selecionar endereço de entrega
@@ -745,7 +742,7 @@
                         Toque para escolher ou retirar na loja
                     </div>
                 </div>
-                <span style="background:#fff; border:1px solid #e4e4e7; padding:5px 10px; border-radius:8px; font-weight:800; font-size:0.74rem; color:var(--primary); flex-shrink:0;">
+                <span style="background:#f4f4f5; border:1px solid #e4e4e7; padding:5px 10px; border-radius:8px; font-weight:800; font-size:0.74rem; color:var(--primary); flex-shrink:0;">
                     Trocar ▾
                 </span>
             </div>
@@ -789,7 +786,6 @@
     </div>
 </div>
 
-<!-- Modal para Escolher Endereço de Entrega na Sacola -->
 <div class="modal-overlay" id="modal-select-delivery-address" style="z-index:2400;" onclick="if(event.target===this) closeCartDeliveryModal()">
     <div class="modal-sheet" style="max-width:460px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -806,7 +802,6 @@
     </div>
 </div>
 
-<!-- Modal com o Formulário para Cadastrar / Editar Endereço -->
 <div class="modal-overlay" id="modal-address-form" style="z-index:2600;" onclick="if(event.target===this) closeAddressFormModal()">
     <div class="modal-sheet" style="max-width:460px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -838,7 +833,7 @@
             <input type="text" id="addr-ref" placeholder="Ex: Próximo à praça / Portão branco">
         </div>
         <div style="display:flex; gap:8px; margin-top:10px;">
-            <button type="button" onclick="closeAddressFormModal()" id="btn-cancel-addr" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">Cancelar</button>
+            <button type="button" onclick="closeAddressFormModal()" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer;">Cancelar</button>
             <button type="button" onclick="saveAddressFromProfile()" class="btn-primary" style="background:var(--primary); flex:1.5; padding:12px;" id="btn-save-addr">💾 Salvar Endereço</button>
         </div>
     </div>
@@ -878,10 +873,6 @@
             </button>
         </div>
 
-        <p style="font-size:0.74rem; color:#71717a; font-weight:700; margin-bottom:12px;">
-            💡 Caso feche esta tela, você pode copiar o código a qualquer momento em <b>Meus Pedidos ➔ Acompanhar</b>.
-        </p>
-
         <div style="display:flex; flex-direction:column; gap:8px;">
             <button type="button" id="pix-modal-chat-btn" class="btn-primary" style="background:var(--primary); padding:12px;">
                 📎 Enviar Comprovante no Chat da Loja
@@ -896,8 +887,8 @@
 <div class="modal-overlay" id="modal-chat" onclick="if(event.target===this) closeClientChat()">
     <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">💬 Chat com a Loja</h3>
-            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; flex-shrink:0;">✕</button>
+            <h3 id="chat-modal-title" style="font-weight:900; font-size:1.05rem;">💬 Chat com a Loja</h3>
+            <button onclick="closeClientChat()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
         </div>
         <div class="chat-msgs-box" id="client-chat-msgs"></div>
         <div style="display:flex; gap:6px; align-items:center; width:100%;">
@@ -911,29 +902,24 @@
     </div>
 </div>
 
-<!-- Modal para o Cliente Cancelar o Pedido informando o Motivo -->
 <div class="modal-overlay" id="modal-client-cancel-order" style="z-index:2500;" onclick="if(event.target===this) closeClientCancelModal()">
     <div class="modal-sheet" style="max-width:440px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 style="font-weight:900; font-size:1.15rem; color:#dc2626;">❌ Cancelar Pedido</h3>
             <button type="button" onclick="closeClientCancelModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer;">✕</button>
         </div>
-        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:12px;">
-            Selecione ou digite o motivo pelo qual deseja cancelar este pedido:
-        </p>
         <div class="input-group">
             <label>Motivo do Cancelamento</label>
             <select id="client-cancel-reason-select" onchange="document.getElementById('client-cancel-custom-box').style.display = this.value === 'OUTRO' ? 'block' : 'none'">
                 <option value="Pedi por engano">Pedi por engano</option>
-                <option value="Quero alterar os itens ou forma de pagamento">Quero alterar os itens ou forma de pagamento</option>
-                <option value="Tempo de espera muito longo">Tempo de espera muito longo</option>
-                <option value="Desisti da compra">Desisti da compra</option>
+                <option value="Quero alterar os itens">Quero alterar os itens</option>
+                <option value="Demora na entrega">Demora na entrega</option>
                 <option value="OUTRO">Outro motivo...</option>
             </select>
         </div>
         <div class="input-group" id="client-cancel-custom-box" style="display:none;">
             <label>Qual o motivo?</label>
-            <input type="text" id="client-cancel-custom-input" placeholder="Digite o motivo do cancelamento...">
+            <input type="text" id="client-cancel-custom-input" placeholder="Digite o motivo...">
         </div>
         <div style="display:flex; gap:8px; margin-top:14px;">
             <button type="button" onclick="closeClientCancelModal()" style="flex:1; background:#f4f4f5; color:#18181b; border:none; padding:13px; border-radius:12px; font-weight:800; cursor:pointer;">Voltar</button>
@@ -961,73 +947,12 @@
     </div>
 </div>
 
-<!-- Modal de Verificação de PIN de 4 Dígitos por E-mail (Google Sheets) -->
-<div class="modal-overlay" id="modal-verify-pin">
-    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <span style="font-size:0.75rem; font-weight:900; color:var(--primary); text-transform:uppercase;">Verificação de Segurança</span>
-            <button type="button" onclick="closeVerifyPinModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
-        </div>
-        <div style="font-size:2.4rem; margin-bottom:6px;">📩</div>
-        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Confirme seu E-mail</h3>
-        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
-            Enviamos um código PIN de <b>4 dígitos</b> para:<br>
-            <b id="pin-target-email" style="color:var(--primary);">email@exemplo.com</b>
-        </p>
-
-        <div class="input-group" style="text-align:center;">
-            <label style="text-align:center;">Digite o PIN de 4 dígitos</label>
-            <input type="text" id="pin-code-input" maxlength="4" inputmode="numeric" placeholder="0000" style="text-align:center; font-size:1.6rem; font-weight:900; letter-spacing:10px; padding:12px;" onkeypress="if(event.key==='Enter') confirmEmailPinCode()">
-        </div>
-
-        <div id="pin-script-config-hint" style="display:none; background:#fffbeb; border:1px dashed #f59e0b; padding:10px; border-radius:12px; margin-bottom:12px; text-align:left; font-size:0.75rem; color:#92400e;">
-            <div style="font-weight:900; margin-bottom:4px;">⚙️ Link do Google Sheets (Apps Script):</div>
-            <div style="display:flex; gap:6px;">
-                <input type="text" id="custom-gsheet-url-input" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1; padding:7px 9px; border:1px solid #fcd34d; border-radius:8px; font-size:0.75rem;">
-                <button type="button" onclick="saveCustomGoogleScriptUrl()" style="background:#d97706; color:#fff; border:none; padding:0 10px; border-radius:8px; font-weight:800; cursor:pointer;">Salvar</button>
-            </div>
-        </div>
-
-        <button type="button" class="btn-primary" id="btn-confirm-pin" onclick="confirmEmailPinCode()" style="background:var(--success); margin-bottom:10px;">
-            ✅ Confirmar PIN e Criar Conta
-        </button>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-            <button type="button" onclick="resendEmailPinCode()" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:0.8rem; cursor:pointer;">
-                🔄 Reenviar PIN
-            </button>
-            <button type="button" onclick="document.getElementById('pin-script-config-hint').style.display = document.getElementById('pin-script-config-hint').style.display === 'none' ? 'block' : 'none'" style="background:none; border:none; color:#71717a; font-weight:700; font-size:0.75rem; cursor:pointer;">
-                ⚙️ Configurar Planilha
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Recuperação de Senha -->
-<div class="modal-overlay" id="modal-forgot-password" onclick="if(event.target===this) closeForgotPasswordModal()">
-    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
-        <div style="display:flex; justify-content:flex-end;">
-            <button type="button" onclick="closeForgotPasswordModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
-        </div>
-        <div style="font-size:2.4rem; margin-bottom:6px;">🔑</div>
-        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Recuperar Minha Senha</h3>
-        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px; line-height:1.4;">
-            Informe seu e-mail cadastrado. Enviaremos um link oficial para você criar uma nova senha:
-        </p>
-        <div class="input-group">
-            <label>Seu E-mail Cadastrado</label>
-            <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
-        </div>
-        <button type="button" class="btn-primary" id="btn-send-reset" onclick="sendClientPasswordReset()">📩 Enviar E-mail de Recuperação</button>
-    </div>
-</div>
-
-<!-- Modal para completar Nome, Sobrenome e Telefone/WhatsApp após entrar com Google -->
+<!-- Modal de Completo de Perfil após entrar com Google -->
 <div class="modal-overlay" id="modal-complete-profile" style="z-index: 6500;">
     <div class="modal-sheet" style="text-align:center; max-width:430px; border-radius:24px; margin:auto;">
         <div style="font-size:2.4rem; margin-bottom:6px;">👤</div>
         <h3 style="font-weight:900; font-size:1.2rem; color:#18181b; margin-bottom:4px;">Complete seu Cadastro</h3>
-        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">Informe seu Nome, Sobrenome e WhatsApp para identificação nos seus pedidos e entregas:</p>
+        <p style="color:#71717a; font-size:0.82rem; font-weight:600; margin-bottom:14px;">Informe seu Nome, Sobrenome e WhatsApp para identificação nos seus pedidos:</p>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <div class="input-group" style="flex:1; min-width:135px;">
@@ -1049,6 +974,25 @@
     </div>
 </div>
 
+<!-- Modal de Recuperação de Senha -->
+<div class="modal-overlay" id="modal-forgot-password" onclick="if(event.target===this) closeForgotPasswordModal()">
+    <div class="modal-sheet" style="text-align:center; max-width:420px; border-radius:24px; margin:auto;">
+        <div style="display:flex; justify-content:flex-end;">
+            <button type="button" onclick="closeForgotPasswordModal()" style="background:none; border:none; font-size:1.3rem; cursor:pointer; color:#71717a;">✕</button>
+        </div>
+        <div style="font-size:2.4rem; margin-bottom:6px;">🔑</div>
+        <h3 style="font-weight:900; font-size:1.22rem; color:#18181b; margin-bottom:6px;">Recuperar Minha Senha</h3>
+        <p style="color:#52525b; font-size:0.84rem; font-weight:600; margin-bottom:14px;">
+            Informe seu e-mail cadastrado. Enviaremos um link para redefinir sua senha:
+        </p>
+        <div class="input-group">
+            <label>Seu E-mail Cadastrado</label>
+            <input type="email" id="forgot-pass-email" placeholder="seuemail@gmail.com" onkeypress="if(event.key==='Enter') sendClientPasswordReset()">
+        </div>
+        <button type="button" class="btn-primary" onclick="sendClientPasswordReset()">📩 Enviar E-mail de Recuperação</button>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -1067,8 +1011,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    window.GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_google_script_url') || "";
-
     window.allStores = [];
     window.allProducts = [];
     window.allCoupons = [];
@@ -1077,10 +1019,8 @@
     window.globalBillingEnabled = true;
     window.currentClient = null;
     window.clientProfileData = { nome: '', primeiroNome: '', sobrenome: '', telefone: '', enderecos: [] };
-    window.pendingRegistrationData = null;
-    window.generatedEmailPin = null;
-    window.editingAddressIndex = -1;
     window.isRegisterMode = false;
+    window.editingAddressIndex = -1;
 
     window.selectedCategory = 'TODOS';
     window.quickFilterMode = 'ALL';
@@ -1117,10 +1057,6 @@
         { img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80", text: "Festival de Pizzas" },
         { img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80", text: "Artesanais Suculentos" }
     ];
-    window.currentBannerIdx = 0;
-    window.totalBannersCount = 0;
-    window.bannerAutoplayTimer = null;
-    window.bannerAutoplayPaused = false;
 
     window.showToast = function(msg) {
         const t = document.getElementById('toast');
@@ -1322,84 +1258,16 @@
         window.applyUnifiedViewMode(nextMode);
     };
 
-    window.setStoresViewMode = function(mode) {
-        window.applyUnifiedViewMode(mode);
-    };
-
-    window.setCategoryProductsViewMode = function(mode) {
-        window.applyUnifiedViewMode(mode);
-    };
-
-    window.setSuggestedViewMode = function(mode) {
-        window.applyUnifiedViewMode(mode);
-    };
-
     window.renderBanners = function(bannersArr) {
         const box = document.getElementById('home-banners');
-        const prevBtn = document.getElementById('banner-prev-btn');
-        const nextBtn = document.getElementById('banner-next-btn');
         if (!box) return;
-
         const list = (Array.isArray(bannersArr) && bannersArr.length > 0) ? bannersArr : window.defaultBanners;
-        window.totalBannersCount = list.length;
-        if (window.currentBannerIdx >= list.length) window.currentBannerIdx = 0;
-
-        const fallbackImg = "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80";
-        box.innerHTML = list.map(b => {
-            const imgUrl = b.img || fallbackImg;
-            return `
+        box.innerHTML = list.map(b => `
             <div class="banner-card">
-                <img src="${imgUrl}" onerror="this.src='${fallbackImg}'" alt="${(b.text || 'Banner').replace(/"/g, '&quot;')}">
-                ${b.text ? `<div class="banner-title">${b.text}</div>` : ''}
-            </div>`;
-        }).join('');
-
-        if (prevBtn) prevBtn.style.visibility = list.length > 1 ? 'visible' : 'hidden';
-        if (nextBtn) nextBtn.style.visibility = list.length > 1 ? 'visible' : 'hidden';
-
-        window.startBannerAutoplay();
-    };
-
-    window.goToBannerSlide = function(idx) {
-        const box = document.getElementById('home-banners');
-        if (!box || window.totalBannersCount <= 0) return;
-        window.currentBannerIdx = (idx + window.totalBannersCount) % window.totalBannersCount;
-        const targetCard = box.children[window.currentBannerIdx];
-        if (targetCard) {
-            box.scrollTo({ left: targetCard.offsetLeft, behavior: 'smooth' });
-        }
-    };
-
-    window.stepBannerCarousel = function(delta) {
-        window.goToBannerSlide((window.currentBannerIdx || 0) + delta);
-    };
-
-    window.onBannerCarouselScroll = function() {
-        const box = document.getElementById('home-banners');
-        if (!box || !box.children.length) return;
-        const cardWidth = box.children[0].offsetWidth + 12;
-        const newIdx = Math.round(box.scrollLeft / cardWidth);
-        if (newIdx !== window.currentBannerIdx && newIdx >= 0 && newIdx < window.totalBannersCount) {
-            window.currentBannerIdx = newIdx;
-        }
-    };
-
-    window.startBannerAutoplay = function() {
-        if (window.bannerAutoplayTimer) clearInterval(window.bannerAutoplayTimer);
-        if (window.totalBannersCount <= 1) return;
-        window.bannerAutoplayTimer = setInterval(() => {
-            if (!window.bannerAutoplayPaused && document.getElementById('sec-home').classList.contains('active')) {
-                window.stepBannerCarousel(1);
-            }
-        }, 4000);
-    };
-
-    window.pauseBannerAutoplay = function() {
-        window.bannerAutoplayPaused = true;
-    };
-
-    window.resumeBannerAutoplay = function() {
-        window.bannerAutoplayPaused = false;
+                <img src="${b.img}" onerror="this.src='https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80'">
+                <div class="banner-title">${b.text || ''}</div>
+            </div>
+        `).join('');
     };
 
     window.openCategoryFullScreen = function(cat) {
@@ -2010,7 +1878,7 @@
                 ].filter(Boolean).join(' • ');
 
                 return `
-                <div class="delivery-option-card ${isSel ? 'selected' : ''}" onclick="selectCartDeliveryOption(${idx})">
+                <div style="background:#fff; border:1px solid ${isSel ? 'var(--primary)' : 'var(--border)'}; background:${isSel ? 'var(--primary-light)' : '#fff'}; border-radius:14px; padding:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="selectCartDeliveryOption(${idx})">
                     <div style="min-width:0; flex:1;">
                         <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🛵 ${mainLine}</div>
                         ${subDetails ? `<div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">${subDetails}</div>` : ''}
@@ -2022,7 +1890,7 @@
 
         const isPickup = window.selectedDeliveryIdx === -1;
         html += `
-        <div class="delivery-option-card ${isPickup ? 'selected' : ''}" onclick="selectCartDeliveryOption(-1)">
+        <div style="background:#fff; border:1px solid ${isPickup ? 'var(--primary)' : 'var(--border)'}; background:${isPickup ? 'var(--primary-light)' : '#fff'}; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="selectCartDeliveryOption(-1)">
             <div style="min-width:0; flex:1;">
                 <div style="font-weight:900; font-size:0.88rem; color:#18181b;">🏪 Vou Retirar na Loja</div>
                 <div style="font-size:0.74rem; color:#52525b; font-weight:600; margin-top:2px;">Sem taxa de entrega • Buscar no estabelecimento</div>
@@ -2678,42 +2546,6 @@
                 }
                 addedCount++;
             });
-        } else if (o.itens) {
-            const parts = String(o.itens).split(',');
-            parts.forEach(part => {
-                const clean = part.trim();
-                const match = clean.match(/^(\d+)x\s+(.+)$/i);
-                const qty = match ? (parseInt(match[1]) || 1) : 1;
-                let rawName = match ? match[2].trim() : clean;
-                rawName = rawName.replace(/\[.*?\]/g, '').replace(/\(Obs:.*?\)/gi, '').trim();
-
-                const foundProd = window.allProducts.find(p =>
-                    p.lojaId === o.lojaId &&
-                    String(p.nome || '').toLowerCase().trim() === rawName.toLowerCase()
-                ) || window.allProducts.find(p =>
-                    p.lojaId === o.lojaId &&
-                    String(p.nome || '').toLowerCase().includes(rawName.toLowerCase())
-                );
-
-                if (foundProd) {
-                    const existingIdx = window.cart.findIndex(item => item.prodId === foundProd.id && !item.addonsKey && !item.obs);
-                    if (existingIdx > -1) {
-                        window.cart[existingIdx].qty += qty;
-                    } else {
-                        window.cart.push({
-                            prodId: foundProd.id,
-                            lojaId: o.lojaId,
-                            nome: foundProd.nome,
-                            unitPrice: parseFloat(foundProd.preco) || 0,
-                            qty: qty,
-                            addonsNames: [],
-                            addonsKey: '',
-                            obs: ''
-                        });
-                    }
-                    addedCount++;
-                }
-            });
         }
 
         if (addedCount > 0) {
@@ -2752,12 +2584,15 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
                         <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
-                        <div style="font-weight:900; font-size:0.95rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                            ${nomeLoja}
+                        <div style="min-width:0;">
+                            <div style="font-weight:900; font-size:0.95rem; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                ${nomeLoja}
+                            </div>
+                            <div style="font-size:0.72rem; color:#71717a; font-weight:700;">
+                                ${isDone ? '<span style="color:#16a34a; font-weight:800;">Pedido finalizado</span>' : (isCanceled ? '<span style="color:#dc2626; font-weight:800;">Cancelado</span>' : 'Pedido em andamento')}
+                            </div>
                         </div>
                     </div>
-                    ${isDone && !isCanceled ? `<span style="font-size:0.72rem; font-weight:700; color:#71717a; white-space:nowrap;">Pedido finalizado</span>` : ''}
-                    ${isCanceled ? `<span style="font-size:0.72rem; font-weight:800; color:#dc2626; white-space:nowrap;">❌ Cancelado</span>` : ''}
                 </div>
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -2765,19 +2600,19 @@
                     <span style="font-size:0.98rem; font-weight:900; color:${isCanceled ? '#dc2626' : 'var(--success)'};">${o.total || 'R$ 0,00'}</span>
                 </div>
 
-                <div class="order-card-actions">
-                    <button type="button" class="btn-order-sleek chat" onclick="openClientChat('${o.id}')">
+                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+                    <button type="button" class="btn-order-sleek" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer;">
                         💬 Chat
                     </button>
                     ${isDone && !isCanceled ? `
-                    <button type="button" class="btn-order-sleek reorder" onclick="reorderToCart('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="reorderToCart('${o.id}')" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         🛍️ Adicionar na sacola
                     </button>` : `
-                    <button type="button" class="btn-order-sleek track ${!isCanceled ? 'active-green' : ''}" onclick="openTrackModal('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="openTrackModal('${o.id}')" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         ${isCanceled ? '🔍 Ver Detalhes' : '🛵 Acompanhar'}
                     </button>`}
                     ${isDone && !isCanceled && !hasEvaluated ? `
-                    <button type="button" class="btn-order-sleek rate" onclick="openRateOrderModal('${o.id}')">
+                    <button type="button" class="btn-order-sleek" onclick="openRateOrderModal('${o.id}')" style="background:#fef3c7; color:#b45309; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
                         ⭐ Avaliar
                     </button>` : ''}
                     ${hasEvaluated ? `<span style="display:inline-flex; align-items:center; gap:4px; font-size:0.74rem; font-weight:800; color:#d97706; padding:6px 10px; background:#fef3c7; border-radius:10px;">★ ${o.avaliacao.stars} Avaliado</span>` : ''}
@@ -2790,8 +2625,6 @@
         window.isRegisterMode = !window.isRegisterMode;
         document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'flex' : 'none';
         document.getElementById('auth-phone-group').style.display = window.isRegisterMode ? 'block' : 'none';
-        const forgotBox = document.getElementById('forgot-pass-link-box');
-        if (forgotBox) forgotBox.style.display = window.isRegisterMode ? 'none' : 'block';
         document.getElementById('cli-auth-submit-btn').innerText = window.isRegisterMode ? 'Criar Minha Conta' : 'Entrar na Conta';
         document.getElementById('cli-auth-toggle-btn').innerText = window.isRegisterMode ? 'Já tem conta? Faça Login' : 'Ainda não tem conta? Cadastre-se grátis';
     };
@@ -2803,38 +2636,6 @@
         const primeiroNome = parts[0] || '';
         const sobrenome = parts.slice(1).join(' ') || '';
         return { primeiroNome, sobrenome };
-    };
-
-    // Registro do Service Worker e Captura do Instalador Nativo (WebAPK na Prateleira de Apps)
-    window.deferredPwaPrompt = null;
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').catch(() => {});
-        });
-    }
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        window.deferredPwaPrompt = e;
-        const btnMob = document.getElementById('btn-pwa-install-mob');
-        if (btnMob) btnMob.style.display = 'inline-flex';
-    });
-    window.addEventListener('appinstalled', () => {
-        window.deferredPwaPrompt = null;
-        const btnMob = document.getElementById('btn-pwa-install-mob');
-        if (btnMob) btnMob.style.display = 'none';
-        window.showToast("🎉 Aplicativo instalado na sua gaveta de apps!");
-    });
-    window.triggerNativePwaInstall = async function() {
-        if (!window.deferredPwaPrompt) {
-            window.showToast("💡 No menu do navegador (⋮), toque em 'Instalar aplicativo'.");
-            return;
-        }
-        window.deferredPwaPrompt.prompt();
-        const { outcome } = await window.deferredPwaPrompt.userChoice;
-        if (outcome === 'accepted') {
-            document.getElementById('btn-pwa-install-mob').style.display = 'none';
-        }
-        window.deferredPwaPrompt = null;
     };
 
     window.saveClientProfileEverywhere = async function(uid, profileObj) {
@@ -2850,7 +2651,6 @@
             ? profileObj.enderecos
             : (Array.isArray(profileObj.enderecos) ? profileObj.enderecos : (existingMem.enderecos || []));
         const emailStr = (profileObj.email || (window.currentClient ? window.currentClient.email : '') || existingMem.email || '').trim();
-        const emailKey = emailStr.toLowerCase().replace(/[^a-z0-9@._-]/g, '_');
 
         const cleanObj = {
             uid: uid,
@@ -2867,9 +2667,6 @@
 
         try {
             localStorage.setItem('juaba_cli_profile_' + uid, JSON.stringify(cleanObj));
-            if (emailStr) {
-                localStorage.setItem('juaba_cli_profile_email_' + emailStr.toLowerCase(), JSON.stringify(cleanObj));
-            }
             localStorage.setItem('juaba_cli_active_session', JSON.stringify({
                 uid,
                 email: cleanObj.email,
@@ -2879,308 +2676,44 @@
         } catch (e) {}
 
         if (auth.currentUser && cleanObj.nome && cleanObj.nome !== 'Cliente') {
-            try {
-                await updateProfile(auth.currentUser, { displayName: cleanObj.nome });
-            } catch (e) {}
+            try { await updateProfile(auth.currentUser, { displayName: cleanObj.nome }); } catch (e) {}
         }
 
-        if (auth.currentUser) {
-            try { await auth.currentUser.getIdToken(); } catch (e) {}
-        }
-
+        // SALVA NA COLEÇÃO 'clientes' (Para aparecer na sua collection 'clientes' do Firebase)
         const writeOps = [
-            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid), cleanObj, { merge: true }),
-            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid, "perfil", "dados"), cleanObj, { merge: true }),
-            setDoc(doc(db, "artifacts", "juaba-delivery", "users", uid, "profile", "data"), cleanObj, { merge: true }),
-            setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", uid), cleanObj, { merge: true }),
-            setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", uid), cleanObj, { merge: true }),
             setDoc(doc(db, "clientes", uid), cleanObj, { merge: true }),
             setDoc(doc(db, "lojas", "_cli_" + uid), {
                 ...cleanObj,
                 isSystemConfig: true,
-                isClientProfileBackup: true,
-                updatedAtMs: -999
+                isClientProfileBackup: true
             }, { merge: true })
         ];
-        if (emailKey) {
-            writeOps.push(
-                setDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users_by_email", emailKey), cleanObj, { merge: true })
-            );
-        }
         await Promise.allSettled(writeOps);
     };
 
     window.loadClientProfileEverywhere = async function(user) {
         if (!user) return { nome: 'Cliente', primeiroNome: '', sobrenome: '', email: '', telefone: '', enderecos: [], perfilConfirmado: false };
 
-        try { await user.getIdToken(); } catch (e) {}
-
-        const emailLower = (user.email || '').toLowerCase().trim();
-        const emailKey = emailLower.replace(/[^a-z0-9@._-]/g, '_');
-        let localUidData = {};
-        let localEmailData = {};
+        let cloudData = null;
         try {
-            const rawUid = localStorage.getItem('juaba_cli_profile_' + user.uid);
-            if (rawUid) localUidData = JSON.parse(rawUid) || {};
-            if (emailLower) {
-                const rawEmail = localStorage.getItem('juaba_cli_profile_email_' + emailLower);
-                if (rawEmail) localEmailData = JSON.parse(rawEmail) || {};
-            }
+            const snap = await getDoc(doc(db, "clientes", user.uid));
+            if (snap.exists()) cloudData = snap.data();
         } catch (e) {}
 
-        const readPromises = [
-            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid)),
-            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid, "perfil", "dados")),
-            getDoc(doc(db, "artifacts", "juaba-delivery", "users", user.uid, "profile", "data")),
-            getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", user.uid)),
-            getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users", user.uid)),
-            getDoc(doc(db, "clientes", user.uid)),
-            getDoc(doc(db, "lojas", "_cli_" + user.uid))
-        ];
-        if (emailKey) {
-            readPromises.push(getDoc(doc(db, "artifacts", "juaba-delivery", "public", "data", "users_by_email", emailKey)));
-        }
-
-        const results = await Promise.allSettled(readPromises);
-        const cloudDocs = [];
-        results.forEach(res => {
-            if (res.status === 'fulfilled' && res.value && res.value.exists()) {
-                cloudDocs.push(res.value.data() || {});
-            }
-        });
-
-        // Também recupera telefone/endereço de pedidos anteriores deste e-mail caso necessário
-        let orderFallbackPhone = '';
-        let orderFallbackName = '';
-        let orderFallbackAddr = null;
-        if (emailLower && Array.isArray(window.rawAllOrders)) {
-            const myPastOrder = window.rawAllOrders.find(o => (o.emailCliente || '').toLowerCase() === emailLower && (o.telefone || o.endereco));
-            if (myPastOrder) {
-                orderFallbackPhone = myPastOrder.telefone || '';
-                orderFallbackName = myPastOrder.cliente || '';
-                if (myPastOrder.endereco && myPastOrder.endereco !== 'Retirar na Loja') {
-                    orderFallbackAddr = { rua: myPastOrder.endereco };
-                }
-            }
-        }
-
-        const pending = window.pendingRegistrationData || {};
-        // Prioriza os dados vindos da nuvem (Firestore) sobre cache local vazio
-        const sources = [pending, ...cloudDocs, localUidData, localEmailData];
-
-        const pickFirstNonEmpty = (field) => {
-            for (const src of sources) {
-                if (src && src[field] && String(src[field]).trim() !== '' && src[field] !== 'Cliente') {
-                    return String(src[field]).trim();
-                }
-            }
-            return '';
-        };
-
-        const bestName = pickFirstNonEmpty('nome') ||
-            (user.displayName && user.displayName !== 'Cliente' ? user.displayName : '') ||
-            orderFallbackName ||
-            (user.email ? user.email.split('@')[0] : 'Cliente');
-
-        const splitted = window.splitFullName(bestName);
-        const bestFirst = pickFirstNonEmpty('primeiroNome') || splitted.primeiroNome || '';
-        const bestLast = pickFirstNonEmpty('sobrenome') || splitted.sobrenome || '';
-        const bestPhone = pickFirstNonEmpty('telefone') || user.phoneNumber || orderFallbackPhone || '';
-
-        let bestAddrs = [];
-        for (const src of sources) {
-            if (src && Array.isArray(src.enderecos) && src.enderecos.length > bestAddrs.length) {
-                bestAddrs = src.enderecos;
-            }
-        }
-        if (bestAddrs.length === 0 && orderFallbackAddr) {
-            bestAddrs = [orderFallbackAddr];
-        }
-
-        const hasConfirmed = sources.some(s => s && (s.perfilConfirmado === true || (s.telefone && String(s.telefone).trim().length >= 8))) ||
-            Boolean(bestPhone && bestPhone.replace(/\D/g, '').length >= 8);
-
+        const fallbackSplit = window.splitFullName(user.displayName || '');
         const merged = {
             uid: user.uid,
-            email: user.email || pickFirstNonEmpty('email') || '',
-            nome: [bestFirst, bestLast].filter(Boolean).join(' ') || bestName,
-            primeiroNome: bestFirst,
-            sobrenome: bestLast,
-            telefone: bestPhone,
-            enderecos: bestAddrs,
-            perfilConfirmado: hasConfirmed
+            email: user.email || '',
+            nome: cloudData?.nome || user.displayName || (user.email ? user.email.split('@')[0] : 'Cliente'),
+            primeiroNome: cloudData?.primeiroNome || fallbackSplit.primeiroNome || '',
+            sobrenome: cloudData?.sobrenome || fallbackSplit.sobrenome || '',
+            telefone: cloudData?.telefone || user.phoneNumber || '',
+            enderecos: Array.isArray(cloudData?.enderecos) ? cloudData.enderecos : [],
+            perfilConfirmado: Boolean(cloudData?.perfilConfirmado || cloudData?.telefone)
         };
 
-        try {
-            localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(merged));
-            if (emailLower) {
-                localStorage.setItem('juaba_cli_profile_email_' + emailLower, JSON.stringify(merged));
-            }
-            localStorage.setItem('juaba_cli_active_session', JSON.stringify({
-                uid: user.uid,
-                email: merged.email,
-                displayName: merged.nome,
-                profile: merged
-            }));
-        } catch (e) {}
-
+        window.clientProfileData = merged;
         return merged;
-    };
-
-    window.profileUnsubscribers = [];
-    window.startUserProfileRealtimeSync = function(user) {
-        if (window.profileUnsubscribers && window.profileUnsubscribers.length) {
-            window.profileUnsubscribers.forEach(unsub => { try { unsub(); } catch (e) {} });
-        }
-        window.profileUnsubscribers = [];
-        if (!user) return;
-
-        const paths = [
-            doc(db, "artifacts", "juaba-delivery", "users", user.uid),
-            doc(db, "artifacts", "juaba-delivery", "users", user.uid, "perfil", "dados"),
-            doc(db, "artifacts", "juaba-delivery", "public", "data", "clientes", user.uid)
-        ];
-
-        paths.forEach(ref => {
-            const unsub = onSnapshot(ref, (snap) => {
-                if (!snap.exists()) return;
-                const d = snap.data() || {};
-                const cur = window.clientProfileData || {};
-                const mergedAddrs = (Array.isArray(d.enderecos) && d.enderecos.length > 0)
-                    ? d.enderecos
-                    : (cur.enderecos || []);
-                const mergedPhone = d.telefone || cur.telefone || '';
-                const mergedFirst = d.primeiroNome || cur.primeiroNome || '';
-                const mergedLast = d.sobrenome || cur.sobrenome || '';
-                const mergedName = d.nome || [mergedFirst, mergedLast].filter(Boolean).join(' ') || cur.nome || 'Cliente';
-
-                if (mergedPhone || mergedAddrs.length > 0 || d.perfilConfirmado) {
-                    window.clientProfileData = {
-                        ...cur,
-                        ...d,
-                        nome: mergedName,
-                        primeiroNome: mergedFirst,
-                        sobrenome: mergedLast,
-                        telefone: mergedPhone,
-                        enderecos: mergedAddrs,
-                        perfilConfirmado: Boolean(d.perfilConfirmado || mergedPhone)
-                    };
-                    try {
-                        localStorage.setItem('juaba_cli_profile_' + user.uid, JSON.stringify(window.clientProfileData));
-                        if (user.email) {
-                            localStorage.setItem('juaba_cli_profile_email_' + user.email.toLowerCase(), JSON.stringify(window.clientProfileData));
-                        }
-                    } catch (e) {}
-                    window.updateClientHeaderUI();
-                    window.renderSavedAddresses();
-                    window.syncCartDeliveryDisplay();
-                    if (window.clientProfileData.perfilConfirmado || window.clientProfileData.telefone) {
-                        document.getElementById('modal-complete-profile').style.display = 'none';
-                    }
-                }
-            }, () => {});
-            window.profileUnsubscribers.push(unsub);
-        });
-    };
-
-    window.sendPinViaGoogleSheets = async function(email, nome, pin) {
-        const scriptUrl = (window.GOOGLE_SCRIPT_URL || localStorage.getItem('juaba_google_script_url') || '').trim();
-        if (!scriptUrl) {
-            document.getElementById('pin-script-config-hint').style.display = 'block';
-            window.showToast(`⚠️ Configure a URL da Planilha ou use o PIN de teste: ${pin}`);
-            return;
-        }
-
-        const payload = {
-            acao: 'enviar_pin',
-            tipo: 'verificacao',
-            email: email,
-            destinatario: email,
-            nome: nome,
-            pin: String(pin),
-            codigo: String(pin),
-            assunto: `Código de Verificação: ${pin} - JuabaDelivery`,
-            mensagem: `Olá ${nome}, seu código PIN de verificação no JuabaDelivery é: ${pin}`
-        };
-
-        try {
-            const query = new URLSearchParams(payload).toString();
-            const sep = scriptUrl.includes('?') ? '&' : '?';
-            fetch(scriptUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            }).catch(() => {});
-
-            fetch(scriptUrl + sep + query, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-            window.showToast(`📩 PIN de 4 dígitos enviado para ${email}!`);
-        } catch (err) {}
-    };
-
-    window.saveCustomGoogleScriptUrl = function() {
-        const val = document.getElementById('custom-gsheet-url-input').value.trim();
-        if (!val) { window.showToast("Cole a URL do Google Apps Script!"); return; }
-        window.GOOGLE_SCRIPT_URL = val;
-        localStorage.setItem('juaba_google_script_url', val);
-        document.getElementById('pin-script-config-hint').style.display = 'none';
-        window.showToast("✅ URL salva! Reenviando PIN...");
-        window.resendEmailPinCode();
-    };
-
-    window.closeVerifyPinModal = function() {
-        document.getElementById('modal-verify-pin').style.display = 'none';
-    };
-
-    window.resendEmailPinCode = function() {
-        if (!window.pendingRegistrationData) return;
-        window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
-        window.sendPinViaGoogleSheets(
-            window.pendingRegistrationData.email,
-            window.pendingRegistrationData.nome,
-            window.generatedEmailPin
-        );
-    };
-
-    window.confirmEmailPinCode = async function() {
-        const typed = document.getElementById('pin-code-input').value.trim();
-        if (!typed || typed.length < 4) { window.showToast("⚠️ Digite os 4 dígitos do PIN!"); return; }
-        if (typed !== String(window.generatedEmailPin)) { window.showToast("❌ PIN incorreto!"); return; }
-        if (!window.pendingRegistrationData) return;
-
-        const { email, pass, nome, primeiroNome, sobrenome, telefone } = window.pendingRegistrationData;
-        const btn = document.getElementById('btn-confirm-pin');
-        btn.disabled = true;
-        btn.innerText = "Criando sua conta...";
-
-        try {
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            const lojaCheck = await getDoc(doc(db, "lojas", cred.user.uid));
-            if (lojaCheck.exists() && !lojaCheck.data().isSystemConfig) {
-                await signOut(auth);
-                window.showToast("⚠️ Este e-mail pertence a uma Loja!");
-                return;
-            }
-            await window.saveClientProfileEverywhere(cred.user.uid, {
-                email,
-                nome,
-                primeiroNome,
-                sobrenome,
-                telefone,
-                enderecos: [],
-                perfilConfirmado: true
-            });
-            window.pendingRegistrationData = null;
-            window.generatedEmailPin = null;
-            window.closeVerifyPinModal();
-            window.updateClientHeaderUI();
-            window.showToast(`🎉 Bem-vindo(a), ${primeiroNome}! Conta verificada!`);
-        } catch (err) {
-            window.showToast("⚠️ Erro ao criar conta.");
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "✅ Confirmar PIN e Criar Conta";
-        }
     };
 
     window.submitClientAuth = async function() {
@@ -3193,28 +2726,23 @@
                 const primeiroNome = document.getElementById('cli-auth-first-name').value.trim();
                 const sobrenome = document.getElementById('cli-auth-last-name').value.trim();
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
-                if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
-                if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
+                if (!primeiroNome || !sobrenome) { window.showToast("⚠️ Informe Nome e Sobrenome!"); return; }
                 if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
-                if (pass.length < 6) { window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!"); return; }
 
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const nome = `${primeiroNome} ${sobrenome}`.trim();
-                window.pendingRegistrationData = { email, pass, nome, primeiroNome, sobrenome, telefone, perfilConfirmado: true };
-                window.generatedEmailPin = String(Math.floor(1000 + Math.random() * 9000));
-                document.getElementById('pin-target-email').innerText = email;
-                document.getElementById('pin-code-input').value = '';
-                document.getElementById('custom-gsheet-url-input').value = window.GOOGLE_SCRIPT_URL || '';
-                document.getElementById('modal-verify-pin').style.display = 'flex';
-
-                await window.sendPinViaGoogleSheets(email, nome, window.generatedEmailPin);
+                await window.saveClientProfileEverywhere(cred.user.uid, {
+                    email,
+                    nome,
+                    primeiroNome,
+                    sobrenome,
+                    telefone,
+                    enderecos: [],
+                    perfilConfirmado: true
+                });
+                window.showToast("🎉 Conta criada com sucesso!");
             } else {
-                const cred = await signInWithEmailAndPassword(auth, email, pass);
-                const lojaSnap = await getDoc(doc(db, "lojas", cred.user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
-                    await signOut(auth);
-                    window.showToast("🏪 Esta conta é de um Lojista!");
-                    return;
-                }
+                await signInWithEmailAndPassword(auth, email, pass);
                 window.showToast("👋 Bem-vindo de volta!");
             }
         } catch (err) {
@@ -3222,73 +2750,48 @@
         }
     };
 
-    window.openForgotPasswordModal = function() {
-        const currentEmail = document.getElementById('cli-auth-email').value.trim();
-        document.getElementById('forgot-pass-email').value = currentEmail;
-        document.getElementById('modal-forgot-password').style.display = 'flex';
-    };
-
-    window.closeForgotPasswordModal = function() {
-        document.getElementById('modal-forgot-password').style.display = 'none';
-    };
-
-    window.sendClientPasswordReset = async function() {
-        const email = document.getElementById('forgot-pass-email').value.trim();
-        if (!email) { window.showToast("⚠️ Digite seu e-mail!"); return; }
+    window.loginWithGoogle = async function() {
         try {
-            await sendPasswordResetEmail(auth, email);
-            window.closeForgotPasswordModal();
-            window.showToast("✅ Link de recuperação enviado para seu e-mail!");
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            const cred = await signInWithPopup(auth, provider);
+            const user = cred.user;
+            if (user) {
+                const ref = doc(db, "clientes", user.uid);
+                const snap = await getDoc(ref);
+                if (!snap.exists()) {
+                    const split = window.splitFullName(user.displayName || '');
+                    const newProfile = {
+                        uid: user.uid,
+                        email: user.email || '',
+                        nome: user.displayName || 'Cliente',
+                        primeiroNome: split.primeiroNome || '',
+                        sobrenome: split.sobrenome || '',
+                        telefone: '',
+                        enderecos: [],
+                        perfilConfirmado: false
+                    };
+                    await setDoc(ref, newProfile, { merge: true });
+                    window.clientProfileData = newProfile;
+                    window.openCompleteProfileModal();
+                } else {
+                    window.clientProfileData = snap.data();
+                    window.updateClientHeaderUI();
+                    window.showToast(`👋 Bem-vindo(a) de volta, ${window.clientProfileData.primeiroNome || window.clientProfileData.nome}!`);
+                }
+            }
         } catch (err) {
-            window.showToast("⚠️ Não foi possível enviar. Verifique o e-mail.");
-        }
-    };
-
-    window.updateClientHeaderUI = function() {
-        if (!window.currentClient) return;
-        const user = window.currentClient;
-        const savedName = (window.clientProfileData && window.clientProfileData.nome && window.clientProfileData.nome !== 'Cliente')
-            ? window.clientProfileData.nome
-            : '';
-        const finalName = savedName || user.displayName || (user.email ? user.email.split('@')[0] : 'Cliente');
-        window.clientProfileData.nome = finalName;
-
-        const firstName = finalName.split(' ')[0];
-        const mobBtn = document.getElementById('mobile-user-btn');
-        const deskBtn = document.getElementById('desktop-user-btn');
-        const profName = document.getElementById('prof-header-name');
-        const profEmail = document.getElementById('prof-header-email');
-        const profPhone = document.getElementById('prof-header-phone');
-
-        if (mobBtn) mobBtn.innerText = `👤 ${firstName}`;
-        if (deskBtn) deskBtn.innerText = `👤 ${firstName}`;
-        if (profName) profName.innerText = finalName;
-        if (profEmail) profEmail.innerText = user.email || '';
-        if (profPhone) {
-            profPhone.innerText = window.clientProfileData.telefone
-                ? `📱 WhatsApp: ${window.clientProfileData.telefone}`
-                : `⚠️ WhatsApp não informado`;
-            profPhone.style.color = window.clientProfileData.telefone ? 'var(--success)' : '#d97706';
-        }
-        if (window.clientProfileData.enderecos && window.clientProfileData.enderecos[0]) {
-            const addrLbl = document.getElementById('desktop-addr-label');
-            if (addrLbl) addrLbl.innerText = (window.clientProfileData.enderecos[0].logradouro || window.clientProfileData.enderecos[0].rua || '').substring(0, 18) + '...';
+            console.error("Erro Login Google:", err);
+            window.showToast("⚠️ Não foi possível entrar com o Google.");
         }
     };
 
     window.openCompleteProfileModal = function() {
         if (!window.currentClient) return;
-        const savedFirst = (window.clientProfileData && window.clientProfileData.primeiroNome) || '';
-        const savedLast = (window.clientProfileData && window.clientProfileData.sobrenome) || '';
-        const fallbackSplit = window.splitFullName(
-            (window.clientProfileData && window.clientProfileData.nome !== 'Cliente')
-                ? window.clientProfileData.nome
-                : (window.currentClient.displayName || '')
-        );
-
-        document.getElementById('google-complete-first-name').value = savedFirst || fallbackSplit.primeiroNome || '';
-        document.getElementById('google-complete-last-name').value = savedLast || fallbackSplit.sobrenome || '';
-        document.getElementById('google-complete-phone').value = (window.clientProfileData && window.clientProfileData.telefone) || '';
+        const sp = window.splitFullName(window.clientProfileData.nome || window.currentClient.displayName || '');
+        document.getElementById('google-complete-first-name').value = window.clientProfileData.primeiroNome || sp.primeiroNome || '';
+        document.getElementById('google-complete-last-name').value = window.clientProfileData.sobrenome || sp.sobrenome || '';
+        document.getElementById('google-complete-phone').value = window.clientProfileData.telefone || '';
         document.getElementById('modal-complete-profile').style.display = 'flex';
     };
 
@@ -3298,17 +2801,11 @@
         const sobrenome = document.getElementById('google-complete-last-name').value.trim();
         const telefone = document.getElementById('google-complete-phone').value.trim();
 
-        if (!primeiroNome) { window.showToast("⚠️ Digite seu Nome!"); return; }
-        if (!sobrenome) { window.showToast("⚠️ Digite seu Sobrenome!"); return; }
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Digite seu WhatsApp com DDD!"); return; }
+        if (!primeiroNome || !sobrenome) { window.showToast("⚠️ Informe Nome e Sobrenome!"); return; }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
 
         const nome = `${primeiroNome} ${sobrenome}`.trim();
-
-        // Preserva quaisquer endereços que já existam no banco para este usuário
-        const existingCloud = await window.loadClientProfileEverywhere(window.currentClient);
-        const preservedAddrs = (Array.isArray(window.clientProfileData.enderecos) && window.clientProfileData.enderecos.length > 0)
-            ? window.clientProfileData.enderecos
-            : (existingCloud.enderecos || []);
+        const existing = window.clientProfileData.enderecos || [];
 
         await window.saveClientProfileEverywhere(window.currentClient.uid, {
             email: window.currentClient.email || '',
@@ -3316,54 +2813,13 @@
             primeiroNome,
             sobrenome,
             telefone,
-            enderecos: preservedAddrs,
+            enderecos: existing,
             perfilConfirmado: true
         });
 
         document.getElementById('modal-complete-profile').style.display = 'none';
         window.updateClientHeaderUI();
-        window.renderSavedAddresses();
-        window.syncCartDeliveryDisplay();
         window.showToast(`✅ Cadastro concluído! Bem-vindo(a), ${primeiroNome}!`);
-    };
-
-    window.loginWithGoogle = async function() {
-        try {
-            window.isGoogleAuthInProgress = true;
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            const cred = await signInWithPopup(auth, provider);
-            const user = cred.user;
-            if (user) {
-                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig && !lojaSnap.data().isClientProfileBackup) {
-                    window.isGoogleAuthInProgress = false;
-                    await signOut(auth);
-                    window.showToast("🏪 Esta conta Google é de um Lojista!");
-                    return;
-                }
-
-                const loaded = await window.loadClientProfileEverywhere(user);
-                window.clientProfileData = loaded;
-                window.startUserProfileRealtimeSync(user);
-
-                if (loaded.perfilConfirmado || (loaded.telefone && String(loaded.telefone).replace(/\D/g, '').length >= 8) || (Array.isArray(loaded.enderecos) && loaded.enderecos.length > 0)) {
-                    window.isGoogleAuthInProgress = false;
-                    document.getElementById('modal-complete-profile').style.display = 'none';
-                    window.updateClientHeaderUI();
-                    window.renderSavedAddresses();
-                    window.syncCartDeliveryDisplay();
-                    window.showToast(`👋 Bem-vindo(a) de volta, ${loaded.primeiroNome || loaded.nome.split(' ')[0]}!`);
-                } else {
-                    window.isGoogleAuthInProgress = false;
-                    window.updateClientHeaderUI();
-                    window.openCompleteProfileModal();
-                }
-            }
-        } catch (err) {
-            window.isGoogleAuthInProgress = false;
-            window.showToast("⚠️ Não foi possível entrar com o Google.");
-        }
     };
 
     window.logoutClient = async function() {
@@ -3381,20 +2837,15 @@
         }
 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        const secPerfil = document.getElementById('sec-perfil');
-        if (secPerfil) secPerfil.classList.add('active');
+        document.getElementById('sec-perfil').classList.add('active');
         document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-        const tabPerfil = document.getElementById('tab-perfil');
-        if (tabPerfil) tabPerfil.classList.add('active');
+        document.getElementById('tab-perfil').classList.add('active');
 
         document.getElementById('profile-main-menu').style.display = (sub === 'main') ? 'block' : 'none';
         document.getElementById('profile-sub-enderecos').style.display = (sub === 'enderecos') ? 'block' : 'none';
         document.getElementById('profile-sub-conta').style.display = (sub === 'conta') ? 'block' : 'none';
 
-        if (sub === 'enderecos') {
-            window.cancelEditAddress();
-            window.renderSavedAddresses();
-        }
+        if (sub === 'enderecos') window.renderSavedAddresses();
         if (sub === 'conta') {
             const sp = window.splitFullName(window.clientProfileData.nome || '');
             document.getElementById('acc-edit-first-name').value = window.clientProfileData.primeiroNome || sp.primeiroNome || '';
@@ -3423,19 +2874,11 @@
             return;
         }
         listEl.innerHTML = addrs.map((a, idx) => {
-            const mainLine = a.logradouro
-                ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}`
-                : (a.rua || '');
-            const subDetails = [
-                a.complemento ? `Compl: ${a.complemento}` : '',
-                a.referencia ? `Ref: ${a.referencia}` : ''
-            ].filter(Boolean).join(' • ');
-
+            const mainLine = a.logradouro ? `${a.logradouro}, Nº ${a.numero || 'S/N'} — ${a.bairro || ''}` : (a.rua || '');
             return `
             <div class="addr-card">
                 <div style="flex:1;">
                     <div style="font-weight:900; font-size:0.92rem; color:#18181b;">📍 ${mainLine}</div>
-                    ${subDetails ? `<div style="font-size:0.76rem; color:#71717a; font-weight:700; margin-top:3px;">${subDetails}</div>` : ''}
                 </div>
                 <button type="button" class="dots-btn" onclick="toggleAddrMenu(${idx}); event.stopPropagation();">⋮</button>
                 <div class="dots-dropdown" id="addr-menu-${idx}">
@@ -3447,11 +2890,8 @@
     };
 
     window.toggleAddrMenu = function(idx) {
-        document.querySelectorAll('.dots-dropdown').forEach((el, i) => {
-            if (i !== idx) el.classList.remove('show');
-        });
-        const target = document.getElementById(`addr-menu-${idx}`);
-        if (target) target.classList.toggle('show');
+        document.querySelectorAll('.dots-dropdown').forEach((el, i) => { if (i !== idx) el.classList.remove('show'); });
+        document.getElementById(`addr-menu-${idx}`).classList.toggle('show');
     };
 
     document.addEventListener('click', () => {
@@ -3459,43 +2899,8 @@
     });
 
     window.openAddressFormModal = function(fromDeliveryPicker = false) {
-        if (!window.currentClient) {
-            window.closeCartModal();
-            window.switchTab('perfil');
-            window.showToast("👤 Entre na sua conta para cadastrar um endereço!");
-            return;
-        }
+        if (!window.currentClient) { window.switchTab('perfil'); window.showToast("Entre na sua conta!"); return; }
         window.reopenDeliveryModalAfterSave = Boolean(fromDeliveryPicker);
-        window.cancelEditAddress();
-        document.getElementById('modal-address-form').style.display = 'flex';
-        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
-    };
-
-    window.closeAddressFormModal = function() {
-        document.getElementById('modal-address-form').style.display = 'none';
-        window.cancelEditAddress();
-    };
-
-    window.startEditAddress = function(idx) {
-        const addrs = window.clientProfileData.enderecos || [];
-        const a = addrs[idx];
-        if (!a) return;
-        window.editingAddressIndex = idx;
-        window.reopenDeliveryModalAfterSave = false;
-
-        document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
-        document.getElementById('addr-numero').value = a.numero || '';
-        document.getElementById('addr-bairro').value = a.bairro || '';
-        document.getElementById('addr-comp').value = a.complemento || '';
-        document.getElementById('addr-ref').value = a.referencia || '';
-
-        document.getElementById('addr-form-title').innerText = '✏️ Editar Endereço';
-        document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
-        document.getElementById('modal-address-form').style.display = 'flex';
-        setTimeout(() => document.getElementById('addr-rua').focus(), 100);
-    };
-
-    window.cancelEditAddress = function() {
         window.editingAddressIndex = -1;
         document.getElementById('addr-rua').value = '';
         document.getElementById('addr-numero').value = '';
@@ -3504,6 +2909,26 @@
         document.getElementById('addr-ref').value = '';
         document.getElementById('addr-form-title').innerText = '➕ Novo Endereço';
         document.getElementById('btn-save-addr').innerText = '💾 Salvar Endereço';
+        document.getElementById('modal-address-form').style.display = 'flex';
+    };
+
+    window.closeAddressFormModal = function() {
+        document.getElementById('modal-address-form').style.display = 'none';
+    };
+
+    window.startEditAddress = function(idx) {
+        const addrs = window.clientProfileData.enderecos || [];
+        const a = addrs[idx];
+        if (!a) return;
+        window.editingAddressIndex = idx;
+        document.getElementById('addr-rua').value = a.logradouro || a.rua || '';
+        document.getElementById('addr-numero').value = a.numero || '';
+        document.getElementById('addr-bairro').value = a.bairro || '';
+        document.getElementById('addr-comp').value = a.complemento || '';
+        document.getElementById('addr-ref').value = a.referencia || '';
+        document.getElementById('addr-form-title').innerText = '✏️ Editar Endereço';
+        document.getElementById('btn-save-addr').innerText = '💾 Atualizar Endereço';
+        document.getElementById('modal-address-form').style.display = 'flex';
     };
 
     window.deleteAddress = async function(idx) {
@@ -3511,8 +2936,6 @@
         window.clientProfileData.enderecos.splice(idx, 1);
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
-        window.updateClientHeaderUI();
-        window.syncCartDeliveryDisplay();
         window.showToast("🗑️ Endereço removido!");
     };
 
@@ -3524,9 +2947,9 @@
         const complemento = document.getElementById('addr-comp').value.trim();
         const referencia = document.getElementById('addr-ref').value.trim();
 
-        if (!logradouro) { window.showToast("⚠️ Informe a Rua / Logradouro!"); document.getElementById('addr-rua').focus(); return; }
-        if (!numero) { window.showToast("⚠️ Informe o Número (ou S/N)!"); document.getElementById('addr-numero').focus(); return; }
-        if (!bairro) { window.showToast("⚠️ Informe o Bairro!"); document.getElementById('addr-bairro').focus(); return; }
+        if (!logradouro) { window.showToast("Informe a Rua!"); return; }
+        if (!numero) { window.showToast("Informe o Número!"); return; }
+        if (!bairro) { window.showToast("Informe o Bairro!"); return; }
 
         const addrObj = { logradouro, numero, bairro, complemento, referencia };
         addrObj.rua = window.formatAddressDisplay(addrObj);
@@ -3536,21 +2959,12 @@
             window.clientProfileData.enderecos[window.editingAddressIndex] = addrObj;
         } else {
             window.clientProfileData.enderecos.push(addrObj);
-            window.selectedDeliveryIdx = window.clientProfileData.enderecos.length - 1;
         }
 
-        const shouldReopenPicker = window.reopenDeliveryModalAfterSave;
         window.closeAddressFormModal();
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.renderSavedAddresses();
-        window.updateClientHeaderUI();
-        window.syncCartDeliveryDisplay();
-        window.showToast("✅ Endereço salvo com sucesso!");
-
-        if (shouldReopenPicker) {
-            window.reopenDeliveryModalAfterSave = false;
-            window.openCartDeliveryModal();
-        }
+        window.showToast("✅ Endereço salvo!");
     };
 
     window.saveAccountDetails = async function() {
@@ -3559,109 +2973,58 @@
         const sobrenome = document.getElementById('acc-edit-last-name').value.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
 
-        if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
-        if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
-        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
+        if (!primeiroNome || !sobrenome) { window.showToast("Informe Nome e Sobrenome!"); return; }
+        if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("Informe seu WhatsApp!"); return; }
 
         const nome = `${primeiroNome} ${sobrenome}`.trim();
         window.clientProfileData.nome = nome;
         window.clientProfileData.primeiroNome = primeiroNome;
         window.clientProfileData.sobrenome = sobrenome;
         window.clientProfileData.telefone = telefone;
-        window.clientProfileData.perfilConfirmado = true;
 
         await window.saveClientProfileEverywhere(window.currentClient.uid, window.clientProfileData);
         window.updateClientHeaderUI();
-        window.showToast("✅ Dados da conta atualizados!");
+        window.showToast("✅ Dados atualizados!");
         window.openProfileSubView('main');
     };
 
-    window.restoreInstantSessionUI = function() {
-        try {
-            const cachedStores = localStorage.getItem('juaba_cache_stores');
-            if (cachedStores) { window.allStores = JSON.parse(cachedStores) || []; window.renderHomeView(); }
-            const cachedProds = localStorage.getItem('juaba_cache_products');
-            if (cachedProds) { window.allProducts = JSON.parse(cachedProds) || []; window.renderHomeView(); }
-            const rawSession = localStorage.getItem('juaba_cli_active_session');
-            if (!rawSession) return;
-            const sess = JSON.parse(rawSession);
-            if (!sess || !sess.uid) return;
-
-            window.currentClient = { uid: sess.uid, email: sess.email || '', displayName: sess.displayName || 'Cliente' };
-            if (sess.profile) { window.clientProfileData = sess.profile; }
-            const tabPed = document.getElementById('tab-pedidos');
-            const dnavPed = document.getElementById('dnav-pedidos');
-            if (tabPed) tabPed.style.display = 'flex';
-            if (dnavPed) dnavPed.style.display = 'inline-block';
-            document.getElementById('profile-logged-out').style.display = 'none';
-            document.getElementById('profile-logged-in').style.display = 'block';
-            window.updateClientHeaderUI();
-
-            const cachedOrders = localStorage.getItem('juaba_cache_orders_' + sess.uid);
-            if (cachedOrders) { window.myOrders = JSON.parse(cachedOrders) || []; window.renderClientOrders(); }
-        } catch (e) {}
+    window.updateClientHeaderUI = function() {
+        if (!window.currentClient) return;
+        const name = window.clientProfileData.nome || window.currentClient.displayName || 'Cliente';
+        const firstName = name.split(' ')[0];
+        document.getElementById('mobile-user-btn').innerText = `👤 ${firstName}`;
+        document.getElementById('desktop-user-btn').innerText = `👤 ${firstName}`;
+        document.getElementById('prof-header-name').innerText = name;
+        document.getElementById('prof-header-email').innerText = window.currentClient.email || '';
+        document.getElementById('prof-header-phone').innerText = window.clientProfileData.telefone ? `📱 WhatsApp: ${window.clientProfileData.telefone}` : `⚠️ WhatsApp não informado`;
     };
-
-    window.restoreInstantSessionUI();
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            try {
-                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
-                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig && !lojaSnap.data().isClientProfileBackup) {
-                    localStorage.removeItem('juaba_cli_active_session');
-                    await signOut(auth);
-                    window.showToast("🏪 Conta de Lojista detectada! Use o Painel do Gestor.");
-                    return;
-                }
-            } catch (e) {}
-        }
-
-        window.currentClient = user;
-        const tabPed = document.getElementById('tab-pedidos');
-        const dnavPed = document.getElementById('dnav-pedidos');
-        const mobBtn = document.getElementById('mobile-user-btn');
-        const deskBtn = document.getElementById('desktop-user-btn');
-
-        if (user) {
-            if (tabPed) tabPed.style.display = 'flex';
-            if (dnavPed) dnavPed.style.display = 'inline-block';
+            window.currentClient = user;
+            document.getElementById('tab-pedidos').style.display = 'flex';
+            document.getElementById('dnav-pedidos').style.display = 'inline-block';
             document.getElementById('profile-logged-out').style.display = 'none';
             document.getElementById('profile-logged-in').style.display = 'block';
 
-            const fullProfile = await window.loadClientProfileEverywhere(user);
-            window.clientProfileData = fullProfile;
-            window.startUserProfileRealtimeSync(user);
-
+            const profile = await window.loadClientProfileEverywhere(user);
+            window.clientProfileData = profile;
             window.updateClientHeaderUI();
-            window.renderSavedAddresses();
-            window.syncCartDeliveryDisplay();
 
-            const alreadyRegistered = Boolean(
-                fullProfile.perfilConfirmado ||
-                (fullProfile.telefone && String(fullProfile.telefone).replace(/\D/g, '').length >= 8) ||
-                (Array.isArray(fullProfile.enderecos) && fullProfile.enderecos.length > 0)
-            );
-
-            if (!window.isGoogleAuthInProgress && !alreadyRegistered) {
+            if (!profile.perfilConfirmado && !profile.telefone) {
                 window.openCompleteProfileModal();
-            } else if (alreadyRegistered) {
+            } else {
                 document.getElementById('modal-complete-profile').style.display = 'none';
             }
-
             window.filterMyOrders();
         } else {
-            if (window.profileUnsubscribers && window.profileUnsubscribers.length) {
-                window.profileUnsubscribers.forEach(unsub => { try { unsub(); } catch (e) {} });
-                window.profileUnsubscribers = [];
-            }
-            localStorage.removeItem('juaba_cli_active_session');
-            if (tabPed) tabPed.style.display = 'none';
-            if (dnavPed) dnavPed.style.display = 'none';
+            window.currentClient = null;
+            document.getElementById('tab-pedidos').style.display = 'none';
+            document.getElementById('dnav-pedidos').style.display = 'none';
             document.getElementById('profile-logged-out').style.display = 'block';
             document.getElementById('profile-logged-in').style.display = 'none';
-            if (mobBtn) mobBtn.innerText = '👤 Entrar';
-            if (deskBtn) deskBtn.innerText = '👤 Entrar';
+            document.getElementById('mobile-user-btn').innerText = '👤 Entrar';
+            document.getElementById('desktop-user-btn').innerText = '👤 Entrar';
             window.myOrders = [];
             window.renderClientOrders();
         }
@@ -3677,7 +3040,6 @@
 
         snap.forEach(d => {
             const data = d.data();
-            if (data.isClientProfileBackup === true) return;
             if (d.id === '_marketplace_config_' || data.isSystemConfig === true) {
                 const ms = data.updatedAtMs || 0;
                 if (ms >= latestMs) {
@@ -3695,14 +3057,13 @@
 
         snap.forEach(d => {
             const data = d.data();
-            if (d.id !== '_marketplace_config_' && !data.isSystemConfig && !data.isClientProfileBackup) {
+            if (d.id !== '_marketplace_config_' && !data.isSystemConfig) {
                 const over = sysOverrides[d.id] || {};
                 const blocked = (sysBlocked[d.id] !== undefined) ? sysBlocked[d.id] : Boolean(data.bloqueada);
                 window.allStores.push({ id: d.id, ...data, ...over, bloqueada: blocked });
             }
         });
 
-        try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
     });
@@ -3710,7 +3071,6 @@
     onSnapshot(collection(db, "produtos"), (snap) => {
         window.allProducts = [];
         snap.forEach(d => window.allProducts.push({ id: d.id, ...d.data() }));
-        try { localStorage.setItem('juaba_cache_products', JSON.stringify(window.allProducts)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
         if (window.detailProduct) window.renderProductSuggestions(window.detailProduct);
@@ -3726,11 +3086,6 @@
         if (!window.currentClient) { window.myOrders = []; return; }
         const myEmail = (window.currentClient.email || '').toLowerCase();
         window.myOrders = window.rawAllOrders.filter(o => (o.emailCliente || '').toLowerCase() === myEmail);
-        try {
-            if (window.currentClient.uid) {
-                localStorage.setItem('juaba_cache_orders_' + window.currentClient.uid, JSON.stringify(window.myOrders));
-            }
-        } catch (e) {}
         window.renderClientOrders();
         if (window.activeTrackOrderId) {
             const found = window.myOrders.find(x => x.id === window.activeTrackOrderId);
@@ -3746,6 +3101,27 @@
         snap.forEach(d => window.rawAllOrders.push({ id: d.id, ...d.data() }));
         window.filterMyOrders();
     });
+
+    window.openForgotPasswordModal = function() {
+        document.getElementById('forgot-pass-email').value = document.getElementById('cli-auth-email').value.trim();
+        document.getElementById('modal-forgot-password').style.display = 'flex';
+    };
+
+    window.closeForgotPasswordModal = function() {
+        document.getElementById('modal-forgot-password').style.display = 'none';
+    };
+
+    window.sendClientPasswordReset = async function() {
+        const email = document.getElementById('forgot-pass-email').value.trim();
+        if (!email) { window.showToast("Digite seu e-mail!"); return; }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            window.closeForgotPasswordModal();
+            window.showToast("✅ Link enviado para seu e-mail!");
+        } catch (e) {
+            window.showToast("⚠️ E-mail não encontrado.");
+        }
+    };
 
     setInterval(() => {
         window.renderHomeView();
