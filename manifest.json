@@ -3,7 +3,7 @@
 "name": "JuabaDelivery | Peça Online",
 "short_name": "JuabaDelivery",
 "description": "Peça os seus pratos favoritos das melhores lojas da região.",
-"start_url": "./",
+"start_url": "./index.html",
 "scope": "./",
 "display": "standalone",
 "background_color": "#ffffff",
