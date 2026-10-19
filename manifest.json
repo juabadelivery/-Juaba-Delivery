@@ -6,9 +6,9 @@
 "start_url": "./index.html",
 "scope": "./",
 "display": "standalone",
-"background_color": "ff0000",
-"theme_color": "ff0000",
-"orientation": "ff0000",
+"background_color": "#ff0000",
+"theme_color": "#ff0000",
+"orientation": "portrait-primary",
 "icons": [
 {
 "src": "https://placehold.co/192x192/ea1d2c/#ff0000.png?text=JD",
