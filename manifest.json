@@ -8,7 +8,7 @@
 "display": "standalone",
 "background_color": "ff0000",
 "theme_color": "ff0000",
-"orientation": "portrait-primary",
+"orientation": "ff0000",
 "icons": [
 {
 "src": "https://placehold.co/192x192/ea1d2c/#ff0000.png?text=JD",
