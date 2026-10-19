@@ -4,7 +4,7 @@
 "short_name": "JuabaDelivery",
 "description": "Peça os seus pratos favoritos das melhores lojas da região.",
 "start_url": "./index.html",
-"scope": "./index.html",
+"scope": "./",
 "display": "standalone",
 "background_color": "#ffffff",
 "theme_color": "#ea1d2c",
