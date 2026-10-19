@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
+    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -99,9 +100,122 @@
         .desktop-header { display: none; }
         .desktop-footer { display: none; }
 
-        .view-section { display: none; max-width: 600px; margin: 0 auto; padding: 14px 16px; animation: fadeIn 0.2s ease; }
+        .view-section { display: none; max-width: 600px; margin: 0 auto; padding: 14px 16px 65px; animation: ifoodSlideFade 0.26s cubic-bezier(0.22, 1, 0.36, 1); }
         .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes ifoodSlideFade {
+            0% { opacity: 0; transform: translateY(8px) scale(0.992); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ==========================================================================
+           ANIMAÇÃO DE ABERTURA DO APP (SPLASH SCREEN ESTILO IFOOD)
+           ========================================================================== */
+        #ifood-splash-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #ea1d2c 0%, #c81421 100%);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #ifood-splash-screen.hide-splash {
+            opacity: 0;
+            transform: scale(1.08);
+            pointer-events: none;
+        }
+        .splash-logo-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: splashPopIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .splash-bag-icon {
+            width: 78px;
+            height: 78px;
+            background: #ffffff;
+            color: var(--primary);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
+            margin-bottom: 14px;
+            animation: splashBagBounce 1.2s ease-in-out infinite;
+        }
+        .splash-brand-title {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            color: #ffffff;
+        }
+        .splash-smile-curve {
+            width: 64px;
+            height: 16px;
+            margin-top: 4px;
+            stroke: #ffffff;
+            stroke-width: 4;
+            fill: none;
+            stroke-linecap: round;
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            animation: splashSmileDraw 0.7s 0.25s ease-out forwards;
+        }
+        @keyframes splashPopIn {
+            0% { opacity: 0; transform: scale(0.6) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes splashBagBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.04); }
+        }
+        @keyframes splashSmileDraw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Badges de Mensagem Não Lida no Chat e Pedidos */
+        .nav-unread-badge {
+            position: absolute; top: -4px; right: -10px;
+            background: #ea1d2c; color: #fff; font-size: 0.65rem; font-weight: 900;
+            min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid #fff; box-shadow: 0 2px 6px rgba(234, 29, 44, 0.45);
+            animation: pulseUnreadBadge 1.4s infinite;
+        }
+        @keyframes pulseUnreadBadge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.16); }
+        }
+        .chat-btn-unread {
+            background: #fff1f2 !important;
+            color: #ea1d2c !important;
+            border: 1.5px solid #ea1d2c !important;
+            animation: pulseChatBtn 1.5s infinite;
+        }
+        @keyframes pulseChatBtn {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(234, 29, 44, 0.35); }
+            50% { box-shadow: 0 0 0 6px rgba(234, 29, 44, 0); }
+        }
+        .suggestions-section-box {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e4e4e7;
+            border-radius: 18px;
+            padding: 12px 14px 24px;
+            margin-top: 8px;
+            margin-bottom: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .suggestions-peek-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #e4e4e7;
+        }
 
         /* ==========================================================================
            ESTILOS DOS CARDS DE BANNERS (CARROSSEL DA TELA INICIAL - MOBILE)
@@ -239,13 +353,13 @@
         }
 
         .product-full-page-card {
-            background: var(--white); border: 1px solid var(--border); border-radius: 22px;
-            padding: 18px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 20px;
+            background: var(--white); border: 1px solid var(--border); border-radius: 20px;
+            padding: 14px 16px; box-shadow: 0 4px 14px rgba(0,0,0,0.03); margin-bottom: 8px;
         }
         .product-hero-img-box {
-            width: 100%; height: 135px; background: #f8fafc; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center; padding: 8px;
-            margin-bottom: 14px; border: 1px solid #f1f5f9; position: relative;
+            width: 100%; height: 118px; background: #f8fafc; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; padding: 6px;
+            margin-bottom: 10px; border: 1px solid #f1f5f9; position: relative;
         }
         .product-hero-img-box img {
             max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px;
@@ -474,6 +588,23 @@
 </head>
 <body>
 
+<!-- TELA DE ABERTURA ANIMADA ESTILO IFOOD -->
+<div id="ifood-splash-screen">
+    <div class="splash-logo-wrap">
+        <div class="splash-bag-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+        </div>
+        <div class="splash-brand-title">JuabaDelivery</div>
+        <svg class="splash-smile-curve" viewBox="0 0 64 18">
+            <path d="M6 4 Q32 18 58 4"></path>
+        </svg>
+    </div>
+</div>
+
 <div class="toast" id="toast">Aviso</div>
 
 <header class="desktop-header">
@@ -482,7 +613,10 @@
             <div class="brand-logo" onclick="switchTab('home')" style="font-size:1.5rem;">Juaba<span>Delivery</span></div>
             <nav class="desktop-nav-links">
                 <button id="dnav-home" class="active" onclick="switchTab('home')">Início</button>
-                <button id="dnav-pedidos" style="display:none;" onclick="switchTab('pedidos')">Meus Pedidos</button>
+                <button id="dnav-pedidos" style="display:none; position:relative;" onclick="switchTab('pedidos')">
+                    Meus Pedidos
+                    <span id="dnav-pedidos-badge" class="nav-unread-badge" style="top:-6px; right:-8px;">0</span>
+                </button>
             </nav>
         </div>
 
@@ -651,23 +785,23 @@
             </div>
 
             <div>
-                <div id="detail-prod-cat-badge" style="font-size:0.74rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:4px;">Categoria</div>
-                <h1 id="detail-prod-name" style="font-weight:900; font-size:1.35rem; color:#111; line-height:1.25; margin-bottom:6px;">Nome do Produto</h1>
-                <p id="detail-prod-desc" style="font-size:0.88rem; color:#52525b; line-height:1.45; margin-bottom:12px;"></p>
+                <div id="detail-prod-cat-badge" style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:2px;">Categoria</div>
+                <h1 id="detail-prod-name" style="font-weight:900; font-size:1.25rem; color:#111; line-height:1.2; margin-bottom:4px;">Nome do Produto</h1>
+                <p id="detail-prod-desc" style="font-size:0.84rem; color:#52525b; line-height:1.35; margin-bottom:8px;"></p>
 
-                <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:16px;">
-                    <span id="detail-prod-price" style="font-weight:900; font-size:1.35rem; color:var(--success);">R$ 0,00</span>
-                    <span id="detail-prod-old-price" style="display:none; font-size:0.9rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ 0,00</span>
+                <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:10px;">
+                    <span id="detail-prod-price" style="font-weight:900; font-size:1.28rem; color:var(--success);">R$ 0,00</span>
+                    <span id="detail-prod-old-price" style="display:none; font-size:0.88rem; font-weight:800; color:#a1a1aa; text-decoration:line-through;">R$ 0,00</span>
                 </div>
 
                 <div id="detail-addons-container"></div>
 
-                <div class="input-group" style="margin-top:10px;">
+                <div class="input-group" style="margin-top:6px; margin-bottom:8px;">
                     <label>Observações do item (Opcional)</label>
-                    <input type="text" id="detail-prod-obs" placeholder="Ex: Sem cebola, bem gelada, ponto da carne...">
+                    <input type="text" id="detail-prod-obs" placeholder="Ex: Sem cebola, bem gelada, ponto da carne..." style="padding:10px 12px;">
                 </div>
 
-                <div class="detail-actions-row">
+                <div class="detail-actions-row" style="margin-top:10px;">
                     <div class="detail-qty-box">
                         <button type="button" onclick="changeDetailQty(-1)">−</button>
                         <span id="detail-prod-qty" style="font-size:1rem; min-width:20px; text-align:center;">1</span>
@@ -683,13 +817,14 @@
         </div>
     </div>
 
-    <div style="margin-top:8px;">
-        <div class="section-header-row">
-            <div>
-                <h3 style="font-weight:900; font-size:1.08rem; color:#111;">✨ Outras opções para você</h3>
-                <p style="font-size:0.76rem; color:#71717a; font-weight:700;">Produtos semelhantes ou da mesma categoria nesta e em outras lojas</p>
+    <div class="suggestions-section-box">
+        <div class="suggestions-peek-header">
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.95rem;">✨</span>
+                <span style="font-weight:800; font-size:0.9rem; color:#52525b; letter-spacing:-0.2px;">Outras opções para você</span>
+                <span style="font-size:0.75rem; color:#a1a1aa; font-weight:700;">↓ role para ver</span>
             </div>
-            <button type="button" class="single-view-toggle-btn" id="btn-toggle-sug-view" onclick="toggleUnifiedViewMode()" title="Alternar visualização">⊞</button>
+            <button type="button" class="single-view-toggle-btn" id="btn-toggle-sug-view" onclick="toggleUnifiedViewMode()" title="Alternar visualização" style="width:32px; height:32px; font-size:0.95rem;">⊞</button>
         </div>
         <div id="detail-suggestions-list" class="products-container grid-mode"></div>
     </div>
@@ -839,8 +974,12 @@
     <button class="nav-tab" id="tab-busca" onclick="switchTab('busca')">
         <span style="font-size:1.2rem;">🔍</span><span>Busca</span>
     </button>
-    <button class="nav-tab" id="tab-pedidos" style="display:none;" onclick="switchTab('pedidos')">
-        <span style="font-size:1.2rem;">🧾</span><span>Pedidos</span>
+    <button class="nav-tab" id="tab-pedidos" style="display:none; position:relative;" onclick="switchTab('pedidos')">
+        <span style="font-size:1.2rem; position:relative; display:inline-block;">
+            🧾
+            <span id="mob-pedidos-badge" class="nav-unread-badge">0</span>
+        </span>
+        <span>Pedidos</span>
     </button>
     <button class="nav-tab" id="tab-perfil" onclick="switchTab('perfil')">
         <span style="font-size:1.2rem;">👤</span><span>Perfil</span>
@@ -1150,16 +1289,50 @@
     window.pendingClientReg = null;
     window.generatedClientPin = null;
 
+    // Registro do Service Worker e Evento de Instalação PWA Nativa (Android / Chrome)
+    window.deferredPwaPrompt = null;
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+    }
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        window.deferredPwaPrompt = e;
+        const btnMob = document.getElementById('btn-pwa-install-mob');
+        if (btnMob) btnMob.style.display = 'inline-flex';
+    });
+    window.addEventListener('appinstalled', () => {
+        window.deferredPwaPrompt = null;
+        const btnMob = document.getElementById('btn-pwa-install-mob');
+        if (btnMob) btnMob.style.display = 'none';
+        window.showToast("🎉 Aplicativo instalado com sucesso!");
+    });
+    window.triggerNativePwaInstall = async function() {
+        if (window.deferredPwaPrompt) {
+            window.deferredPwaPrompt.prompt();
+            await window.deferredPwaPrompt.userChoice;
+            window.deferredPwaPrompt = null;
+        } else {
+            window.showToast("📲 No navegador, toque em ⋮ e escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+        }
+    };
+
     window.allStores = [];
     window.allProducts = [];
     window.allCoupons = [];
     window.myOrders = [];
-    window.cart = [];
+    try {
+        window.cart = JSON.parse(localStorage.getItem('juaba_saved_cart') || '[]');
+        if (!Array.isArray(window.cart)) window.cart = [];
+    } catch (e) { window.cart = []; }
     window.globalBillingEnabled = true;
     window.currentClient = null;
     window.clientProfileData = { nome: '', primeiroNome: '', sobrenome: '', telefone: '', enderecos: [] };
     window.isRegisterMode = false;
     window.editingAddressIndex = -1;
+    window.prevStoreChatCounts = {};
+    window.initialOrdersLoadDone = false;
 
     window.selectedCategory = 'TODOS';
     window.quickFilterMode = 'ALL';
@@ -1201,6 +1374,112 @@
         const t = document.getElementById('toast');
         t.innerText = msg; t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
+    };
+
+    // Som de Notificação estilo iFood quando chega mensagem da loja
+    window.playClientNotificationSound = function() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.11);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.38);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.38);
+        } catch (e) {}
+    };
+
+    // Salva e Restaura a Aba / Página Atual para não voltar ao Início ao atualizar (F5)
+    window.saveNavigationState = function(stateObj) {
+        try {
+            sessionStorage.setItem('juaba_nav_state', JSON.stringify(stateObj));
+        } catch (e) {}
+    };
+
+    window.restoreNavigationState = function() {
+        try {
+            const raw = sessionStorage.getItem('juaba_nav_state');
+            if (!raw) return;
+            const st = JSON.parse(raw);
+            if (!st || !st.view) return;
+
+            if (st.view === 'category-view' && st.category && st.category !== 'TODOS') {
+                window.openCategoryFullScreen(st.category);
+            } else if (st.view === 'store-menu' && st.storeId) {
+                window.activeStoreId = st.storeId;
+                window.openStoreMenu(st.storeId);
+            } else if (st.view === 'product-detail' && st.prodId) {
+                const foundProd = window.allProducts.find(x => x.id === st.prodId);
+                if (foundProd) {
+                    window.openProductDetailModal(st.prodId);
+                } else if (st.storeId) {
+                    window.openStoreMenu(st.storeId);
+                }
+            } else if (st.view === 'perfil') {
+                window.switchTab('perfil');
+                if (st.profileSub && st.profileSub !== 'main') {
+                    window.openProfileSubView(st.profileSub);
+                }
+            } else if (['home', 'busca', 'pedidos'].includes(st.view)) {
+                window.switchTab(st.view);
+            }
+        } catch (e) {}
+    };
+
+    // Contabiliza mensagens enviadas pela loja que ainda não foram visualizadas pelo cliente
+    window.getStoreMessagesCount = function(orderObj) {
+        if (!orderObj || !Array.isArray(orderObj.chat)) return 0;
+        return orderObj.chat.filter(m => m.sender === 'loja').length;
+    };
+
+    window.getUnreadStoreMessagesForOrder = function(orderObj) {
+        if (!orderObj) return 0;
+        const totalStoreMsgs = window.getStoreMessagesCount(orderObj);
+        const seenCount = parseInt(localStorage.getItem('juaba_seen_chat_' + orderObj.id) || '0', 10);
+        return Math.max(0, totalStoreMsgs - seenCount);
+    };
+
+    window.markOrderChatAsRead = function(orderId) {
+        const o = window.myOrders.find(x => x.id === orderId);
+        if (!o) return;
+        const totalStoreMsgs = window.getStoreMessagesCount(o);
+        try {
+            localStorage.setItem('juaba_seen_chat_' + orderId, String(totalStoreMsgs));
+        } catch (e) {}
+        window.updateUnreadChatBadgesUI();
+        window.renderClientOrders();
+    };
+
+    window.updateUnreadChatBadgesUI = function() {
+        let totalUnread = 0;
+        (window.myOrders || []).forEach(o => {
+            totalUnread += window.getUnreadStoreMessagesForOrder(o);
+        });
+
+        const mobBadge = document.getElementById('mob-pedidos-badge');
+        const deskBadge = document.getElementById('dnav-pedidos-badge');
+
+        if (mobBadge) {
+            if (totalUnread > 0) {
+                mobBadge.innerText = totalUnread > 9 ? '9+' : String(totalUnread);
+                mobBadge.style.display = 'inline-flex';
+            } else {
+                mobBadge.style.display = 'none';
+            }
+        }
+        if (deskBadge) {
+            if (totalUnread > 0) {
+                deskBadge.innerText = totalUnread > 9 ? '9+' : String(totalUnread);
+                deskBadge.style.display = 'inline-flex';
+            } else {
+                deskBadge.style.display = 'none';
+            }
+        }
     };
 
     window.parseCurrencyToNumber = function(valRaw) {
@@ -1366,6 +1645,7 @@
             document.getElementById('profile-sub-conta').style.display = 'none';
             window.updateClientHeaderUI();
         }
+        window.saveNavigationState({ view: tab, profileSub: 'main' });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1451,6 +1731,7 @@
         window.renderCategoryFullScreen();
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.getElementById('sec-category-view').classList.add('active');
+        window.saveNavigationState({ view: 'category-view', category: cat });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1613,6 +1894,7 @@
         window.renderStoreMenu(storeId);
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.getElementById('sec-store-menu').classList.add('active');
+        window.saveNavigationState({ view: 'store-menu', storeId: storeId });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -1723,6 +2005,7 @@
 
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
         document.getElementById('sec-product-detail').classList.add('active');
+        window.saveNavigationState({ view: 'product-detail', prodId: prodId, storeId: p.lojaId });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -2129,6 +2412,9 @@
     };
 
     window.updateCartFloatingBar = function() {
+        try {
+            localStorage.setItem('juaba_saved_cart', JSON.stringify(window.cart || []));
+        } catch (e) {}
         const totalItems = window.cart.reduce((acc, i) => acc + i.qty, 0);
         const mobCartBtn = document.getElementById('mobile-header-cart-btn');
         const mobCartCount = document.getElementById('mobile-header-cart-count');
@@ -2389,8 +2675,9 @@
         const s3 = !isCanceled && (['Entrega', 'Concluido'].includes(st) || window.isOrderDone(st));
         const s4 = !isCanceled && window.isOrderDone(st);
 
+        // O PIX Copia e Cola e o botão de Conversar dentro de "Acompanhar" só aparecem enquanto o lojista ainda NÃO aceitou (status === 'Novo')
         let pixHtml = '';
-        if (!isCanceled && !s4 && String(o.pagamento || '').toUpperCase().includes('PIX')) {
+        if (!isCanceled && st === 'Novo' && String(o.pagamento || '').toUpperCase().includes('PIX')) {
             const valNum = window.parseCurrencyToNumber(o.total);
             const chavePix = window.getStorePixKey(loja, o);
             const nomeLoja = o.nomeLoja || (loja ? loja.nome_loja : 'Restaurante');
@@ -2398,7 +2685,7 @@
             pixHtml = `
             <div style="background:#f0fdf4; border:2px dashed #22c55e; border-radius:16px; padding:14px; margin:12px 0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="font-weight:900; color:#15803d; font-size:0.84rem;">💠 PIX Copia e Cola (Se ja pagou desconsidere essa menssagem)</span>
+                    <span style="font-weight:900; color:#15803d; font-size:0.84rem;">💠 PIX Copia e Cola (Valor já incluso)</span>
                     <span style="background:#dcfce7; color:#166534; font-weight:900; padding:3px 9px; border-radius:8px; font-size:0.82rem;">${o.total}</span>
                 </div>
                 <input type="text" readonly value="${pixPayload}" style="width:100%; padding:8px 10px; border:1px solid #86efac; border-radius:8px; background:#fff; font-family:monospace; font-size:0.72rem; color:#18181b; font-weight:700; margin-bottom:8px; outline:none;">
@@ -2420,7 +2707,7 @@
 
         const receiptBtnHtml = (!isCanceled && st === 'Novo')
             ? `<button class="btn-primary" style="margin-bottom:8px; padding:11px 14px; font-size:0.88rem; border-radius:12px;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Conversar / Enviar Comprovante</button>`
-            : `<button class="btn-primary" style="margin-bottom:8px; padding:11px 14px; font-size:0.88rem; border-radius:12px; background:#18181b;" onclick="document.getElementById('modal-track-order').style.display='none'; openClientChat('${o.id}')">💬 Abrir Chat com a Loja</button>`;
+            : '';
 
         const canClientCancel = (!isCanceled && st === 'Novo');
         const cancelBtnHtml = canClientCancel
@@ -2508,6 +2795,7 @@
         const nomeLoja = (o && o.nomeLoja) ? o.nomeLoja : (loja ? loja.nome_loja : 'Loja');
         document.getElementById('chat-modal-title').innerText = `💬 Chat — ${nomeLoja}`;
         document.getElementById('modal-chat').style.display = 'flex';
+        window.markOrderChatAsRead(orderId);
         window.renderClientChatMessages();
     };
 
@@ -2769,10 +3057,18 @@
             const isDone = window.isOrderDone(o.status);
             const isCanceled = (o.status === 'Cancelado');
             const hasEvaluated = Boolean(o.avaliacao);
+            const unreadCount = window.getUnreadStoreMessagesForOrder(o);
+
+            const unreadBanner = unreadCount > 0
+                ? `<div onclick="openClientChat('${o.id}')" style="background:#fff1f2; border:1px solid #fecdd3; color:#ea1d2c; padding:7px 11px; border-radius:10px; font-size:0.75rem; font-weight:900; margin-bottom:9px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+                     <span>🔴 ${unreadCount === 1 ? '1 nova mensagem da loja não lida' : `${unreadCount} novas mensagens da loja não lidas`}</span>
+                     <span style="text-decoration:underline;">Abrir chat ➔</span>
+                   </div>`
+                : '';
 
             return `
-            <div style="background:#fff; border:1px solid ${isCanceled ? '#fecaca' : 'var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+            <div style="background:#fff; border:${unreadCount > 0 ? '2px solid var(--primary)' : (isCanceled ? '1px solid #fecaca' : '1px solid var(--border)')}; border-radius:18px; padding:15px 16px; margin-bottom:12px; box-shadow:${unreadCount > 0 ? '0 6px 18px rgba(234,29,44,0.12)' : 'none'};">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px;">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
                         <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
                         <div style="min-width:0;">
@@ -2785,6 +3081,7 @@
                         </div>
                     </div>
                 </div>
+                ${unreadBanner}
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <span style="font-size:0.78rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
@@ -2792,8 +3089,9 @@
                 </div>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
-                    <button type="button" class="btn-order-sleek" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer;">
-                        💬 Chat
+                    <button type="button" class="btn-order-sleek ${unreadCount > 0 ? 'chat-btn-unread' : ''}" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                        <span>💬 Chat</span>
+                        ${unreadCount > 0 ? `<span style="background:#ea1d2c; color:#fff; padding:1px 6px; border-radius:999px; font-size:0.68rem; font-weight:900;">${unreadCount}</span>` : ''}
                     </button>
                     ${isDone && !isCanceled ? `
                     <button type="button" class="btn-order-sleek" onclick="reorderToCart('${o.id}')" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">
@@ -3201,6 +3499,7 @@
             document.getElementById('acc-edit-name').value = window.clientProfileData.nome || '';
             document.getElementById('acc-edit-phone').value = window.clientProfileData.telefone || '';
         }
+        window.saveNavigationState({ view: 'perfil', profileSub: sub });
     };
 
     window.formatAddressDisplay = function(a) {
@@ -3367,8 +3666,89 @@
         }
     };
 
+    // =========================================================================
+    // HIDRATAÇÃO INSTANTÂNEA DE SESSÃO, LOJAS, PRODUTOS E PEDIDOS (ZERO DELAY NO F5)
+    // =========================================================================
+    window.hydrateInstantCache = function() {
+        try {
+            const cachedBanners = JSON.parse(localStorage.getItem('juaba_cache_banners') || 'null');
+            window.renderBanners(cachedBanners || window.defaultBanners);
+        } catch (e) {
+            window.renderBanners(window.defaultBanners);
+        }
+
+        try {
+            const cachedStores = JSON.parse(localStorage.getItem('juaba_cache_stores') || '[]');
+            const cachedProds = JSON.parse(localStorage.getItem('juaba_cache_products') || '[]');
+            if (Array.isArray(cachedStores) && cachedStores.length > 0) window.allStores = cachedStores;
+            if (Array.isArray(cachedProds) && cachedProds.length > 0) window.allProducts = cachedProds;
+            if (window.allStores.length > 0) window.renderHomeView();
+        } catch (e) {}
+
+        try {
+            const savedSession = JSON.parse(localStorage.getItem('juaba_cli_active_session') || 'null');
+            if (savedSession && savedSession.uid) {
+                window.currentClient = {
+                    uid: savedSession.uid,
+                    email: savedSession.email || '',
+                    displayName: savedSession.displayName || 'Cliente'
+                };
+                if (savedSession.profile) {
+                    window.clientProfileData = savedSession.profile;
+                }
+                document.getElementById('tab-pedidos').style.display = 'flex';
+                document.getElementById('dnav-pedidos').style.display = 'inline-block';
+                document.getElementById('profile-logged-out').style.display = 'none';
+                document.getElementById('profile-logged-in').style.display = 'block';
+                window.updateClientHeaderUI();
+                window.renderSavedAddresses();
+                window.syncCartDeliveryDisplay();
+
+                const emailKey = String(savedSession.email || '').toLowerCase();
+                if (emailKey) {
+                    const cachedMyOrders = JSON.parse(localStorage.getItem('juaba_cache_orders_' + emailKey) || '[]');
+                    if (Array.isArray(cachedMyOrders) && cachedMyOrders.length > 0) {
+                        window.myOrders = cachedMyOrders;
+                        window.myOrders.forEach(o => {
+                            window.prevStoreChatCounts[o.id] = window.getStoreMessagesCount(o);
+                        });
+                        window.renderClientOrders();
+                        window.updateUnreadChatBadgesUI();
+                    }
+                }
+            }
+        } catch (e) {}
+
+        window.updateCartFloatingBar();
+        window.restoreNavigationState();
+
+        // Animação de abertura estilo iFood (Splash Screen) na entrada do aplicativo
+        const splashEl = document.getElementById('ifood-splash-screen');
+        if (splashEl) {
+            if (sessionStorage.getItem('juaba_splash_shown') === '1') {
+                splashEl.style.display = 'none';
+            } else {
+                sessionStorage.setItem('juaba_splash_shown', '1');
+                setTimeout(() => {
+                    splashEl.classList.add('hide-splash');
+                    setTimeout(() => { splashEl.style.display = 'none'; }, 480);
+                }, 1150);
+            }
+        }
+    };
+    window.hydrateInstantCache();
+
     onAuthStateChanged(auth, async (user) => {
         if (user) {
+            try {
+                const lojaSnap = await getDoc(doc(db, "lojas", user.uid));
+                if (lojaSnap.exists() && !lojaSnap.data().isSystemConfig) {
+                    await signOut(auth);
+                    window.showToast("🏪 Este e-mail pertence a uma Loja! Acesse pelo Painel do Lojista.");
+                    return;
+                }
+            } catch (e) {}
+
             window.currentClient = user;
             document.getElementById('tab-pedidos').style.display = 'flex';
             document.getElementById('dnav-pedidos').style.display = 'inline-block';
@@ -3381,12 +3761,21 @@
             } else {
                 const profile = await window.loadClientProfileEverywhere(user);
                 window.clientProfileData = profile;
+                try {
+                    localStorage.setItem('juaba_cli_active_session', JSON.stringify({
+                        uid: user.uid,
+                        email: user.email || '',
+                        displayName: profile.nome || user.displayName || 'Cliente',
+                        profile: profile
+                    }));
+                } catch (e) {}
                 window.updateClientHeaderUI();
                 window.renderSavedAddresses();
                 window.syncCartDeliveryDisplay();
             }
             window.filterMyOrders();
         } else {
+            try { localStorage.removeItem('juaba_cli_active_session'); } catch (e) {}
             window.currentClient = null;
             document.getElementById('tab-pedidos').style.display = 'none';
             document.getElementById('dnav-pedidos').style.display = 'none';
@@ -3396,6 +3785,7 @@
             if (deskBtn) deskBtn.innerText = '👤 Entrar';
             window.myOrders = [];
             window.renderClientOrders();
+            window.updateUnreadChatBadgesUI();
         }
     });
 
@@ -3423,6 +3813,9 @@
 
         window.globalBillingEnabled = sysBillingEnabled;
         window.renderBanners(sysBanners || window.defaultBanners);
+        try {
+            if (sysBanners) localStorage.setItem('juaba_cache_banners', JSON.stringify(sysBanners));
+        } catch (e) {}
 
         snap.forEach(d => {
             const data = d.data();
@@ -3433,6 +3826,7 @@
             }
         });
 
+        try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
     });
@@ -3440,9 +3834,19 @@
     onSnapshot(collection(db, "produtos"), (snap) => {
         window.allProducts = [];
         snap.forEach(d => window.allProducts.push({ id: d.id, ...d.data() }));
+        try { localStorage.setItem('juaba_cache_products', JSON.stringify(window.allProducts)); } catch (e) {}
         window.renderHomeView();
         if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
         if (window.detailProduct) window.renderProductSuggestions(window.detailProduct);
+        if (!window.hasRestoredProductDetailOnce) {
+            window.hasRestoredProductDetailOnce = true;
+            try {
+                const st = JSON.parse(sessionStorage.getItem('juaba_nav_state') || 'null');
+                if (st && st.view === 'product-detail' && st.prodId && !window.detailProduct) {
+                    window.openProductDetailModal(st.prodId);
+                }
+            } catch (e) {}
+        }
     });
 
     onSnapshot(collection(db, "cupons"), (snap) => {
@@ -3455,6 +3859,28 @@
         if (!window.currentClient) { window.myOrders = []; return; }
         const myEmail = (window.currentClient.email || '').toLowerCase();
         window.myOrders = window.rawAllOrders.filter(o => !o.isUserProfileDoc && (o.emailCliente || '').toLowerCase() === myEmail);
+
+        // Verifica se chegou nova mensagem do lojista em algum pedido do cliente
+        window.myOrders.forEach(o => {
+            const storeMsgCount = window.getStoreMessagesCount(o);
+            const prevCount = window.prevStoreChatCounts[o.id];
+
+            if (window.activeChatOrderId === o.id && document.getElementById('modal-chat').style.display === 'flex') {
+                try { localStorage.setItem('juaba_seen_chat_' + o.id, String(storeMsgCount)); } catch (e) {}
+            } else if (window.initialOrdersLoadDone && prevCount !== undefined && storeMsgCount > prevCount) {
+                window.playClientNotificationSound();
+                const nomeLoja = o.nomeLoja || 'Restaurante';
+                window.showToast(`💬 Nova mensagem de ${nomeLoja} no seu pedido!`);
+            }
+            window.prevStoreChatCounts[o.id] = storeMsgCount;
+        });
+        window.initialOrdersLoadDone = true;
+
+        try {
+            if (myEmail) localStorage.setItem('juaba_cache_orders_' + myEmail, JSON.stringify(window.myOrders));
+        } catch (e) {}
+
+        window.updateUnreadChatBadgesUI();
         window.renderClientOrders();
         if (window.activeTrackOrderId) {
             const found = window.myOrders.find(x => x.id === window.activeTrackOrderId);
