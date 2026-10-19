@@ -17,7 +17,8 @@
 "purpose": "any"
 },
 {
-"src": "",
+"src": "
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=G4Xry8H4Vokxu1GCDbvrNqm1hhQtrr_2nCdWs8Kn7mbLie4AdBE71w&VER=8&database=projects%2Fjuaba-delivery%2Fdatabases%2F(default)&RID=rpc&SID=afBNZ7HS4KlLEELuAjCPFw&AID=32&CI=0&TYPE=xmlhttp&zx=w7stzzp7roap&t=1",
 "sizes": "512x512",
 "type": "image/png",
 "purpose": "any"
