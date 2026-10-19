@@ -192,12 +192,76 @@
         .chat-btn-unread {
             background: #fff1f2 !important;
             color: #ea1d2c !important;
-            border: 1.5px solid #ea1d2c !important;
+            border: 2px solid #ea1d2c !important;
             animation: pulseChatBtn 1.5s infinite;
         }
         @keyframes pulseChatBtn {
             0%, 100% { box-shadow: 0 0 0 0 rgba(234, 29, 44, 0.35); }
             50% { box-shadow: 0 0 0 6px rgba(234, 29, 44, 0); }
+        }
+
+        /* Campo de Senha com Botão Olhinho e Checklist de Senha Forte */
+        .pass-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .pass-input-wrapper input {
+            padding-right: 46px !important;
+        }
+        .pass-eye-btn {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        .pass-eye-btn:active {
+            background: #f4f4f5;
+        }
+        .strong-pass-rules {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #71717a;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .pass-rule-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .pass-rule-item.valid {
+            color: var(--success);
+            font-weight: 800;
+        }
+
+        /* Card Flutuante/Topo na Tela do Usuário para Baixar o Aplicativo */
+        .pwa-install-screen-banner {
+            background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            border: 1px solid #3f3f46;
         }
         .suggestions-section-box {
             background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
@@ -664,6 +728,27 @@
 
 <!-- ABA 1: INÍCIO (VITRINE) -->
 <main id="sec-home" class="view-section active">
+    <!-- Banner Interativo na Tela do Usuário para Baixar o Aplicativo -->
+    <div class="pwa-install-screen-banner" id="pwa-onscreen-install-card">
+        <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+            <div style="width:40px; height:40px; border-radius:12px; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0; font-weight:900;">
+                📲
+            </div>
+            <div style="min-width:0;">
+                <div style="font-weight:900; font-size:0.88rem; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Baixar App JuabaDelivery</div>
+                <div style="font-size:0.72rem; color:#d4d4d8; font-weight:600;">Instale no celular para pedir mais rápido</div>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            <button type="button" onclick="triggerNativePwaInstall()" style="background:var(--primary); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer; box-shadow:0 4px 10px rgba(234,29,44,0.35);">
+                Baixar
+            </button>
+            <button type="button" onclick="dismissOnscreenPwaCard()" style="background:rgba(255,255,255,0.1); color:#a1a1aa; border:none; width:28px; height:28px; border-radius:8px; font-weight:900; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                ✕
+            </button>
+        </div>
+    </div>
+
     <!-- ==========================================================================
          ESTRUTURA HTML DOS CARDS DE BANNERS (CARROSSEL DESLIZÁVEL)
          - No celular: vários cards lado a lado que passam deslizando com o dedo.
@@ -852,9 +937,15 @@
         <h2 style="font-weight:900; font-size:1.25rem; margin-bottom:6px;">👤 Acesse sua Conta</h2>
         <p style="color:#71717a; font-size:0.84rem; margin-bottom:16px; font-weight:600;">Entre ou cadastre-se para salvar seus endereços e acompanhar pedidos.</p>
         
-        <div class="input-group" id="auth-name-group" style="display:none;">
-            <label>Seu Nome Completo *</label>
-            <input type="text" id="cli-auth-name" placeholder="Ex: Eder Garcia Gomes">
+        <div id="auth-name-group" style="display:none; gap:10px; flex-wrap:wrap;">
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Nome *</label>
+                <input type="text" id="cli-auth-first-name" placeholder="Ex: Eder">
+            </div>
+            <div class="input-group" style="flex:1; min-width:135px;">
+                <label>Sobrenome *</label>
+                <input type="text" id="cli-auth-last-name" placeholder="Ex: Garcia Gomes">
+            </div>
         </div>
         <div class="input-group" id="auth-phone-group" style="display:none;">
             <label>Seu WhatsApp (com DDD) *</label>
@@ -867,7 +958,23 @@
         </div>
         <div class="input-group">
             <label>Senha</label>
-            <input type="password" id="cli-auth-pass" placeholder="Sua senha...">
+            <div class="pass-input-wrapper">
+                <input type="password" id="cli-auth-pass" placeholder="Sua senha..." oninput="validateStrongPasswordLive(this.value)">
+                <button type="button" class="pass-eye-btn" onclick="togglePasswordVisibility('cli-auth-pass', this)" title="Mostrar/Ocultar senha">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+            </div>
+            <!-- Checklist de Senha Forte (aparece ao criar conta) -->
+            <div class="strong-pass-rules" id="strong-pass-rules-box">
+                <div style="font-weight:900; color:#18181b; margin-bottom:2px;">🔒 Sua senha precisa ter:</div>
+                <div class="pass-rule-item" id="prule-len"><span>○</span> Mínimo de 6 caracteres</div>
+                <div class="pass-rule-item" id="prule-upper"><span>○</span> Pelo menos 1 letra maiúscula (A-Z)</div>
+                <div class="pass-rule-item" id="prule-num"><span>○</span> Pelo menos 1 número (0-9)</div>
+                <div class="pass-rule-item" id="prule-spec"><span>○</span> Pelo menos 1 caractere especial (@, #, $, !, %, &...)</div>
+            </div>
         </div>
 
         <div id="forgot-pass-link-box" style="text-align:right; margin-top:-6px; margin-bottom:12px;">
@@ -939,9 +1046,15 @@
             <button onclick="openProfileSubView('main')" style="background:#fff; border:1px solid var(--border); padding:8px 14px; border-radius:999px; font-weight:800; margin-bottom:14px; cursor:pointer;">← Voltar ao Perfil</button>
             <div style="background:#fff; border:1px solid var(--border); border-radius:20px; padding:18px;">
                 <h3 style="font-weight:900; font-size:1.1rem; margin-bottom:14px;">⚙️ Dados da Minha Conta</h3>
-                <div class="input-group">
-                    <label>Seu Nome Completo *</label>
-                    <input type="text" id="acc-edit-name" placeholder="Ex: Eder Garcia Gomes">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div class="input-group" style="flex:1; min-width:135px;">
+                        <label>Nome *</label>
+                        <input type="text" id="acc-edit-first-name" placeholder="Ex: Eder">
+                    </div>
+                    <div class="input-group" style="flex:1; min-width:135px;">
+                        <label>Sobrenome *</label>
+                        <input type="text" id="acc-edit-last-name" placeholder="Ex: Garcia Gomes">
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>Telefone / WhatsApp *</label>
@@ -1262,6 +1375,34 @@
     </div>
 </div>
 
+<!-- Modal de Instruções para Instalar o App no Celular (Caso o navegador bloqueie o prompt automático) -->
+<div class="modal-overlay" id="modal-pwa-install-help" style="z-index: 7000;" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-sheet" style="max-width:440px; text-align:left;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-weight:900; font-size:1.15rem; color:#18181b;">📲 Baixar App JuabaDelivery</h3>
+            <button type="button" onclick="document.getElementById('modal-pwa-install-help').style.display='none'" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#71717a;">✕</button>
+        </div>
+        <p style="font-size:0.84rem; color:#52525b; font-weight:600; margin-bottom:14px; line-height:1.4;">
+            Instale o aplicativo oficial no seu celular em 2 segundos sem ocupar memória:
+        </p>
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:10px;">
+            <div style="font-weight:900; font-size:0.88rem; color:#18181b; margin-bottom:6px;">🤖 No Android (Chrome / Samsung):</div>
+            <div style="font-size:0.8rem; color:#3f3f46; font-weight:600; line-height:1.5;">
+                1. Toque nos <b>3 pontinhos (⋮)</b> no canto superior direito do navegador.<br>
+                2. Toque em <b>"Adicionar à tela inicial"</b> ou <b>"Instalar aplicativo"</b> e confirme.
+            </div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:14px;">
+            <div style="font-weight:900; font-size:0.88rem; color:#18181b; margin-bottom:6px;">🍎 No iPhone (Safari):</div>
+            <div style="font-size:0.8rem; color:#3f3f46; font-weight:600; line-height:1.5;">
+                1. Toque no botão <b>Compartilhar (⬆️)</b> na barra inferior.<br>
+                2. Role para baixo e toque em <b>"Adicionar à Tela de Início"</b>.
+            </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="document.getElementById('modal-pwa-install-help').style.display='none'">Entendi!</button>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -1289,33 +1430,98 @@
     window.pendingClientReg = null;
     window.generatedClientPin = null;
 
-    // Registro do Service Worker e Evento de Instalação PWA Nativa (Android / Chrome)
+    // =========================================================================
+    // MOTOR DE INSTALAÇÃO DO APP NO CELULAR (PWA + BANNER NA TELA)
+    // =========================================================================
     window.deferredPwaPrompt = null;
+
+    // Verifica se o app já está rodando instalado em tela cheia
+    window.isRunningStandalone = function() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    };
+
+    window.dismissOnscreenPwaCard = function() {
+        const card = document.getElementById('pwa-onscreen-install-card');
+        if (card) card.style.display = 'none';
+        sessionStorage.setItem('juaba_pwa_card_closed', '1');
+    };
+
+    if (window.isRunningStandalone() || sessionStorage.getItem('juaba_pwa_card_closed') === '1') {
+        const card = document.getElementById('pwa-onscreen-install-card');
+        if (card) card.style.display = 'none';
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').catch(() => {});
         });
     }
+
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         window.deferredPwaPrompt = e;
         const btnMob = document.getElementById('btn-pwa-install-mob');
         if (btnMob) btnMob.style.display = 'inline-flex';
+        const card = document.getElementById('pwa-onscreen-install-card');
+        if (card && !window.isRunningStandalone()) card.style.display = 'flex';
     });
+
     window.addEventListener('appinstalled', () => {
         window.deferredPwaPrompt = null;
         const btnMob = document.getElementById('btn-pwa-install-mob');
         if (btnMob) btnMob.style.display = 'none';
+        const card = document.getElementById('pwa-onscreen-install-card');
+        if (card) card.style.display = 'none';
         window.showToast("🎉 Aplicativo instalado com sucesso!");
     });
+
     window.triggerNativePwaInstall = async function() {
         if (window.deferredPwaPrompt) {
             window.deferredPwaPrompt.prompt();
             await window.deferredPwaPrompt.userChoice;
             window.deferredPwaPrompt = null;
         } else {
-            window.showToast("📲 No navegador, toque em ⋮ e escolha 'Instalar aplicativo' ou 'Adicionar à tela inicial'.");
+            document.getElementById('modal-pwa-install-help').style.display = 'flex';
         }
+    };
+
+    // Função do "Olhinho" para Mostrar/Ocultar a Senha enquanto digita
+    window.togglePasswordVisibility = function(inputId, btnEl) {
+        const inp = document.getElementById(inputId);
+        if (!inp) return;
+        const isPass = inp.type === 'password';
+        inp.type = isPass ? 'text' : 'password';
+        btnEl.innerHTML = isPass
+            ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea1d2c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
+            : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+    };
+
+    // Validação em tempo real da Senha Forte (Letra Maiúscula, Número e Caractere Especial)
+    window.checkStrongPassword = function(pass) {
+        const p = String(pass || '');
+        return {
+            len: p.length >= 6,
+            upper: /[A-Z]/.test(p),
+            num: /[0-9]/.test(p),
+            spec: /[^A-Za-z0-9]/.test(p),
+            get isValid() { return this.len && this.upper && this.num && this.spec; }
+        };
+    };
+
+    window.validateStrongPasswordLive = function(val) {
+        if (!window.isRegisterMode) return;
+        const res = window.checkStrongPassword(val);
+        const setRule = (id, ok) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('valid', ok);
+            const span = el.querySelector('span');
+            if (span) span.innerText = ok ? '✔' : '○';
+        };
+        setRule('prule-len', res.len);
+        setRule('prule-upper', res.upper);
+        setRule('prule-num', res.num);
+        setRule('prule-spec', res.spec);
     };
 
     window.allStores = [];
@@ -3059,15 +3265,8 @@
             const hasEvaluated = Boolean(o.avaliacao);
             const unreadCount = window.getUnreadStoreMessagesForOrder(o);
 
-            const unreadBanner = unreadCount > 0
-                ? `<div onclick="openClientChat('${o.id}')" style="background:#fff1f2; border:1px solid #fecdd3; color:#ea1d2c; padding:7px 11px; border-radius:10px; font-size:0.75rem; font-weight:900; margin-bottom:9px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-                     <span>🔴 ${unreadCount === 1 ? '1 nova mensagem da loja não lida' : `${unreadCount} novas mensagens da loja não lidas`}</span>
-                     <span style="text-decoration:underline;">Abrir chat ➔</span>
-                   </div>`
-                : '';
-
             return `
-            <div style="background:#fff; border:${unreadCount > 0 ? '2px solid var(--primary)' : (isCanceled ? '1px solid #fecaca' : '1px solid var(--border)')}; border-radius:18px; padding:15px 16px; margin-bottom:12px; box-shadow:${unreadCount > 0 ? '0 6px 18px rgba(234,29,44,0.12)' : 'none'};">
+            <div style="background:#fff; border:${isCanceled ? '1px solid #fecaca' : '1px solid var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px;">
                     <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
                         <img src="${logo}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150'" style="width:38px; height:38px; border-radius:50%; object-fit:cover; border:1px solid var(--border); flex-shrink:0;">
@@ -3081,7 +3280,6 @@
                         </div>
                     </div>
                 </div>
-                ${unreadBanner}
 
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <span style="font-size:0.78rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${o.pagamento || 'PIX'}</b></span>
@@ -3089,7 +3287,7 @@
                 </div>
 
                 <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
-                    <button type="button" class="btn-order-sleek ${unreadCount > 0 ? 'chat-btn-unread' : ''}" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                    <button type="button" class="btn-order-sleek ${unreadCount > 0 ? 'chat-btn-unread' : ''}" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; color:#18181b; border:1px solid transparent; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
                         <span>💬 Chat</span>
                         ${unreadCount > 0 ? `<span style="background:#ea1d2c; color:#fff; padding:1px 6px; border-radius:999px; font-size:0.68rem; font-weight:900;">${unreadCount}</span>` : ''}
                     </button>
@@ -3112,8 +3310,13 @@
 
     window.toggleClientAuthMode = function() {
         window.isRegisterMode = !window.isRegisterMode;
-        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'block' : 'none';
+        document.getElementById('auth-name-group').style.display = window.isRegisterMode ? 'flex' : 'none';
         document.getElementById('auth-phone-group').style.display = window.isRegisterMode ? 'block' : 'none';
+        const rulesBox = document.getElementById('strong-pass-rules-box');
+        if (rulesBox) rulesBox.style.display = window.isRegisterMode ? 'flex' : 'none';
+        if (window.isRegisterMode) {
+            window.validateStrongPasswordLive(document.getElementById('cli-auth-pass').value);
+        }
         const forgotBox = document.getElementById('forgot-pass-link-box');
         if (forgotBox) forgotBox.style.display = window.isRegisterMode ? 'none' : 'block';
         document.getElementById('cli-auth-submit-btn').innerText = window.isRegisterMode ? 'Criar Minha Conta' : 'Entrar na Conta';
@@ -3397,9 +3600,12 @@
         try {
             // Sinaliza que estamos concluindo um cadastro para que o onAuthStateChanged não sobrescreva os dados
             window.isRegisteringClient = true;
+            const { primeiroNome, sobrenome } = window.pendingClientReg;
             window.clientProfileData = {
                 email: email.toLowerCase(),
                 nome: nome,
+                primeiroNome: primeiroNome || '',
+                sobrenome: sobrenome || '',
                 telefone: telefone,
                 enderecos: []
             };
@@ -3410,6 +3616,8 @@
             await window.saveClientProfileEverywhere(cred.user.uid, {
                 email: email.toLowerCase(),
                 nome: nome,
+                primeiroNome: primeiroNome || '',
+                sobrenome: sobrenome || '',
                 telefone: telefone,
                 enderecos: []
             });
@@ -3439,14 +3647,23 @@
 
         try {
             if (window.isRegisterMode) {
-                const nome = document.getElementById('cli-auth-name').value.trim();
+                const primeiroNome = document.getElementById('cli-auth-first-name').value.trim();
+                const sobrenome = document.getElementById('cli-auth-last-name').value.trim();
+                const nome = `${primeiroNome} ${sobrenome}`.trim();
                 const telefone = document.getElementById('cli-auth-phone').value.trim();
-                if (!nome || nome.length < 2) { window.showToast("⚠️ Informe seu Nome Completo!"); return; }
+
+                if (!primeiroNome) { window.showToast("⚠️ Informe seu Nome!"); return; }
+                if (!sobrenome) { window.showToast("⚠️ Informe seu Sobrenome!"); return; }
                 if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("⚠️ Informe seu WhatsApp com DDD!"); return; }
-                if (pass.length < 6) { window.showToast("⚠️ A senha deve ter pelo menos 6 caracteres!"); return; }
+
+                const passCheck = window.checkStrongPassword(pass);
+                if (!passCheck.isValid) {
+                    window.showToast("🔒 A senha precisa ter letra maiúscula, número e caractere especial (@, #, !...)!");
+                    return;
+                }
 
                 // Guarda os dados preenchidos e gera o PIN de 4 dígitos para validar o e-mail
-                window.pendingClientReg = { email, pass, nome, telefone };
+                window.pendingClientReg = { email, pass, nome, primeiroNome, sobrenome, telefone };
                 window.generatedClientPin = String(Math.floor(1000 + Math.random() * 9000));
 
                 document.getElementById('client-pin-target-email').innerText = email;
@@ -3496,7 +3713,12 @@
 
         if (sub === 'enderecos') window.renderSavedAddresses();
         if (sub === 'conta') {
-            document.getElementById('acc-edit-name').value = window.clientProfileData.nome || '';
+            const full = String(window.clientProfileData.nome || '').trim();
+            const parts = full.split(' ');
+            const fName = window.clientProfileData.primeiroNome || parts[0] || '';
+            const lName = window.clientProfileData.sobrenome || parts.slice(1).join(' ') || '';
+            document.getElementById('acc-edit-first-name').value = fName;
+            document.getElementById('acc-edit-last-name').value = lName;
             document.getElementById('acc-edit-phone').value = window.clientProfileData.telefone || '';
         }
         window.saveNavigationState({ view: 'perfil', profileSub: sub });
@@ -3628,12 +3850,16 @@
 
     window.saveAccountDetails = async function() {
         if (!window.currentClient) return;
-        const nome = document.getElementById('acc-edit-name').value.trim();
+        const primeiroNome = document.getElementById('acc-edit-first-name').value.trim();
+        const sobrenome = document.getElementById('acc-edit-last-name').value.trim();
+        const nome = `${primeiroNome} ${sobrenome}`.trim();
         const telefone = document.getElementById('acc-edit-phone').value.trim();
 
-        if (!nome || nome.length < 2) { window.showToast("Informe seu Nome Completo!"); return; }
+        if (!primeiroNome || !sobrenome) { window.showToast("Informe seu Nome e Sobrenome!"); return; }
         if (!telefone || telefone.replace(/\D/g, '').length < 8) { window.showToast("Informe seu WhatsApp!"); return; }
 
+        window.clientProfileData.primeiroNome = primeiroNome;
+        window.clientProfileData.sobrenome = sobrenome;
         window.clientProfileData.nome = nome;
         window.clientProfileData.telefone = telefone;
 
@@ -3722,7 +3948,13 @@
         window.updateCartFloatingBar();
         window.restoreNavigationState();
 
-        // Animação de abertura estilo iFood (Splash Screen) na entrada do aplicativo
+        // =========================================================================
+        // ⏱️ CONFIGURAÇÃO DO TEMPO DE EXIBIÇÃO DA ANIMAÇÃO DE ABERTURA (ESTILO IFOOD)
+        // Altere o número abaixo (em milissegundos) para aumentar ou diminuir o tempo:
+        // Exemplo: 1500 = 1,5 segundos | 3000 = 3 segundos | 4500 = 4,5 segundos
+        // =========================================================================
+        window.TEMPO_ANIMACAO_ABERTURA_MS = 6000;
+
         const splashEl = document.getElementById('ifood-splash-screen');
         if (splashEl) {
             if (sessionStorage.getItem('juaba_splash_shown') === '1') {
@@ -3732,7 +3964,7 @@
                 setTimeout(() => {
                     splashEl.classList.add('hide-splash');
                     setTimeout(() => { splashEl.style.display = 'none'; }, 480);
-                }, 1150);
+                }, window.TEMPO_ANIMACAO_ABERTURA_MS);
             }
         }
     };
