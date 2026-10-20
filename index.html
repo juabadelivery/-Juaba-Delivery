@@ -983,7 +983,7 @@
 
     window.getStoreMessagesCount = (o) => (o && Array.isArray(o.chat)) ? o.chat.filter(m => m.sender === 'loja').length : 0;
     window.getUnreadStoreMessagesForOrder = (o) => {
-        if (!o) return 0;
+        if (!o || window.isOrderDone(o.status) || o.status === 'Cancelado') return 0;
         const seen = parseInt(localStorage.getItem('juaba_seen_chat_' + o.id) || '0', 10);
         return Math.max(0, window.getStoreMessagesCount(o) - seen);
     };
@@ -1613,8 +1613,12 @@
     };
 
     window.openClientChat = (orderId) => {
-        window.activeChatOrderId = orderId;
         const o = window.myOrders.find(x => x.id === orderId);
+        if (!o || window.isOrderDone(o.status) || o.status === 'Cancelado') {
+            window.showToast("ℹ️ O chat fica disponível apenas enquanto o pedido está em andamento.");
+            return;
+        }
+        window.activeChatOrderId = orderId;
         el('chat-modal-title').innerText = `💬 Chat — ${o?.nomeLoja || 'Loja'}`;
         el('modal-chat').style.display = 'flex';
         window.markOrderChatAsRead(orderId); window.renderClientChatMessages();
@@ -1745,7 +1749,7 @@
                     <span style="font-size:0.98rem; font-weight:900; color:${isCanc ? '#dc2626' : 'var(--success)'};">${window.escapeHtml(o.total || 'R$ 0,00')}</span>
                 </div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                    <button type="button" class="${unread > 0 ? 'chat-btn-unread' : ''}" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer;">💬 Chat ${unread > 0 ? `(${unread})` : ''}</button>
+                    ${(!isDone && !isCanc) ? `<button type="button" class="${unread > 0 ? 'chat-btn-unread' : ''}" onclick="openClientChat('${o.id}')" style="background:#f4f4f5; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.78rem; cursor:pointer;">💬 Chat ${unread > 0 ? `(${unread})` : ''}</button>` : ''}
                     ${isDone && !isCanc ? `<button type="button" onclick="reorderToCart('${o.id}')" style="background:var(--success); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">🛍️ Repetir</button>` : `<button type="button" onclick="openTrackModal('${o.id}')" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">🛵 Acompanhar</button>`}
                     ${isDone && !isCanc && !o.avaliacao ? `<button type="button" onclick="openRateOrderModal('${o.id}')" style="background:#fef3c7; color:#b45309; border:none; padding:8px 12px; border-radius:10px; font-weight:900; font-size:0.78rem; cursor:pointer;">⭐ Avaliar</button>` : ''}
                 </div>
@@ -1822,15 +1826,37 @@
         if (!_pendingClientReg) return;
         const { email, pass, nome, primeiroNome, sobrenome, telefone } = _pendingClientReg;
         const btn = el('btn-client-confirm-pin'); btn.disabled = true; btn.innerText = "Criando conta...";
+        window.isRegisteringClient = true;
         try {
-            window.isRegisteringClient = true;
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            await window.saveClientProfileEverywhere(cred.user.uid, { email, nome, primeiroNome, sobrenome, telefone, enderecos: [] });
+            let userObj = null;
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                userObj = cred.user;
+            } catch (authErr) {
+                if (authErr.code === 'auth/email-already-in-use') {
+                    const signCred = await signInWithEmailAndPassword(auth, email, pass);
+                    userObj = signCred.user;
+                } else {
+                    throw authErr;
+                }
+            }
+            await window.saveClientProfileEverywhere(userObj.uid, { email, nome, primeiroNome, sobrenome, telefone, enderecos: [] });
+            window.currentClient = userObj;
             window.isRegisteringClient = false; _pendingClientReg = null; _pinHash = null;
-            el('modal-client-verify-pin').style.display = 'none'; window.updateClientHeaderUI();
+            el('modal-client-verify-pin').style.display = 'none';
+            el('tab-pedidos').style.display = 'flex'; el('dnav-pedidos').style.display = 'inline-block';
+            el('profile-logged-out').style.display = 'none'; el('profile-logged-in').style.display = 'block';
+            window.updateClientHeaderUI(); window.listenToMyOrders(userObj.email);
             window.showToast("🎉 Conta criada com sucesso!");
-        } catch (e) { window.isRegisteringClient = false; window.showToast("⚠️ Erro ao criar conta."); }
-        finally { btn.disabled = false; btn.innerText = "✅ Validar PIN e Concluir Cadastro"; }
+        } catch (e) {
+            window.isRegisteringClient = false;
+            const msg = e?.code === 'auth/wrong-password' || e?.code === 'auth/invalid-credential'
+                ? "⚠️ Este e-mail já está cadastrado com outra senha! Faça login."
+                : "⚠️ Erro ao criar conta: " + (e?.message || "Verifique sua conexão.");
+            window.showToast(msg);
+        } finally {
+            btn.disabled = false; btn.innerText = "✅ Validar PIN e Concluir Cadastro";
+        }
     };
 
     window.submitClientAuth = async () => {
@@ -1962,9 +1988,18 @@
             window.myOrders = [];
             snap.forEach(d => window.myOrders.push({ id: d.id, ...d.data() }));
             window.myOrders.forEach(o => {
+                const isOrderActive = !window.isOrderDone(o.status) && o.status !== 'Cancelado';
                 const cnt = window.getStoreMessagesCount(o), prev = window.prevStoreChatCounts[o.id];
-                if (window.activeChatOrderId === o.id && el('modal-chat').style.display === 'flex') localStorage.setItem('juaba_seen_chat_' + o.id, String(cnt));
-                else if (window.initialOrdersLoadDone && prev !== undefined && cnt > prev) { window.playClientNotificationSound(); window.showToast(`💬 Nova mensagem de ${o.nomeLoja || 'Loja'}!`); }
+                if (window.activeChatOrderId === o.id && el('modal-chat').style.display === 'flex') {
+                    if (!isOrderActive) {
+                        window.closeClientChat();
+                    } else {
+                        localStorage.setItem('juaba_seen_chat_' + o.id, String(cnt));
+                    }
+                } else if (isOrderActive && window.initialOrdersLoadDone && prev !== undefined && cnt > prev) {
+                    window.playClientNotificationSound();
+                    window.showToast(`💬 Nova mensagem de ${o.nomeLoja || 'Loja'}!`);
+                }
                 window.prevStoreChatCounts[o.id] = cnt;
             });
             window.initialOrdersLoadDone = true;
@@ -1977,6 +2012,7 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
+        if (window.isRegisteringClient) return;
         if (user) {
             window.currentClient = user;
             el('tab-pedidos').style.display = 'flex'; el('dnav-pedidos').style.display = 'inline-block';
