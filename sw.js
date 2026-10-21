@@ -185,7 +185,6 @@ async function checkFirestoreInBackground() {
                             await showNativeSwNotification(`🛵 ${nomeLoja}`, body, docId, `juaba_status_${docId}_${status}`);
                             await notifyOpenClients({ type: 'JUABA_SW_SYNC_CLIENT', docId, status, storeMsgCount });
                         } else if (!prevStatus && status !== 'Novo') {
-                            // Caso o pedido tenha mudado rápido logo após ser criado
                             let body = `Status atualizado para: ${status}`;
                             if (status === 'Preparando') body = '🍳 A loja aceitou seu pedido e já está preparando!';
                             else if (status === 'Entrega') body = '🛵 Seu pedido saiu para entrega! Prepare-se para receber.';
