@@ -783,6 +783,7 @@
 
     // Escopo Privado de Segurança (Inacessível via Console DevTools)
     const GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_gscript_url') || "https://script.google.com/macros/s/AKfycbzPwVthaJMg8GifsEy09DapU84EJzVrpuJeyD6EB4dGyIdv3VR6yCzW_1LR_Zdg1GYb/exec";
+    const FCM_VAPID_KEY = localStorage.getItem('juaba_vapid_key') || "";
     let _pendingClientReg = null;
     let _pinHash = null;
     let _internalCoupons = [];
@@ -843,7 +844,9 @@
             };
             el('pwa-manifest-link').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
         }
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        }
     })();
 
     window.isRunningStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -922,37 +925,44 @@
     window.initialOrdersLoadDone = false;
     window.clientFcmToken = localStorage.getItem('juaba_fcm_token') || '';
 
-    // Motor de Notificações Nativas + Firebase Cloud Messaging (FCM Push)
+    // Motor de Notificações Nativas + Firebase Cloud Messaging (Funciona com App Aberto e Fechado igual WhatsApp)
     window.initPushNotificationsEngine = async () => {
         try {
-            if ('Notification' in window && Notification.permission === 'default') {
+            if (!('Notification' in window)) return;
+            if (Notification.permission === 'default') {
                 await Notification.requestPermission();
             }
+            if (Notification.permission !== 'granted') return;
+
             const supported = await isSupported().catch(() => false);
             if (!supported) return;
+
             const messaging = getMessaging(app);
+            const swReg = await navigator.serviceWorker?.ready.catch(() => null);
+
+            const tokenOptions = swReg ? { serviceWorkerRegistration: swReg } : {};
+            if (FCM_VAPID_KEY) tokenOptions.vapidKey = FCM_VAPID_KEY;
+
+            const token = await getToken(messaging, tokenOptions).catch(() => '');
+            if (token) {
+                window.clientFcmToken = token;
+                localStorage.setItem('juaba_fcm_token', token);
+                if (window.currentClient?.uid) {
+                    setDoc(doc(db, "usuario", window.currentClient.uid), { fcmToken: token, updatedAtMs: Date.now() }, { merge: true }).catch(() => {});
+                }
+            }
+
             onMessage(messaging, (payload) => {
                 const title = payload?.notification?.title || payload?.data?.title || 'JuabaDelivery';
                 const body = payload?.notification?.body || payload?.data?.body || 'Atualização no seu pedido!';
                 window.triggerNativeSystemNotification(title, body, payload?.data?.orderId);
             });
-            if ('Notification' in window && Notification.permission === 'granted') {
-                const swReg = await navigator.serviceWorker?.getRegistration().catch(() => null);
-                const token = await getToken(messaging, swReg ? { serviceWorkerRegistration: swReg } : undefined).catch(() => '');
-                if (token) {
-                    window.clientFcmToken = token;
-                    localStorage.setItem('juaba_fcm_token', token);
-                    if (window.currentClient?.uid) {
-                        setDoc(doc(db, "usuario", window.currentClient.uid), { fcmToken: token }, { merge: true }).catch(() => {});
-                    }
-                }
-            }
         } catch (e) {}
     };
 
     window.triggerNativeSystemNotification = async (title, body, orderId = null) => {
         window.playClientNotificationSound();
-        if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200]); } catch (e) {} }
+        if (navigator.vibrate) { try { navigator.vibrate([250, 100, 250, 100, 300]); } catch (e) {} }
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         const iconUrl = window.generateAppPngIcon(192);
         const options = {
@@ -961,11 +971,12 @@
             badge: iconUrl,
             tag: orderId ? `juaba_ord_${orderId}` : `juaba_notif_${Date.now()}`,
             renotify: true,
-            vibrate: [200, 100, 200],
-            data: { orderId }
+            requireInteraction: true,
+            vibrate: [250, 100, 250, 100, 300],
+            data: { orderId, url: window.location.href }
         };
         try {
-            const reg = await navigator.serviceWorker?.getRegistration();
+            const reg = await navigator.serviceWorker?.ready;
             if (reg && reg.showNotification) {
                 await reg.showNotification(title, options);
                 return;
@@ -981,34 +992,30 @@
         } catch (e) {}
     };
 
-    window.buildStoreWhatsappRedirectUrl = (loja, orderId, orderData, isPix) => {
+    // Dispara aviso automático em segundo plano para o WhatsApp do Lojista (Sem tirar o cliente do App)
+    window.notifyStoreWhatsappBackground = async (loja, orderId) => {
         const rawWpp = String(loja?.whatsapp || '').replace(/\D/g, '');
-        if (!rawWpp || rawWpp.length < 8) return '';
+        if (!rawWpp || rawWpp.length < 8) return;
         const phone = rawWpp.startsWith('55') ? rawWpp : '55' + rawWpp;
-        const shortId = String(orderId || 'JUABA').substring(0, 6).toUpperCase();
-        const itensLines = (orderData.itensCart || []).map(i => {
-            const adds = (Array.isArray(i.addonsNames) && i.addonsNames.length) ? ` [${i.addonsNames.join(', ')}]` : '';
-            const obs = i.obs ? ` (Obs: ${i.obs})` : '';
-            return `• ${i.qty}x ${i.nome}${adds}${obs}`;
-        }).join('\n') || `• ${orderData.itens}`;
+        const textoAviso = "🔔 Novo pedido no JuabaDelivery! Abra seu painel para aceitar.";
 
-        let msg = `🧾 *NOVO PEDIDO #${shortId} — ${loja?.nome_loja || 'JuabaDelivery'}*\n`;
-        msg += `👤 *Cliente:* ${orderData.cliente}\n`;
-        msg += `📱 *Contato:* ${orderData.telefone}\n\n`;
-        msg += `🍔 *ITENS DO PEDIDO:*\n${itensLines}\n\n`;
-        msg += `📍 *Endereço de Entrega:*\n${orderData.endereco}\n`;
-        msg += `💰 *Valor Total (c/ entrega):* ${orderData.total}\n\n`;
-
-        if (isPix) {
-            msg += `💠 *PAGAMENTO VIA PIX*\n`;
-            msg += `📋 *PIX Copia e Cola (Padrão Banco Central):*\n${orderData.pixCopiaECola}\n\n`;
-            msg += `⏳ *Aguardando comprovante de pagamento PIX para iniciar o preparo!*`;
-        } else {
-            const isDinheiro = String(orderData.pagamento || '').toLowerCase().includes('dinheiro');
-            msg += `${isDinheiro ? '💵' : '💳'} *Forma de Pagamento:* Pagamento em ${orderData.pagamento}\n\n`;
-            msg += `✅ *Pedido enviado! Aguardando confirmação da loja.*`;
-        }
-        return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+        try {
+            const payload = {
+                acao: 'aviso_whatsapp_lojista',
+                telefoneLoja: phone,
+                nomeLoja: loja?.nome_loja || 'Lojista',
+                wppApiKey: loja?.wpp_api_key || '',
+                fcmTokenLoja: loja?.fcmTokenLoja || '',
+                orderId: String(orderId || ''),
+                mensagem: textoAviso
+            };
+            const sep = GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?';
+            await fetch(GOOGLE_SCRIPT_URL + sep + new URLSearchParams(payload).toString(), {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {}
     };
 
     window.selectedCategory = 'TODOS';
@@ -1123,7 +1130,9 @@
         let crc = 0xFFFF;
         for (let i = 0; i < payload.length; i++) {
             crc ^= payload.charCodeAt(i) << 8;
-            for (let j = 0; j < 8; j++) crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+            for (let j = 0; j < 8; j++) {
+                crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+            }
         }
         return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     };
@@ -1619,35 +1628,28 @@
             emailCliente: window.currentClient.email.toLowerCase(), telefone: window.clientProfileData.telefone || '',
             endereco: deliv.replace('Entregar em: ', ''), itens: itensStr, itensCart: window.cart,
             pagamento: payStr, total: totTxt, status: 'Novo', data: new Date().toLocaleString('pt-BR'), chat: [],
-            fcmTokenCliente: window.clientFcmToken || ''
+            fcmTokenCliente: window.clientFcmToken || localStorage.getItem('juaba_fcm_token') || ''
         };
         try {
             await window.initPushNotificationsEngine();
-            const isPickup = (window.selectedDeliveryIdx === -1 || deliv === 'Retirar na Loja');
             const isPix = payStr.toUpperCase().includes('PIX');
+            newOrder.fcmTokenCliente = window.clientFcmToken || localStorage.getItem('juaba_fcm_token') || '';
+
             const docRef = await addDoc(collection(db, "pedidos"), newOrder);
             const createdOrder = { id: docRef.id, ...newOrder };
 
             window.cart = []; window.appliedCoupon = null; window.updateCartFloatingBar(); window.closeCartModal();
             window.showToast("🎉 Pedido enviado com sucesso!");
 
-            // Regra 1: Se for Retirar na Loja -> Não redireciona ao WhatsApp
-            if (isPickup) {
-                if (isPix) window.openPixCheckoutModal(docRef.id, createdOrder);
-                else window.openTrackModal(docRef.id, createdOrder);
-                return;
-            }
-
-            // Regras 2 e 3: Se for Entrega -> Direciona ao WhatsApp da Loja (PIX com Copia e Cola BC ou Dinheiro/Cartão)
-            const wppUrl = window.buildStoreWhatsappRedirectUrl(loja, docRef.id, createdOrder, isPix);
+            // Mantém o cliente 100% dentro do aplicativo (Abre modal PIX ou Rastreio)
             if (isPix) {
                 window.openPixCheckoutModal(docRef.id, createdOrder);
             } else {
                 window.openTrackModal(docRef.id, createdOrder);
             }
-            if (wppUrl) {
-                window.open(wppUrl, '_blank');
-            }
+
+            // Envia aviso automático em segundo plano para o WhatsApp do lojista
+            window.notifyStoreWhatsappBackground(loja, docRef.id);
         } catch (e) { window.showToast("⚠️ Erro ao enviar pedido."); }
     };
 
