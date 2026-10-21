@@ -1,45 +1,148 @@
-// sw.js - Service Worker JuabaDelivery (Funciona com App Cliente e Painel Lojista fechados)
+// sw.js - Service Worker JuabaDelivery (Persistente com IndexedDB + Loop waitUntil em 2º Plano)
 self.addEventListener('install', (e) => self.skipWaiting());
-self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-
-let watchConfig = {
-    projectId: 'juaba-delivery',
-    emailCliente: '',
-    lojaId: ''
-};
-const clientStatusMemory = {};
-const clientChatMemory = {};
-const storeOrdersMemory = new Set();
-const storeChatMemory = {};
-let initializedClient = false;
-let initializedStore = false;
-
-// Recebe credenciais de monitoramento do App Cliente e do Painel Lojista
-self.addEventListener('message', (event) => {
-    const data = event.data || {};
-    if (data.type === 'JUABA_WATCH_CLIENT') {
-        if (data.projectId) watchConfig.projectId = data.projectId;
-        if (data.emailCliente && data.emailCliente !== watchConfig.emailCliente) {
-            watchConfig.emailCliente = data.emailCliente;
-            initializedClient = false;
-        }
-        checkFirestoreInBackground();
-    } else if (data.type === 'JUABA_WATCH_STORE') {
-        if (data.projectId) watchConfig.projectId = data.projectId;
-        if (data.lojaId && data.lojaId !== watchConfig.lojaId) {
-            watchConfig.lojaId = data.lojaId;
-            initializedStore = false;
-        }
-        checkFirestoreInBackground();
-    }
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        self.clients.claim().then(() => startBackgroundLoop())
+    );
 });
 
+const DB_NAME = 'juaba_sw_persistent_db';
+const STORE_NAME = 'sw_state';
+
+function openSwDb() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function loadSwState() {
+    try {
+        const db = await openSwDb();
+        return await new Promise((resolve) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get('config');
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+async function saveSwState(state) {
+    try {
+        const db = await openSwDb();
+        return await new Promise((resolve) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).put(state, 'config');
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => resolve(false);
+        });
+    } catch (e) {
+        return false;
+    }
+}
+
+function getDefaultState() {
+    return {
+        projectId: 'juaba-delivery',
+        emailCliente: '',
+        lojaId: '',
+        initializedClient: false,
+        initializedStore: false,
+        clientStatusMemory: {},
+        clientChatMemory: {},
+        storeOrdersMemory: {},
+        storeChatMemory: {}
+    };
+}
+
+let isLoopRunning = false;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Recebe e salva no IndexedDB as credenciais e o estado atual dos pedidos vindos do App ou Painel
+self.addEventListener('message', (event) => {
+    const data = event.data || {};
+    event.waitUntil((async () => {
+        const state = (await loadSwState()) || getDefaultState();
+
+        if (data.type === 'JUABA_WATCH_CLIENT') {
+            if (data.projectId) state.projectId = data.projectId;
+            if (data.emailCliente) {
+                const cleanEmail = String(data.emailCliente).toLowerCase().trim();
+                if (cleanEmail !== state.emailCliente) {
+                    state.emailCliente = cleanEmail;
+                }
+            }
+            if (data.ordersSnapshot && typeof data.ordersSnapshot === 'object') {
+                for (const [id, info] of Object.entries(data.ordersSnapshot)) {
+                    state.clientStatusMemory[id] = info.status;
+                    state.clientChatMemory[id] = info.storeMsgCount;
+                }
+                state.initializedClient = true;
+            }
+            await saveSwState(state);
+            await checkFirestoreInBackground();
+            startBackgroundLoop();
+        } else if (data.type === 'JUABA_WATCH_STORE') {
+            if (data.projectId) state.projectId = data.projectId;
+            if (data.lojaId && data.lojaId !== state.lojaId) {
+                state.lojaId = data.lojaId;
+            }
+            if (data.ordersSnapshot && typeof data.ordersSnapshot === 'object') {
+                for (const [id, info] of Object.entries(data.ordersSnapshot)) {
+                    state.storeOrdersMemory[id] = true;
+                    state.storeChatMemory[id] = info.cliMsgCount;
+                }
+                state.initializedStore = true;
+            }
+            await saveSwState(state);
+            await checkFirestoreInBackground();
+            startBackgroundLoop();
+        } else if (data.type === 'JUABA_APP_BACKGROUNDED') {
+            await checkFirestoreInBackground();
+            startBackgroundLoop();
+        }
+    })());
+});
+
+async function startBackgroundLoop() {
+    if (isLoopRunning) return;
+    isLoopRunning = true;
+    try {
+        // Mantém o Service Worker acordado verificando a cada 5 segundos
+        for (let i = 0; i < 36; i++) {
+            await checkFirestoreInBackground();
+            await sleep(5000);
+        }
+    } catch (e) {}
+    isLoopRunning = false;
+    // Renova o ciclo via Background Sync para o Android não encerrar o monitoramento
+    try {
+        if (self.registration && self.registration.sync) {
+            await self.registration.sync.register('juaba-bg-keepalive');
+        }
+    } catch (e) {}
+}
+
 async function checkFirestoreInBackground() {
-    const proj = watchConfig.projectId || 'juaba-delivery';
+    const state = await loadSwState();
+    if (!state) return;
+
+    const proj = state.projectId || 'juaba-delivery';
     const url = `https://firestore.googleapis.com/v1/projects/${proj}/databases/(default)/documents:runQuery`;
+    let stateChanged = false;
 
     // 1. Monitora atualizações de status e chat para o Cliente mesmo com o app fechado
-    if (watchConfig.emailCliente) {
+    if (state.emailCliente) {
         try {
             const res = await fetch(url, {
                 method: 'POST',
@@ -51,7 +154,7 @@ async function checkFirestoreInBackground() {
                             fieldFilter: {
                                 field: { fieldPath: 'emailCliente' },
                                 op: 'EQUAL',
-                                value: { stringValue: watchConfig.emailCliente }
+                                value: { stringValue: state.emailCliente }
                             }
                         }
                     }
@@ -69,30 +172,50 @@ async function checkFirestoreInBackground() {
                     const storeMsgs = chatValues.filter(v => v.mapValue?.fields?.sender?.stringValue === 'loja');
                     const storeMsgCount = storeMsgs.length;
 
-                    if (initializedClient) {
-                        if (clientStatusMemory[docId] && clientStatusMemory[docId] !== status) {
+                    const prevStatus = state.clientStatusMemory[docId];
+                    const prevChatCount = state.clientChatMemory[docId];
+
+                    if (state.initializedClient) {
+                        if (prevStatus && prevStatus !== status) {
                             let body = `Status atualizado para: ${status}`;
                             if (status === 'Preparando') body = '🍳 A loja aceitou seu pedido e já está preparando!';
                             else if (status === 'Entrega') body = '🛵 Seu pedido saiu para entrega! Prepare-se para receber.';
                             else if (status === 'Concluido') body = '✅ Pedido entregue e concluído! Bom apetite!';
                             else if (status === 'Cancelado') body = '❌ Seu pedido foi cancelado pela loja.';
-                            await showNativeSwNotification(`🛵 ${nomeLoja}`, body, docId);
+                            await showNativeSwNotification(`🛵 ${nomeLoja}`, body, docId, `juaba_status_${docId}_${status}`);
+                            await notifyOpenClients({ type: 'JUABA_SW_SYNC_CLIENT', docId, status, storeMsgCount });
+                        } else if (!prevStatus && status !== 'Novo') {
+                            // Caso o pedido tenha mudado rápido logo após ser criado
+                            let body = `Status atualizado para: ${status}`;
+                            if (status === 'Preparando') body = '🍳 A loja aceitou seu pedido e já está preparando!';
+                            else if (status === 'Entrega') body = '🛵 Seu pedido saiu para entrega! Prepare-se para receber.';
+                            await showNativeSwNotification(`🛵 ${nomeLoja}`, body, docId, `juaba_status_${docId}_${status}`);
+                            await notifyOpenClients({ type: 'JUABA_SW_SYNC_CLIENT', docId, status, storeMsgCount });
                         }
-                        if (clientChatMemory[docId] !== undefined && storeMsgCount > clientChatMemory[docId]) {
+
+                        if (prevChatCount !== undefined && storeMsgCount > prevChatCount) {
                             const lastMsg = storeMsgs[storeMsgs.length - 1]?.mapValue?.fields?.text?.stringValue || 'Nova mensagem da loja!';
-                            await showNativeSwNotification(`💬 ${nomeLoja}`, lastMsg, docId);
+                            await showNativeSwNotification(`💬 ${nomeLoja}`, lastMsg, docId, `juaba_chat_${docId}_${storeMsgCount}`);
+                            await notifyOpenClients({ type: 'JUABA_SW_SYNC_CLIENT', docId, status, storeMsgCount });
                         }
                     }
-                    clientStatusMemory[docId] = status;
-                    clientChatMemory[docId] = storeMsgCount;
+
+                    if (state.clientStatusMemory[docId] !== status || state.clientChatMemory[docId] !== storeMsgCount) {
+                        state.clientStatusMemory[docId] = status;
+                        state.clientChatMemory[docId] = storeMsgCount;
+                        stateChanged = true;
+                    }
                 }
-                initializedClient = true;
+                if (!state.initializedClient) {
+                    state.initializedClient = true;
+                    stateChanged = true;
+                }
             }
         } catch (e) {}
     }
 
     // 2. Monitora novos pedidos e mensagens para o Painel do Lojista mesmo com o app fechado
-    if (watchConfig.lojaId) {
+    if (state.lojaId) {
         try {
             const res = await fetch(url, {
                 method: 'POST',
@@ -104,7 +227,7 @@ async function checkFirestoreInBackground() {
                             fieldFilter: {
                                 field: { fieldPath: 'lojaId' },
                                 op: 'EQUAL',
-                                value: { stringValue: watchConfig.lojaId }
+                                value: { stringValue: state.lojaId }
                             }
                         }
                     }
@@ -122,44 +245,68 @@ async function checkFirestoreInBackground() {
                     const cliMsgs = chatValues.filter(v => v.mapValue?.fields?.sender?.stringValue === 'cliente');
                     const cliMsgCount = cliMsgs.length;
 
-                    if (initializedStore) {
-                        if (!storeOrdersMemory.has(docId) && status === 'Novo') {
+                    const knownOrder = state.storeOrdersMemory[docId];
+                    const prevCliChat = state.storeChatMemory[docId];
+
+                    if (state.initializedStore) {
+                        if (!knownOrder && status === 'Novo') {
                             await showNativeSwNotification(
                                 `🔔 Novo Pedido #${docId.substring(0, 6).toUpperCase()}`,
                                 '🔔 Novo pedido no JuabaDelivery! Abra seu painel para aceitar.',
-                                docId
+                                docId,
+                                `juaba_neworder_${docId}`
                             );
+                            await notifyOpenClients({ type: 'JUABA_SW_SYNC_STORE', docId, cliMsgCount });
                         }
-                        if (storeChatMemory[docId] !== undefined && cliMsgCount > storeChatMemory[docId]) {
+                        if (prevCliChat !== undefined && cliMsgCount > prevCliChat) {
                             const lastMsg = cliMsgs[cliMsgs.length - 1]?.mapValue?.fields?.text?.stringValue || 'Nova mensagem do cliente!';
-                            await showNativeSwNotification(`💬 ${cliente}`, lastMsg, docId);
+                            await showNativeSwNotification(`💬 ${cliente}`, lastMsg, docId, `juaba_storechat_${docId}_${cliMsgCount}`);
+                            await notifyOpenClients({ type: 'JUABA_SW_SYNC_STORE', docId, cliMsgCount });
                         }
                     }
-                    storeOrdersMemory.add(docId);
-                    storeChatMemory[docId] = cliMsgCount;
+
+                    if (!state.storeOrdersMemory[docId] || state.storeChatMemory[docId] !== cliMsgCount) {
+                        state.storeOrdersMemory[docId] = true;
+                        state.storeChatMemory[docId] = cliMsgCount;
+                        stateChanged = true;
+                    }
                 }
-                initializedStore = true;
+                if (!state.initializedStore) {
+                    state.initializedStore = true;
+                    stateChanged = true;
+                }
             }
         } catch (e) {}
     }
+
+    if (stateChanged) {
+        await saveSwState(state);
+    }
 }
 
-setInterval(checkFirestoreInBackground, 15000);
+async function notifyOpenClients(msg) {
+    try {
+        const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const c of list) {
+            c.postMessage(msg);
+        }
+    } catch (e) {}
+}
 
 self.addEventListener('periodicsync', (event) => {
-    event.waitUntil(checkFirestoreInBackground());
+    event.waitUntil(startBackgroundLoop());
 });
 
 self.addEventListener('sync', (event) => {
-    event.waitUntil(checkFirestoreInBackground());
+    event.waitUntil(startBackgroundLoop());
 });
 
-async function showNativeSwNotification(title, body, orderId) {
+async function showNativeSwNotification(title, body, orderId, customTag) {
     const options = {
         body: String(body || ''),
         icon: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png',
         badge: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png',
-        tag: orderId ? `juaba_sw_${orderId}_${Date.now()}` : `juaba_sw_${Date.now()}`,
+        tag: customTag || (orderId ? `juaba_sw_${orderId}` : `juaba_sw_${Date.now()}`),
         renotify: true,
         requireInteraction: true,
         vibrate: [300, 100, 300, 100, 400],
@@ -181,7 +328,12 @@ self.addEventListener('push', (event) => {
     const body = notif.body || 'Você tem uma nova atualização no seu pedido!';
     const orderId = data.data?.orderId || notif.orderId || null;
 
-    event.waitUntil(showNativeSwNotification(title, body, orderId));
+    event.waitUntil(
+        Promise.all([
+            showNativeSwNotification(title, body, orderId),
+            startBackgroundLoop()
+        ])
+    );
 });
 
 self.addEventListener('notificationclick', (event) => {
