@@ -14,6 +14,7 @@
     <link rel="icon" type="image/png" sizes="192x192" id="pwa-fav-icon" href="https://placehold.co/192x192/ea1d2c/ffffff.png?text=JD">
     <link rel="apple-touch-icon" sizes="192x192" id="pwa-apple-icon" href="https://placehold.co/192x192/ea1d2c/ffffff.png?text=JD">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #ea1d2c;
@@ -781,9 +782,8 @@
     const db = getFirestore(app);
     const el = (id) => document.getElementById(id);
 
-    // Escopo Privado de Segurança (Inacessível via Console DevTools)
+    // Escopo Privado de Segurança
     const GOOGLE_SCRIPT_URL = localStorage.getItem('juaba_gscript_url') || "https://script.google.com/macros/s/AKfycbzPwVthaJMg8GifsEy09DapU84EJzVrpuJeyD6EB4dGyIdv3VR6yCzW_1LR_Zdg1GYb/exec";
-    const FCM_VAPID_KEY = localStorage.getItem('juaba_vapid_key') || "";
     let _pendingClientReg = null;
     let _pinHash = null;
     let _internalCoupons = [];
@@ -844,9 +844,7 @@
             };
             el('pwa-manifest-link').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
         }
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').catch(() => {});
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
     })();
 
     window.isRunningStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -925,44 +923,37 @@
     window.initialOrdersLoadDone = false;
     window.clientFcmToken = localStorage.getItem('juaba_fcm_token') || '';
 
-    // Motor de Notificações Nativas + Firebase Cloud Messaging (Funciona com App Aberto e Fechado igual WhatsApp)
+    // Motor de Notificações Nativas + Firebase Cloud Messaging (FCM Push)
     window.initPushNotificationsEngine = async () => {
         try {
-            if (!('Notification' in window)) return;
-            if (Notification.permission === 'default') {
+            if ('Notification' in window && Notification.permission === 'default') {
                 await Notification.requestPermission();
             }
-            if (Notification.permission !== 'granted') return;
-
             const supported = await isSupported().catch(() => false);
             if (!supported) return;
-
             const messaging = getMessaging(app);
-            const swReg = await navigator.serviceWorker?.ready.catch(() => null);
-
-            const tokenOptions = swReg ? { serviceWorkerRegistration: swReg } : {};
-            if (FCM_VAPID_KEY) tokenOptions.vapidKey = FCM_VAPID_KEY;
-
-            const token = await getToken(messaging, tokenOptions).catch(() => '');
-            if (token) {
-                window.clientFcmToken = token;
-                localStorage.setItem('juaba_fcm_token', token);
-                if (window.currentClient?.uid) {
-                    setDoc(doc(db, "usuario", window.currentClient.uid), { fcmToken: token, updatedAtMs: Date.now() }, { merge: true }).catch(() => {});
-                }
-            }
-
             onMessage(messaging, (payload) => {
                 const title = payload?.notification?.title || payload?.data?.title || 'JuabaDelivery';
                 const body = payload?.notification?.body || payload?.data?.body || 'Atualização no seu pedido!';
                 window.triggerNativeSystemNotification(title, body, payload?.data?.orderId);
             });
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const swReg = await navigator.serviceWorker?.getRegistration().catch(() => null);
+                const token = await getToken(messaging, swReg ? { serviceWorkerRegistration: swReg } : undefined).catch(() => '');
+                if (token) {
+                    window.clientFcmToken = token;
+                    localStorage.setItem('juaba_fcm_token', token);
+                    if (window.currentClient?.uid) {
+                        setDoc(doc(db, "usuario", window.currentClient.uid), { fcmToken: token }, { merge: true }).catch(() => {});
+                    }
+                }
+            }
         } catch (e) {}
     };
 
     window.triggerNativeSystemNotification = async (title, body, orderId = null) => {
         window.playClientNotificationSound();
-        if (navigator.vibrate) { try { navigator.vibrate([250, 100, 250, 100, 300]); } catch (e) {} }
+        if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200]); } catch (e) {} }
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         const iconUrl = window.generateAppPngIcon(192);
         const options = {
@@ -971,12 +962,11 @@
             badge: iconUrl,
             tag: orderId ? `juaba_ord_${orderId}` : `juaba_notif_${Date.now()}`,
             renotify: true,
-            requireInteraction: true,
-            vibrate: [250, 100, 250, 100, 300],
-            data: { orderId, url: window.location.href }
+            vibrate: [200, 100, 200],
+            data: { orderId }
         };
         try {
-            const reg = await navigator.serviceWorker?.ready;
+            const reg = await navigator.serviceWorker?.getRegistration();
             if (reg && reg.showNotification) {
                 await reg.showNotification(title, options);
                 return;
@@ -989,32 +979,6 @@
                 if (orderId) window.openTrackModal(orderId);
                 n.close();
             };
-        } catch (e) {}
-    };
-
-    // Dispara aviso automático em segundo plano para o WhatsApp do Lojista (Sem tirar o cliente do App)
-    window.notifyStoreWhatsappBackground = async (loja, orderId) => {
-        const rawWpp = String(loja?.whatsapp || '').replace(/\D/g, '');
-        if (!rawWpp || rawWpp.length < 8) return;
-        const phone = rawWpp.startsWith('55') ? rawWpp : '55' + rawWpp;
-        const textoAviso = "🔔 Novo pedido no JuabaDelivery! Abra seu painel para aceitar.";
-
-        try {
-            const payload = {
-                acao: 'aviso_whatsapp_lojista',
-                telefoneLoja: phone,
-                nomeLoja: loja?.nome_loja || 'Lojista',
-                wppApiKey: loja?.wpp_api_key || '',
-                fcmTokenLoja: loja?.fcmTokenLoja || '',
-                orderId: String(orderId || ''),
-                mensagem: textoAviso
-            };
-            const sep = GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?';
-            await fetch(GOOGLE_SCRIPT_URL + sep + new URLSearchParams(payload).toString(), {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            });
         } catch (e) {}
     };
 
@@ -1130,9 +1094,7 @@
         let crc = 0xFFFF;
         for (let i = 0; i < payload.length; i++) {
             crc ^= payload.charCodeAt(i) << 8;
-            for (let j = 0; j < 8; j++) {
-                crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
-            }
+            for (let j = 0; j < 8; j++) crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
         }
         return payload + (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     };
@@ -1628,28 +1590,23 @@
             emailCliente: window.currentClient.email.toLowerCase(), telefone: window.clientProfileData.telefone || '',
             endereco: deliv.replace('Entregar em: ', ''), itens: itensStr, itensCart: window.cart,
             pagamento: payStr, total: totTxt, status: 'Novo', data: new Date().toLocaleString('pt-BR'), chat: [],
-            fcmTokenCliente: window.clientFcmToken || localStorage.getItem('juaba_fcm_token') || ''
+            fcmTokenCliente: window.clientFcmToken || ''
         };
         try {
             await window.initPushNotificationsEngine();
             const isPix = payStr.toUpperCase().includes('PIX');
-            newOrder.fcmTokenCliente = window.clientFcmToken || localStorage.getItem('juaba_fcm_token') || '';
-
             const docRef = await addDoc(collection(db, "pedidos"), newOrder);
             const createdOrder = { id: docRef.id, ...newOrder };
 
             window.cart = []; window.appliedCoupon = null; window.updateCartFloatingBar(); window.closeCartModal();
             window.showToast("🎉 Pedido enviado com sucesso!");
 
-            // Mantém o cliente 100% dentro do aplicativo (Abre modal PIX ou Rastreio)
+            // Abre o modal do PIX ou a tela de acompanhamento diretamente (sem jogar para o WhatsApp)
             if (isPix) {
                 window.openPixCheckoutModal(docRef.id, createdOrder);
             } else {
                 window.openTrackModal(docRef.id, createdOrder);
             }
-
-            // Envia aviso automático em segundo plano para o WhatsApp do lojista
-            window.notifyStoreWhatsappBackground(loja, docRef.id);
         } catch (e) { window.showToast("⚠️ Erro ao enviar pedido."); }
     };
 
@@ -1856,9 +1813,11 @@
             const isDone = window.isOrderDone(o.status), isCanc = o.status === 'Cancelado', unread = window.getUnreadStoreMessagesForOrder(o);
             return `<div style="background:#fff; border:${isCanc ? '1px solid #fecaca' : '1px solid var(--border)'}; border-radius:18px; padding:15px 16px; margin-bottom:12px;">
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; cursor:pointer;" onclick="openStoreMenu('${o.lojaId}')">
-                    <img src="${window.escapeHtml(logo)}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;">
-                    <div><div style="font-weight:900; font-size:0.95rem;">${window.escapeHtml(o.nomeLoja || loja?.nome_loja || 'Restaurante')}</div>
-                    <div style="font-size:0.72rem; font-weight:800; color:${isDone ? '#16a34a' : (isCanc ? '#dc2626' : '#71717a')};">${isDone ? 'Pedido finalizado' : (isCanc ? 'Cancelado' : 'Em andamento')}</div></div>
+                    <img src="${window.escapeHtml(logo)}" style="width:38px; height:38px; border-radius:50%; flex-shrink:0; object-fit:cover;">
+                    <div style="min-width:0; flex:1;">
+                        <div style="font-weight:900; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${window.escapeHtml(o.nomeLoja || loja?.nome_loja || 'Restaurante')} <span style="color:#a1a1aa; font-weight:800; font-size:0.85rem;">• #${o.id.substring(0,6).toUpperCase()}</span></div>
+                        <div style="font-size:0.72rem; font-weight:800; color:#71717a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><span style="color:${isDone ? '#16a34a' : (isCanc ? '#dc2626' : '#71717a')};">${isDone ? 'Pedido finalizado' : (isCanc ? 'Cancelado' : 'Em andamento')}</span> • ${window.escapeHtml(o.data || '')}</div>
+                    </div>
                 </div>
                 <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
                     <span style="font-size:0.78rem; font-weight:800; color:#71717a;">Pagamento: <b style="color:#111;">${window.escapeHtml(o.pagamento || 'PIX')}</b></span>
