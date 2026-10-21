@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="JuabaDelivery">
     <meta name="application-name" content="JuabaDelivery">
-    <link rel="manifest" href="manifest.json" id="pwa-manifest-link">
+    <link rel="manifest" id="pwa-manifest-link" href='data:application/manifest+json,{"name":"JuabaDelivery","short_name":"JuabaDelivery","start_url":"/","scope":"/","display":"standalone","background_color":"#ffffff","theme_color":"#ea1d2c","icons":[{"src":"https://placehold.co/192x192/ea1d2c/ffffff.png?text=JD","sizes":"192x192","type":"image/png"},{"src":"https://placehold.co/512x512/ea1d2c/ffffff.png?text=JD","sizes":"512x512","type":"image/png"}]}'>
     <link rel="icon" type="image/png" sizes="192x192" id="pwa-fav-icon" href="https://placehold.co/192x192/ea1d2c/ffffff.png?text=JD">
     <link rel="apple-touch-icon" sizes="192x192" id="pwa-apple-icon" href="https://placehold.co/192x192/ea1d2c/ffffff.png?text=JD">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -241,6 +241,9 @@
 <header class="mobile-header">
     <div class="brand-logo" onclick="switchTab('home')">Juaba<span>Delivery</span></div>
     <div style="display:flex; align-items:center; gap:8px;">
+        <button onclick="requestNotificationPermissionManual()" id="btn-enable-notif-mob" style="display:none; background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:7px 10px; border-radius:999px; font-weight:800; font-size:0.72rem; cursor:pointer;">
+            🔔 Ativar Alertas
+        </button>
         <button onclick="triggerNativePwaInstall()" id="btn-pwa-install-mob" style="display:none; background:var(--primary); color:#fff; border:none; padding:7px 11px; border-radius:999px; font-weight:800; font-size:0.74rem; cursor:pointer;">
             📲 Instalar App
         </button>
@@ -831,17 +834,30 @@
         } catch (e) {}
 
         if (!externalOk && el('pwa-manifest-link')) {
-            const startUrl = window.location.origin + window.location.pathname;
+            const originUrl = window.location.origin + '/';
             const manifest = {
-                id: startUrl, name: "JuabaDelivery | Peça Online", short_name: "JuabaDelivery",
-                start_url: startUrl, scope: startUrl, display: "standalone",
-                background_color: "#ffffff", theme_color: "#ea1d2c", orientation: "portrait-primary",
+                id: originUrl,
+                name: "JuabaDelivery | Peça Online",
+                short_name: "JuabaDelivery",
+                start_url: originUrl,
+                scope: "/",
+                display: "standalone",
+                display_override: ["standalone", "fullscreen"],
+                background_color: "#ffffff",
+                theme_color: "#ea1d2c",
+                orientation: "portrait-primary",
                 icons: [
-                    { src: icon192, sizes: "192x192", type: "image/png", purpose: "any" },
-                    { src: icon512, sizes: "512x512", type: "image/png", purpose: "any" }
+                    { src: icon192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+                    { src: icon512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
                 ]
             };
-            el('pwa-manifest-link').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+            try {
+                // Usa Blob URL de mesma origem para que o Android reconheca o escopo do domínio sem exibir a barra de URL no topo
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+                el('pwa-manifest-link').href = URL.createObjectURL(blob);
+            } catch (e) {
+                el('pwa-manifest-link').href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+            }
         }
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
     })();
@@ -922,12 +938,39 @@
     window.initialOrdersLoadDone = false;
     window.clientFcmToken = localStorage.getItem('juaba_fcm_token') || '';
 
+    // Verifica e exibe botão de ativar alertas caso a permissão ainda não tenha sido concedida no celular
+    window.checkNotificationButtonUI = () => {
+        const btn = el('btn-enable-notif-mob');
+        if (!btn) return;
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            btn.style.display = 'inline-flex';
+        } else {
+            btn.style.display = 'none';
+        }
+    };
+
+    window.requestNotificationPermissionManual = async () => {
+        if (!('Notification' in window)) {
+            window.showToast("⚠️ Seu navegador não suporta notificações nativas.");
+            return;
+        }
+        try {
+            const perm = await Notification.requestPermission();
+            window.checkNotificationButtonUI();
+            if (perm === 'granted') {
+                window.showToast("🔔 Alertas ativados com sucesso!");
+                window.triggerNativeSystemNotification("🔔 JuabaDelivery", "Você receberá alertas aqui quando seu pedido atualizar!");
+                window.initPushNotificationsEngine();
+            } else {
+                window.showToast("⚠️ Permissão negada. Libere as notificações nas configurações do navegador.");
+            }
+        } catch (e) {}
+    };
+
     // Motor de Notificações Nativas + Firebase Cloud Messaging (FCM Push)
     window.initPushNotificationsEngine = async () => {
+        window.checkNotificationButtonUI();
         try {
-            if ('Notification' in window && Notification.permission === 'default') {
-                await Notification.requestPermission();
-            }
             const supported = await isSupported().catch(() => false);
             if (!supported) return;
             const messaging = getMessaging(app);
@@ -952,21 +995,22 @@
 
     window.triggerNativeSystemNotification = async (title, body, orderId = null) => {
         window.playClientNotificationSound();
-        if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200]); } catch (e) {} }
+        if (navigator.vibrate) { try { navigator.vibrate([250, 120, 250]); } catch (e) {} }
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         const iconUrl = window.generateAppPngIcon(192);
         const options = {
             body: String(body || ''),
             icon: iconUrl,
             badge: iconUrl,
-            tag: orderId ? `juaba_ord_${orderId}` : `juaba_notif_${Date.now()}`,
+            tag: orderId ? `juaba_ord_${orderId}_${Date.now()}` : `juaba_notif_${Date.now()}`,
             renotify: true,
-            vibrate: [200, 100, 200],
+            requireInteraction: false,
+            vibrate: [250, 120, 250],
             data: { orderId }
         };
         try {
             const reg = await navigator.serviceWorker?.getRegistration();
-            if (reg && reg.showNotification) {
+            if (reg && typeof reg.showNotification === 'function') {
                 await reg.showNotification(title, options);
                 return;
             }
@@ -1622,11 +1666,19 @@
             fcmTokenCliente: window.clientFcmToken || ''
         };
         try {
-            await window.initPushNotificationsEngine();
+            // Solicita a permissão diretamente no clique do usuário antes de qualquer await para o Android não bloquear
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(() => window.checkNotificationButtonUI()).catch(() => {});
+            }
+            window.initPushNotificationsEngine();
             const isPickup = (window.selectedDeliveryIdx === -1 || deliv === 'Retirar na Loja');
             const isPix = payStr.toUpperCase().includes('PIX');
             const docRef = await addDoc(collection(db, "pedidos"), newOrder);
             const createdOrder = { id: docRef.id, ...newOrder };
+
+            // Registra imediatamente o status inicial para que a mudança para "Preparando" dispare notificação na hora
+            window.prevOrderStatusMap[docRef.id] = 'Novo';
+            window.prevStoreChatCounts[docRef.id] = 0;
 
             window.cart = []; window.appliedCoupon = null; window.updateCartFloatingBar(); window.closeCartModal();
             window.showToast("🎉 Pedido enviado com sucesso!");
@@ -2097,37 +2149,49 @@
     window.listenToMyOrders = (email) => {
         if (_unsubscribeOrders) { _unsubscribeOrders(); _unsubscribeOrders = null; }
         if (!email) { window.myOrders = []; window.renderClientOrders(); window.updateUnreadChatBadgesUI(); return; }
-        const q = query(collection(db, "pedidos"), where("emailCliente", "==", email.toLowerCase()));
-        _unsubscribeOrders = onSnapshot(q, (snap) => {
+        const cleanEmail = String(email).trim().toLowerCase();
+
+        // Escuta a coleção de pedidos filtrando pelo e-mail de forma resiliente (case-insensitive)
+        _unsubscribeOrders = onSnapshot(collection(db, "pedidos"), (snap) => {
             window.myOrders = [];
-            snap.forEach(d => window.myOrders.push({ id: d.id, ...d.data() }));
+            snap.forEach(d => {
+                const data = d.data();
+                if (!data.isUserProfileDoc && !d.id.startsWith('user_profile_')) {
+                    if (String(data.emailCliente || '').trim().toLowerCase() === cleanEmail) {
+                        window.myOrders.push({ id: d.id, ...data });
+                    }
+                }
+            });
+
             window.myOrders.forEach(o => {
                 const isOrderActive = !window.isOrderDone(o.status) && o.status !== 'Cancelado';
-                const cnt = window.getStoreMessagesCount(o), prev = window.prevStoreChatCounts[o.id];
+                const cnt = window.getStoreMessagesCount(o);
+                const prev = window.prevStoreChatCounts[o.id];
                 const prevStatus = window.prevOrderStatusMap[o.id];
                 const lastStoreMsg = Array.isArray(o.chat) ? [...o.chat].reverse().find(m => m.sender === 'loja') : null;
 
-                // Notificação estilo WhatsApp quando chega nova mensagem da loja
+                // 1. Notificação quando chega nova mensagem da loja no chat
                 if (window.activeChatOrderId === o.id && el('modal-chat').style.display === 'flex') {
                     if (!isOrderActive) {
                         window.closeClientChat();
                     } else {
                         localStorage.setItem('juaba_seen_chat_' + o.id, String(cnt));
                     }
-                } else if (isOrderActive && window.initialOrdersLoadDone && prev !== undefined && cnt > prev) {
+                } else if (isOrderActive && prev !== undefined && cnt > prev) {
                     const msgPreview = lastStoreMsg?.text || 'Nova mensagem recebida no seu pedido!';
                     window.showToast(`💬 ${o.nomeLoja || 'Loja'}: ${msgPreview}`);
                     window.triggerNativeSystemNotification(`💬 ${o.nomeLoja || 'Restaurante'}`, msgPreview, o.id);
                 }
 
-                // Notificação estilo WhatsApp/iFood quando o status do pedido muda
-                if (window.initialOrdersLoadDone && prevStatus && prevStatus !== o.status) {
-                    let statusTitle = `🛵 Atualização — ${o.nomeLoja || 'Pedido'}`;
-                    let statusBody = `O status do seu pedido #${o.id.substring(0,6).toUpperCase()} mudou para: ${o.status}`;
+                // 2. Notificação quando o status do pedido muda (Ex: Novo -> Preparando -> Entrega -> Concluido)
+                if (prevStatus !== undefined && prevStatus !== o.status) {
+                    let statusTitle = `🛵 ${o.nomeLoja || 'JuabaDelivery'} — Pedido #${o.id.substring(0,6).toUpperCase()}`;
+                    let statusBody = `O status do seu pedido mudou para: ${o.status}`;
                     if (o.status === 'Preparando') statusBody = `🍳 A loja aceitou seu pedido e já está preparando!`;
                     else if (o.status === 'Entrega') statusBody = `🛵 Seu pedido saiu para entrega! Prepare-se para receber.`;
-                    else if (window.isOrderDone(o.status)) statusBody = `✅ Pedido concluído! Bom apetite!`;
+                    else if (window.isOrderDone(o.status)) statusBody = `✅ Pedido entregue e concluído! Bom apetite!`;
                     else if (o.status === 'Cancelado') statusBody = `❌ Pedido cancelado: ${o.motivoCancelamento || 'Verifique os detalhes no app.'}`;
+                    
                     window.showToast(statusBody);
                     window.triggerNativeSystemNotification(statusTitle, statusBody, o.id);
                 }
@@ -2135,78 +2199,18 @@
                 window.prevStoreChatCounts[o.id] = cnt;
                 window.prevOrderStatusMap[o.id] = o.status;
             });
+
             window.initialOrdersLoadDone = true;
-            window.updateUnreadChatBadgesUI(); window.renderClientOrders();
+            try { localStorage.setItem('juaba_cache_orders_' + cleanEmail, JSON.stringify(window.myOrders)); } catch (e) {}
+
+            window.updateUnreadChatBadgesUI();
+            window.renderClientOrders();
             if (window.activeTrackOrderId && el('modal-track-order').style.display === 'flex') {
-                const f = window.myOrders.find(x => x.id === window.activeTrackOrderId); if (f) window.openTrackModal(f.id, f);
+                const f = window.myOrders.find(x => x.id === window.activeTrackOrderId);
+                if (f) window.openTrackModal(f.id, f);
             }
             if (window.activeChatOrderId) window.renderClientChatMessages();
-        }, () => {});
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-        if (window.isRegisteringClient) return;
-        if (user) {
-            window.currentClient = user;
-            el('tab-pedidos').style.display = 'flex'; el('dnav-pedidos').style.display = 'inline-block';
-            el('profile-logged-out').style.display = 'none'; el('profile-logged-in').style.display = 'block';
-            if (!window.isRegisteringClient) await window.loadClientProfileEverywhere(user);
-            window.updateClientHeaderUI(); window.renderSavedAddresses(); window.syncCartDeliveryDisplay();
-            window.listenToMyOrders(user.email);
-            window.initPushNotificationsEngine();
-        } else {
-            window.currentClient = null;
-            el('tab-pedidos').style.display = 'none'; el('dnav-pedidos').style.display = 'none';
-            el('profile-logged-out').style.display = 'block'; el('profile-logged-in').style.display = 'none';
-            if (el('desktop-user-btn')) el('desktop-user-btn').innerText = '👤 Entrar';
-            window.listenToMyOrders(null);
-        }
-    });
-
-    onSnapshot(collection(db, "lojas"), (snap) => {
-        window.allStores = []; let sysBlocked = {}, sysOverrides = {}, sysBanners = null, latestMs = -1;
-        snap.forEach(d => {
-            const data = d.data();
-            if (d.id === '_marketplace_config_' || data.isSystemConfig === true) {
-                if ((data.updatedAtMs || 0) >= latestMs) {
-                    latestMs = data.updatedAtMs || 0;
-                    if (data.billingSystemEnabled !== undefined) window.globalBillingEnabled = Boolean(data.billingSystemEnabled);
-                    if (data.blockedStores) sysBlocked = data.blockedStores;
-                    if (data.storeOverrides) sysOverrides = data.storeOverrides;
-                    if (Array.isArray(data.banners) && data.banners.length) sysBanners = data.banners;
-                }
-            }
+        }, (err) => {
+            console.error("Erro no listener de pedidos:", err);
         });
-        window.renderBanners(sysBanners || window.defaultBanners);
-        snap.forEach(d => {
-            const data = d.data();
-            if (d.id !== '_marketplace_config_' && !data.isSystemConfig) {
-                window.allStores.push({ id: d.id, ...data, ...(sysOverrides[d.id] || {}), bloqueada: sysBlocked[d.id] ?? Boolean(data.bloqueada) });
-            }
-        });
-        try { localStorage.setItem('juaba_cache_stores', JSON.stringify(window.allStores)); } catch (e) {}
-        window.renderHomeView(); if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
-    }, () => {});
-
-    onSnapshot(collection(db, "produtos"), (snap) => {
-        window.allProducts = []; snap.forEach(d => window.allProducts.push({ id: d.id, ...d.data() }));
-        try { localStorage.setItem('juaba_cache_products', JSON.stringify(window.allProducts)); } catch (e) {}
-        window.renderHomeView(); if (window.activeStoreId) window.renderStoreMenu(window.activeStoreId);
-    }, () => {});
-
-    onSnapshot(collection(db, "cupons"), (snap) => {
-        _internalCoupons = []; window.storesWithCoupons.clear();
-        snap.forEach(d => { const data = d.data(); _internalCoupons.push({ id: d.id, ...data }); if (data.lojaId) window.storesWithCoupons.add(data.lojaId); });
-        window.renderHomeView();
-    }, () => {});
-
-    window.openForgotPasswordModal = () => { el('forgot-pass-email').value = el('cli-auth-email').value.trim(); el('modal-forgot-password').style.display = 'flex'; };
-    window.closeForgotPasswordModal = () => { el('modal-forgot-password').style.display = 'none'; };
-    window.sendClientPasswordReset = async () => {
-        const email = el('forgot-pass-email').value.trim(); if (!email) { window.showToast("Digite seu e-mail!"); return; }
-        try { await sendPasswordResetEmail(auth, email); window.closeForgotPasswordModal(); window.showToast("✅ Link enviado para seu e-mail!"); }
-        catch (e) { window.showToast("⚠️ E-mail não encontrado."); }
     };
-</script>
-</body>
-</html>
