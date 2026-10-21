@@ -925,29 +925,53 @@
     window.initialOrdersLoadDone = false;
     window.clientFcmToken = localStorage.getItem('juaba_fcm_token') || '';
 
-    // Mantém o processo e o Service Worker ativos em 2º plano no Android/iOS quando há pedido em andamento
-    window.keepAliveAudioCtx = null;
+    // Gera um arquivo WAV silencioso real de 1 segundo para impedir que o Android congele o PWA quando minimizado/fechado
+    window.createSilentWavDataUri = () => {
+        const sampleRate = 8000, numSamples = 8000;
+        const buffer = new ArrayBuffer(44 + numSamples * 2);
+        const view = new DataView(buffer);
+        const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+        writeStr(0, 'RIFF'); view.setUint32(4, 36 + numSamples * 2, true); writeStr(8, 'WAVE');
+        writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+        writeStr(36, 'data'); view.setUint32(40, numSamples * 2, true);
+        const bytes = new Uint8Array(buffer);
+        let bin = '';
+        for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+        return 'data:audio/wav;base64,' + btoa(bin);
+    };
+
+    window.keepAliveAudioEl = null;
     window.enableBackgroundKeepAlive = () => {
         try {
             if (navigator.locks && navigator.locks.request) {
                 navigator.locks.request('juaba_client_bg_lock', { mode: 'shared' }, () => new Promise(() => {}));
             }
-            if (!window.keepAliveAudioCtx) {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) {
-                    const ctx = new AudioCtx();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    gain.gain.value = 0.00001; // Inaudível, impede o Android/iOS de congelar o PWA em 2º plano
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start();
-                    window.keepAliveAudioCtx = ctx;
-                }
-            } else if (window.keepAliveAudioCtx.state === 'suspended') {
-                window.keepAliveAudioCtx.resume().catch(() => {});
+            if (!window.keepAliveAudioEl) {
+                const audio = document.createElement('audio');
+                audio.src = window.createSilentWavDataUri();
+                audio.loop = true;
+                audio.volume = 0.01;
+                audio.setAttribute('playsinline', '');
+                audio.style.display = 'none';
+                document.body.appendChild(audio);
+                window.keepAliveAudioEl = audio;
+            }
+            if (window.keepAliveAudioEl.paused) {
+                window.keepAliveAudioEl.play().catch(() => {});
             }
         } catch (e) {}
+    };
+
+    window.buildClientOrdersSnapshotForSw = () => {
+        const snap = {};
+        (window.myOrders || []).forEach(o => {
+            snap[o.id] = {
+                status: o.status || 'Novo',
+                storeMsgCount: window.getStoreMessagesCount(o)
+            };
+        });
+        return snap;
     };
 
     window.syncWatcherWithServiceWorker = () => {
@@ -955,13 +979,15 @@
             const payload = {
                 type: 'JUABA_WATCH_CLIENT',
                 projectId: firebaseConfig.projectId,
-                emailCliente: window.currentClient?.email ? window.currentClient.email.toLowerCase() : ''
+                emailCliente: window.currentClient?.email ? window.currentClient.email.toLowerCase() : '',
+                ordersSnapshot: window.buildClientOrdersSnapshotForSw()
             };
             if (navigator.serviceWorker?.controller) {
                 navigator.serviceWorker.controller.postMessage(payload);
             }
             navigator.serviceWorker?.ready.then(reg => {
                 if (reg?.active) reg.active.postMessage(payload);
+                if (reg?.sync) reg.sync.register('juaba-bg-keepalive').catch(() => {});
                 if (reg?.periodicSync) {
                     reg.periodicSync.register('juaba-check-orders', { minInterval: 60000 }).catch(() => {});
                 }
@@ -969,10 +995,33 @@
         } catch (e) {}
     };
 
+    // Quando o cliente minimiza ou fecha o app, avisa imediatamente o Service Worker para assumir o monitoramento
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            window.syncWatcherWithServiceWorker();
+            if (navigator.serviceWorker?.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'JUABA_APP_BACKGROUNDED' });
+            }
+        } else {
+            window.enableBackgroundKeepAlive();
+        }
+    });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            const d = event.data || {};
+            if (d.type === 'JUABA_SW_SYNC_CLIENT' && d.docId) {
+                if (d.status) window.prevOrderStatusMap[d.docId] = d.status;
+                if (d.storeMsgCount !== undefined) window.prevStoreChatCounts[d.docId] = d.storeMsgCount;
+            }
+        });
+    }
+
     // Solicita permissão de notificação no primeiro toque do usuário (exigência do Android/iOS)
     window.bindFirstGestureNotificationPermission = () => {
         const handler = async () => {
             window.enableBackgroundKeepAlive();
+            window.syncWatcherWithServiceWorker();
             if ('Notification' in window && Notification.permission === 'default') {
                 try {
                     const perm = await Notification.requestPermission();
@@ -1021,7 +1070,7 @@
         } catch (e) {}
     };
 
-    window.triggerNativeSystemNotification = async (title, body, orderId = null) => {
+    window.triggerNativeSystemNotification = async (title, body, orderId = null, customTag = null) => {
         window.playClientNotificationSound();
         if (navigator.vibrate) { try { navigator.vibrate([250, 100, 250, 100, 350]); } catch (e) {} }
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -1030,7 +1079,7 @@
             body: String(body || ''),
             icon: iconUrl,
             badge: iconUrl,
-            tag: orderId ? `juaba_ord_${orderId}_${Date.now()}` : `juaba_notif_${Date.now()}`,
+            tag: customTag || (orderId ? `juaba_ord_${orderId}_${Date.now()}` : `juaba_notif_${Date.now()}`),
             renotify: true,
             requireInteraction: true,
             vibrate: [250, 100, 250, 100, 350],
@@ -2225,7 +2274,7 @@
                 } else if (isOrderActive && window.initialOrdersLoadDone && prev !== undefined && cnt > prev) {
                     const msgPreview = lastStoreMsg?.text || 'Nova mensagem recebida no seu pedido!';
                     window.showToast(`💬 ${o.nomeLoja || 'Loja'}: ${msgPreview}`);
-                    window.triggerNativeSystemNotification(`💬 ${o.nomeLoja || 'Restaurante'}`, msgPreview, o.id);
+                    window.triggerNativeSystemNotification(`💬 ${o.nomeLoja || 'Restaurante'}`, msgPreview, o.id, `juaba_chat_${o.id}_${cnt}`);
                 }
 
                 // Notificação estilo WhatsApp/iFood quando o status do pedido muda
@@ -2237,13 +2286,14 @@
                     else if (window.isOrderDone(o.status)) statusBody = `✅ Pedido concluído! Bom apetite!`;
                     else if (o.status === 'Cancelado') statusBody = `❌ Pedido cancelado: ${o.motivoCancelamento || 'Verifique os detalhes no app.'}`;
                     window.showToast(statusBody);
-                    window.triggerNativeSystemNotification(statusTitle, statusBody, o.id);
+                    window.triggerNativeSystemNotification(statusTitle, statusBody, o.id, `juaba_status_${o.id}_${o.status}`);
                 }
 
                 window.prevStoreChatCounts[o.id] = cnt;
                 window.prevOrderStatusMap[o.id] = o.status;
             });
             window.initialOrdersLoadDone = true;
+            window.syncWatcherWithServiceWorker();
             window.updateUnreadChatBadgesUI(); window.renderClientOrders();
             if (window.activeTrackOrderId && el('modal-track-order').style.display === 'flex') {
                 const f = window.myOrders.find(x => x.id === window.activeTrackOrderId); if (f) window.openTrackModal(f.id, f);
@@ -2261,6 +2311,7 @@
             if (!window.isRegisteringClient) await window.loadClientProfileEverywhere(user);
             window.updateClientHeaderUI(); window.renderSavedAddresses(); window.syncCartDeliveryDisplay();
             window.listenToMyOrders(user.email);
+            window.syncWatcherWithServiceWorker();
             window.initPushNotificationsEngine();
         } else {
             window.currentClient = null;
