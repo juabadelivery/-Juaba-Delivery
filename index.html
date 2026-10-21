@@ -1070,46 +1070,6 @@
         } catch (e) {}
     };
 
-    window.notifyStoreOwnerNewOrderAuto = async (loja, orderId, orderData) => {
-        if (!loja) return;
-        const rawWpp = String(loja.whatsapp || '').replace(/\D/g, '');
-        const phone = rawWpp ? (rawWpp.startsWith('55') ? rawWpp : '55' + rawWpp) : '';
-        const shortId = String(orderId || 'JUABA').substring(0, 6).toUpperCase();
-        const textoAlerta = `🔔 *NOVO PEDIDO NO PAINEL #${shortId}*\n👤 *Cliente:* ${orderData.cliente}\n📱 *Fone:* ${orderData.telefone}\n🍔 *Itens:* ${orderData.itens}\n📍 *Entrega:* ${orderData.endereco}\n💳 *Pagto:* ${orderData.pagamento}\n💰 *Total:* ${orderData.total}\n\n👉 _Abra o Painel do Lojista para aceitar o pedido!_`;
-
-        const apiKey = String(loja.whatsappApiKey || loja.callmebotKey || '').trim();
-        if (phone && apiKey) {
-            const callMeUrl = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(textoAlerta)}&apikey=${encodeURIComponent(apiKey)}`;
-            fetch(callMeUrl, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-        }
-
-        try {
-            const payload = {
-                acao: 'notificar_novo_pedido_loja',
-                lojaId: loja.id || '',
-                nomeLoja: loja.nome_loja || 'Loja',
-                whatsappLoja: phone,
-                whatsappApiKey: apiKey,
-                emailLoja: loja.email_loja || '',
-                pedidoId: shortId,
-                cliente: orderData.cliente,
-                telefoneCliente: orderData.telefone,
-                endereco: orderData.endereco,
-                itens: orderData.itens,
-                pagamento: orderData.pagamento,
-                total: orderData.total,
-                mensagem: textoAlerta
-            };
-            const sep = GOOGLE_SCRIPT_URL.includes('?') ? '&' : '?';
-            await fetch(GOOGLE_SCRIPT_URL + sep + new URLSearchParams(payload).toString(), {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            });
-        } catch (e) {}
-    };
-
     window.togglePasswordVisibility = (inputId, btnEl) => {
         const inp = el(inputId); if (!inp) return;
         const isPass = inp.type === 'password';
@@ -1771,9 +1731,6 @@
                 localStorage.setItem('juaba_last_status_' + docRef.id, 'Novo');
                 localStorage.setItem('juaba_seen_chat_' + docRef.id, '0');
             } catch (e) {}
-
-            // Envia notificação automática em 2º plano para o WhatsApp do Lojista (sem tirar o cliente do app)
-            window.notifyStoreOwnerNewOrderAuto(loja, docRef.id, createdOrder);
 
             window.cart = []; window.appliedCoupon = null; window.updateCartFloatingBar(); window.closeCartModal();
             window.showToast("🎉 Pedido enviado com sucesso!");
